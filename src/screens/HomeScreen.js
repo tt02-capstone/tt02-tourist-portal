@@ -17,6 +17,16 @@ const HomeScreen = ({ navigation }) => {
           })
         }
       />
+      <Button
+        text = "Test Checkout"
+        mode ="contained"
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'CheckoutScreen' }],
+          })
+        }
+      />
     </Background>
   )
 }

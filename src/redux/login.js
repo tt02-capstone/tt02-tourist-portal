@@ -1,34 +1,22 @@
 import axios from "axios";
-import Toast from "react-native-toast-message";
 
 const HOST = '172.18.28.167'
 const baseURL = `http://${HOST}:8080/tourist`
 
 export async function loginUser(email,password) {
-    await axios.post(`${baseURL}/login/${email.value}/${password.value}`)
-    .then((response) => {
+    try {
+        const response = await axios.post(`${baseURL}/login/${email.value}/${password.value}`)
         console.log(response.data.httpStatusCode)
         if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-            console.log('error')
-            Toast.show({
-                type: 'error',
-                text1: response.data.errorMessage
-            })
-
-            return false;
+            console.log('error',response.data)
+            return {status:false, data:response.data};
 
         } else {
-            Toast.show({
-                type: 'success',
-                text1: 'Login Successful'
-            })
-
             console.log('success', response.data)
-            return true;
+            return {status:true, data:response.data};
         }
-    })
-    .catch((error) => {
+    }
+    catch(error){
         console.error("Login Redux Error : ", error);
-    });
-    
+    };
 }

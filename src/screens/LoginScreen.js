@@ -14,7 +14,7 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
 
-  const onLoginPressed = () => {
+  const onLoginPressed = async () => {
     const emailError = InputValidator.emailValidator(email.value)
     const passwordError = InputValidator.passwordValidator(password.value)
 
@@ -25,14 +25,24 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      let touristLogin = loginUser(email,password)
-      console.log(touristLogin)
-      if (touristLogin) {
+      let touristLogin = await loginUser(email,password)
+      if (touristLogin.status) {
         navigation.reset({
           index: 0,
           routes: [{ name: 'HomeScreen' }],
         });
-      } 
+
+          Toast.show({
+            type: 'success',
+            text1: 'Login Successful'
+        });
+
+      } else {
+          Toast.show({
+            type: 'error',
+            text1: touristLogin.data.errorMessage
+        })
+      }
     } catch (error) {
       alert('An error hass occurred' + error)
     }

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST = ''
+const HOST = '192.168.0.207'
 
 const baseURL = `http://${HOST}:8080/payment`
 console.log(baseURL)
@@ -25,15 +25,15 @@ export async function createStripeCustomer(tourist_email, tourist_name) {
 
 export async function getPaymentMethods(tourist_email) {
     try {
-        const response = await axios.get(`${baseURL}/getPaymentMethods`)
+        const response = await axios.get(`${baseURL}/getPaymentMethods/${tourist_email}`)
         console.log(response.data.httpStatusCode)
         if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
             console.log('error',response.data)
-            return {status:false, data:response.data};
+            return JSON.parse(response.data);
 
         } else {
             console.log('success', response.data)
-            return {status:true, data:response.data};
+            return response.data;
         }
     }
     catch(error){
@@ -41,9 +41,11 @@ export async function getPaymentMethods(tourist_email) {
     };
 }
 
-export async function addPaymentMethod(tourist_email, stripe_payment_id) {
+
+export async function addPaymentMethod(tourist_email, payment_method_id) {
     try {
-        const response = await axios.post(`${baseURL}/addPaymentMethod`)
+
+        const response = await axios.post(`${baseURL}/addPaymentMethod/${tourist_email}/${payment_method_id}`)
         console.log(response.data.httpStatusCode)
         if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
             console.log('error',response.data)

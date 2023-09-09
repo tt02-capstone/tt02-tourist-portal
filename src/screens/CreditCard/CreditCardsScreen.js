@@ -1,81 +1,74 @@
 import React, { useEffect, useState } from 'react';
 import Background from '../../components/Background';
 import Header from '../../components/Header'
-import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { CardForm, useStripe } from '@stripe/stripe-react-native';
+import { getPaymentMethods } from '../../redux/creditCard'
 
 const CreditCardsScreen = ({ navigation }) => {
   const [cards, setCards] = useState([]); // Your state to keep track of user's cards
-  const { confirmPayment, createPaymentMethod, listPaymentMethods } = useStripe();
+  
 
-  // Load saved cards
-  /* useEffect(() => {
-    const fetchSavedCards = async () => {
-      // Replace this with an API call to your backend to get Stripe Customer ID
-      const customerId = 'your-customer-id-here';
-      
-      // Fetch saved cards from Stripe
-      const paymentMethods = await listPaymentMethods({
-        customerId,
-        type: 'card',
-      });
-
-      if (!paymentMethods.error) {
-        setCards(paymentMethods.data);
+  useEffect(() => {
+    async function onLoad(tourist_email) {
+      try {
+        const paymentMethods = await getPaymentMethods(tourist_email);  
+        
+        console.log(paymentMethods)
+        const extractedDetails = paymentMethods.map(paymentMethod => {
+          const { card } = paymentMethod;
+          return {
+            id: paymentMethod.id,
+            last4: card.last4,
+            brand: card.brand,
+            expMonth: card.expMonth,
+            expYear: card.expYear,
+            
+          };
+        });
+        setCards(extractedDetails)
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
       }
-    };
-    
-    fetchSavedCards();
-  }, []); */
-
-  /* const handleAddCard = async () => {
-    const { paymentMethod, error } = await createPaymentMethod({
-      type: 'Card',
-    });
-
-    if (error) {
-      // Handle error
-      console.log(error);
-    } else if (paymentMethod) {
-      // Save new card (you may want to call your API to associate it with the user)
-      setCards([...cards, paymentMethod]);
     }
-  }; */
+    const tourist_email = "asd@gmail.com"; //get from local storage
+    onLoad(tourist_email);
+  }, []);
+  
 
+  /* const tempCards = [
+    { id: 'card_1abc', last4: '1234', brand: 'Visa' },
+    { id: 'card_2def', last4: '5678', brand: 'MasterCard' },
+    // ...
+  ];
 
-
-  /* return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Credit Cards</Text>
-      <FlatList
-        data={cards}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text>{item.card.brand} **** **** **** {item.card.last4}</Text>
-            <Text>Exp: {item.card.exp_month}/{item.card.exp_year}</Text>
-          </View>
-        )}
-      />
-      <View style={styles.addButton}>
-        <Button title="Add New Card" onPress={handleAddCard} />
-      </View>
-    </View>
-  ); */
-
+  setCards(tempCards) */
+  
   return (
     <Background>
         <View >
-        <Button
-        title = "Add New Card"
-        mode ="contained"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'AddCreditCardScreen' }],
-          })
-        }
-      />
+        <FlatList
+          data={cards}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.cardContainer}>
+              <Text style={styles.cardText}>
+                {`${item.brand} **** **** **** ${item.last4}`}
+              </Text>
+            </View>
+          )}
+        />
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'AddCreditCardScreen' }],
+            })
+          }
+        >
+          <Text style={styles.addButtonText}>Add New Card</Text>
+        </TouchableOpacity>
       </View>
     </Background>
     
@@ -83,24 +76,37 @@ const CreditCardsScreen = ({ navigation }) => {
   );
 };
 
-export default CreditCardsScreen;
-
-/* const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
-  title: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  card: {
+  cardContainer: {
+    color: '#D3D3D3',
+    borderColor: '#D3D3D3',  // You can use any color
+    borderWidth: 1,       // You can adjust the border width
+    borderRadius: 8,      // Rounded corners
     padding: 16,
-    marginBottom: 12,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    elevation: 1,   
+  },
+  cardText: {
+    fontSize: 16,
   },
   addButton: {
-    marginTop: 20,
+    backgroundColor: '#6200EE',
+    borderRadius: 8,
+    padding: 16,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    alignItems: 'center',
   },
-}); */
+  addButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+});
+
+export default CreditCardsScreen;
+
+

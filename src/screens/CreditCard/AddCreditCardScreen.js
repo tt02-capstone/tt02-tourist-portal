@@ -3,8 +3,13 @@ import { CardForm, useStripe } from '@stripe/stripe-react-native';
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 import Background from '../../components/Background'
 import Header from '../../components/Header'
+import { addPaymentMethod } from '../../redux/creditCard'
+import Toast from "react-native-toast-message";
+
+
 
 const AddCardScreen = ({ navigation }) => {
+  
   const { confirmPayment, createPaymentMethod } = useStripe();
   const [cardDetails, setCardDetails] = useState(null);
 
@@ -18,6 +23,23 @@ const AddCardScreen = ({ navigation }) => {
     } else if (paymentMethod) {
       // API call to associate paymentMethod.id with customer on your server
       console.log(paymentMethod.id)
+      const tourist_email = "hardcoded@gmail.com"
+      const result = await addPaymentMethod(tourist_email, paymentMethod.id); 
+      console.log(result.status)
+      if (result.status) {
+        console.log('checkmate')
+        Toast.show({
+          type: 'success',
+          text1: 'Successfully added card'
+      });
+        navigation.navigate('CreditCardsScreen');
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Unable to add card'
+      });
+      }
+
     }
   };
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { Text } from 'react-native-paper'
-import axios from 'axios'
 import Background from '../components/Background'
 import Header from '../components/Header'
 import Button from '../components/Button'
@@ -9,13 +8,14 @@ import TextInput from '../components/TextInput'
 import { theme } from '../core/theme'
 import Toast from "react-native-toast-message";
 import InputValidator from "../helpers/InputValidator";
-import {touristApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
-
+import { userLogin } from '../redux/userRedux';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
+
+  localStorage.removeItem("user");
 
   const onLoginPressed = async () => {
     const emailError = InputValidator.emailValidator(email.value)
@@ -27,36 +27,30 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await touristApi.post(`/login/${email.value}/${password.value}`)
-      if (
-        response.data.httpStatusCode === 400 ||
-        response.data.httpStatusCode === 404
-      ) {
+      const response = await userLogin(email.value, password.value);
+      if (response.status) {
+        console.log('success', response.data)
+        localStorage.setItem("user", JSON.stringify(response.data));
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'HomeScreen' }],
+        })
+
+      } else {
         console.log('error')
         Toast.show({
           type: 'error',
           text1: response.data.errorMessage
         })
-      } else {
-        Toast.show({
-          type: 'success',
-          text1: 'Login Successful'
-        })
-
-        console.log('success', response.data)
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'HomeScreen' }],
-        })
       }
     } catch (error) {
-      alert('An error hass occurred' + error)
+      alert('Error: ', error)
     }
   }
 
   return (
     <Background>
-      <Header>Travel Planning App</Header>
+      <Header>WithinSG</Header>
       <TextInput
         label="Email"
         value={email.value}

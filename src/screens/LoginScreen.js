@@ -29,10 +29,12 @@ const LoginScreen = ({ navigation }) => {
       if (touristLogin.status) {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'HomeScreen' }],
+          routes: [{ name: 'HomeScreenWithDrawer' }],
         });
+        
+        // navigation.navigate('HomeScreen')
 
-          Toast.show({
+        Toast.show({
             type: 'success',
             text1: 'Login Successful'
         });
@@ -50,7 +52,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <Background>
-      <Header>Travel Planning App</Header>
+      <Header>WithinSG Travel Planning</Header>
       <TextInput
         label="Email"
         value={email.value}
@@ -70,7 +72,13 @@ const LoginScreen = ({ navigation }) => {
           text = "Forgot your password?"
           viewStyle={styles.forgotPassword}
           textStyle={styles.forgot}
-          onPress={() => console.log('ResetPasswordScreen')}
+          onPress={() => 
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{ name: 'ResetPasswordScreen' }],
+            // })
+            navigation.navigate('ResetPasswordScreen')
+          }
       />
       <Button text = "Login" mode="contained" onPress={onLoginPressed}/>
       <CustomButton

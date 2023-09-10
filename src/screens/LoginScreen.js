@@ -12,14 +12,13 @@ import InputValidator from "../helpers/InputValidator";
 import {touristApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
 
-
-const LoginScreen = ({ navigation }) => {
+export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
 
   const onLoginPressed = async () => {
-    const emailError = InputValidator.emailValidator(email.value)
-    const passwordError = InputValidator.passwordValidator(password.value)
+    const emailError = InputValidator.email(email.value)
+    const passwordError = InputValidator.password(password.value)
     if (emailError || passwordError) {
       setEmail({ ...email, error: emailError })
       setPassword({ ...password, error: passwordError })
@@ -76,14 +75,14 @@ const LoginScreen = ({ navigation }) => {
           text = "Forgot your password?"
           viewStyle={styles.forgotPassword}
           textStyle={styles.forgot}
-          onPress={() => console.log('ResetPasswordScreen')}
+          onPress={() => navigation.navigate('ForgotPasswordScreen')}
       />
       <Button text = "Login" mode="contained" onPress={onLoginPressed}/>
       <CustomButton
           text = "Sign up"
           viewStyle={styles.row}
           textStyle={styles.link}
-          onPress={() => console.log('RegisterScreen')}
+          onPress={() =>navigation.navigate('SignUpScreen')}
       />
     </Background>
   )
@@ -109,4 +108,3 @@ const styles = StyleSheet.create({
   },
 })
 
-export default LoginScreen

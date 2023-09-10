@@ -3,7 +3,7 @@ import Background from '../components/Background'
 import Header from '../components/Header'
 import Button from '../components/Button'
 
-const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ navigation }) => {
   return (
     <Background>
       <Header>Home Screen</Header>
@@ -20,4 +20,3 @@ const HomeScreen = ({ navigation }) => {
     </Background>
   )
 }
-export default HomeScreen

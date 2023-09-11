@@ -1,62 +1,63 @@
-import React, { useState } from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
-import {Paragraph, Text} from 'react-native-paper'
+import React, {useContext, useState} from 'react'
+import {Pressable, StyleSheet, TextComponent, View} from 'react-native'
+import {List, Paragraph, RadioButton, Text} from 'react-native-paper'
 import axios from 'axios'
 import Background from '../components/Background'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import TextInput from '../components/TextInput'
-import { theme } from '../core/theme'
+import {theme} from '../core/theme'
 import Toast from "react-native-toast-message";
 import InputValidator from "../helpers/InputValidator";
 import {touristApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
-import { ProgressBar, MD3Colors } from 'react-native-paper';
+import {ProgressBar, MD3Colors} from 'react-native-paper';
+import {FormContext, FormProvider} from '../helpers/FormProvider'
+import {validate} from "@babel/core/lib/config/validation/options";
 
-export const SignUpScreen = ({ navigation }) => {
-  const [name, setName] = useState({ value: '', error: '' })
-  const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
-  const [progress, setProgress] = React.useState(0.3);
-  const onSignUpPressed = () => {
+export const SignUpScreen = ({navigation}) => {
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
-    const nameError = InputValidator.name(name.value)
-    const emailError = InputValidator.email(email.value)
-    const passwordError = InputValidator.password(password.value)
-    if (emailError || passwordError || nameError) {
-      setName({ ...name, error: nameError })
-      setEmail({ ...email, error: emailError })
-      setPassword({ ...password, error: passwordError })
-      return
+    const [isLocal, setIsLocal] = useState('');
+    const [progress, setProgress] = React.useState(0.5);
+    const [page, setPage] = React.useState(0);
+    const onSignUpPressed = () => {
+
+        const nameError = InputValidator.name(name)
+        const emailError = InputValidator.email(email)
+        const passwordError = InputValidator.password(password)
+        if (emailError || passwordError || nameError) {
+            return
+        }
+
+        // navigation.reset({
+        //   index: 0,
+        //   routes: [{ name: 'HomeScreen' }],
+        // })
     }
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'HomeScreen' }],
-    })
-  }
-
-  return (
-      <Background>
-          <View>
-              <Paragraph>Default ProgressBar </Paragraph>
-              <ProgressBar progress={progress} visible={true} />
-          </View>
+    return (<Background>
+        <View>
+            <Paragraph>Default ProgressBar </Paragraph>
+            <ProgressBar progress={progress} visible={true}/>
+        </View>
         <TextInput
             label="Name"
             returnKeyType="next"
-            value={name.value}
-            onChangeText={(text) => setName({ value: text, error: '' })}
-            error={!!name.error}
-            errorText={name.error}
+            value={name}
+            onChangeText={(text) => setName(text)}
+            // error={!!name.error}
+            errorText={InputValidator.name(name)}
         />
         <TextInput
             label="Email"
             returnKeyType="next"
-            value={email.value}
-            onChangeText={(text) => setEmail({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            // error={!!email.error}
+            errorText={InputValidator.email(email)}
             autoCapitalize="none"
             autoCompleteType="email"
             textContentType="emailAddress"
@@ -65,35 +66,41 @@ export const SignUpScreen = ({ navigation }) => {
         <TextInput
             label="Password"
             returnKeyType="done"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!password.error}
-            errorText={password.error}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            // error={!!password.error}
+            errorText={InputValidator.password(password)}
             secureTextEntry
         />
-        <Button
-            text = "Sign Up"
-            mode="contained"
-            onPress={onSignUpPressed}
-            style={{ marginTop: 24 }}
-        />
-          <View style={styles.row}>
-          <Text>Already have an account? </Text>
-          <Pressable onPress={() => navigation.replace('LoginScreen')}>
-            <Text style={styles.link}>Login</Text>
-          </Pressable>
+        <Text>Are you a Singapore Citizen, PR or Long Term Pass Holder </Text>
+        <View style={{flexDirection: 'row', width: '100%'}}>
+            <RadioButton.Group
+                value={isLocal}
+                onValueChange={(value) => setIsLocal(value)}
+                style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}
+            >
+                <RadioButton.Item label="Yes" value="Yes"/>
+                <RadioButton.Item label="No" value="No"/>
+            </RadioButton.Group>
         </View>
-      </Background>
-  )
+        {page < 3 && (<Button
+            text={"Next"}
+            onPress={() => {
+                setPage(page + 1);
+            }}
+        />)}
+        {/*{page === 2 && isLocal === 'Yes' && (*/}
+
+
+        {/*)}*/}
+    </Background>)
+
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    marginTop: 4,
-  },
-  link: {
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-  },
+    row: {
+        flexDirection: 'row', marginTop: 4,
+    }, link: {
+        fontWeight: 'bold', color: theme.colors.primary,
+    },
 })

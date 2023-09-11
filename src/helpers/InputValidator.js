@@ -14,7 +14,7 @@ const name = (name) => {
     return ''
 }
 
-const password = (password) =>  {
+const password = (password) => {
     if (!password) {
         return "Password can't be empty.";
     }
@@ -22,4 +22,4 @@ const password = (password) =>  {
     return password.length < 5 ? 'Password must be at least 5 characters long.' : '';
 }
 
-export default  { password, email, name }
+export default {password, email, name}

@@ -55,7 +55,7 @@ export const LoginScreen = ({navigation}) => {
 
     return (
         <Background>
-            <Header>Travel Planning App</Header>
+            <Header>WithinSG</Header>
             <TextInput
                 label="Email"
                 value={email.value}

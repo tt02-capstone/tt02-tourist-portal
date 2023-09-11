@@ -7,3 +7,6 @@ export const touristApi = axios.create({
     baseURL: HOST_WITH_PORT + '/tourist'
 })
 
+export const localApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/local'
+})

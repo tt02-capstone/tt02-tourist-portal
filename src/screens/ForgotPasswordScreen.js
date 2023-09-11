@@ -5,7 +5,8 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import InputValidator from '../helpers/InputValidator'
 import Toast from "react-native-toast-message";
-import {touristApi} from "../helpers/api";
+import {localApi, touristApi} from "../helpers/api";
+import {ActivityIndicator} from "react-native-paper";
 
 export const ForgotPasswordScreen = ({navigation}) => {
     const [email, setEmail] = useState({value: '', error: ''})
@@ -19,7 +20,7 @@ export const ForgotPasswordScreen = ({navigation}) => {
 
         setLoading(true);
         try {
-            const response = touristApi.post(`/passwordResetStageOne/${email}`)
+            const response = localApi.post(`/passwordResetStageOne/${email.value}`)
             console.log(response);
             if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
                 Toast.show({
@@ -44,33 +45,32 @@ export const ForgotPasswordScreen = ({navigation}) => {
         } catch (error) {
             console.error("Axios Error : ", error)
         }
-        ;
-
         // navigation.navigate('LoginScreen')
     }
 
     return (
         <Background>
-            <Header>Have you forgotten your WithinSG account password?</Header>
-            <TextInput
-                label="E-mail address"
-                returnKeyType="done"
-                value={email.value}
-                onChangeText={(text) => setEmail({value: text, error: ''})}
-                error={!!email.error}
-                errorText={email.error}
-                autoCapitalize="none"
-                autoCompleteType="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-                description="You will receive email with password reset link."
-            />
-            <Button
-                text="Send Instructions"
-                // viewStyle={{ marginTop: 16 }}
-                mode="contained"
-                onPress={sendForgotPasswordEmail}
-            />
+            <ActivityIndicator size="large" animating={loading}/>
+                <Header>Have you forgotten your WithinSG account password?</Header>
+                <TextInput
+                    label="E-mail address"
+                    returnKeyType="done"
+                    value={email.value}
+                    onChangeText={(text) => setEmail({value: text, error: ''})}
+                    error={!!email.error}
+                    errorText={email.error}
+                    autoCapitalize="none"
+                    autoCompleteType="email"
+                    textContentType="emailAddress"
+                    keyboardType="email-address"
+                    description="You will receive email with password reset link."
+                />
+                <Button
+                    text="Send Instructions"
+                    // viewStyle={{ marginTop: 16 }}
+                    mode="contained"
+                    onPress={sendForgotPasswordEmail}
+                />
         </Background>
     )
 }

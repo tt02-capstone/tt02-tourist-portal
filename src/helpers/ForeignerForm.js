@@ -6,23 +6,22 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { CallingCodePicker } from '@digieggs/rn-country-code-picker';
 // import RNDateTimePicker from "@react-native-community/datetimepicker";
 
-export const LocalForm = ({formData, setFormData}) => {
+export const ForeignerForm = ({formData, setFormData}) => {
 
     return (
         <View>
             <TextInput
-                label="NRIC Number"
+                label="Passport Number"
                 returnKeyType="next"
-                value={formData.nric}
-                onChangeText={(nric) => setFormData({...formData, nric })}
+                value={formData.passport}
+                onChangeText={(passport) => setFormData({...formData, passport })}
                 // error={!!email.error}
-                errorText={InputValidator.nric(formData.nric)}
+                errorText={InputValidator.passport(formData.passport)}
                 autoCapitalize="none"
                 autoCompleteType="passport"
                 textContentType="passport"
                 keyboardType="passport"
             />
-
             {/*<RNDateTimePicker*/}
             {/*    value={formData.dob}*/}
             {/*    is24Hour={true}*/}

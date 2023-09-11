@@ -7,7 +7,9 @@ import HomeScreen from "./src/screens/HomeScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import CreditCardsScreen from "./src/screens/CreditCard/CreditCardsScreen"
 import AddCreditCardScreen from './src/screens/CreditCard/AddCreditCardScreen';
+import CreditCardScreen from './src/screens/CreditCard/CreditCardScreen';
 import { initStripe } from '@stripe/stripe-react-native';
+
 
 initStripe({
   // API Key is test key, will be masked via GitHub Actions for deployment
@@ -23,6 +25,7 @@ export default function App() {
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login'}}/>
             <Stack.Screen name="CreditCardsScreen" component={CreditCardsScreen} options={{title: 'My Credit Cards'}}/>
             <Stack.Screen name="AddCreditCardScreen" component={AddCreditCardScreen} options={{title: 'Add Credit Card'}}/>
+            <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

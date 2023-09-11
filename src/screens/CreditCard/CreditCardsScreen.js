@@ -35,14 +35,6 @@ const CreditCardsScreen = ({ navigation }) => {
     onLoad(tourist_email);
   }, []);
   
-
-  /* const tempCards = [
-    { id: 'card_1abc', last4: '1234', brand: 'Visa' },
-    { id: 'card_2def', last4: '5678', brand: 'MasterCard' },
-    // ...
-  ];
-
-  setCards(tempCards) */
   
   return (
     <Background>
@@ -51,11 +43,23 @@ const CreditCardsScreen = ({ navigation }) => {
           data={cards}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.cardContainer}>
-              <Text style={styles.cardText}>
-                {`${item.brand} **** **** **** ${item.last4}`}
-              </Text>
-            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('CreditCardScreen', {
+                  id: item.id,
+                  brand: item.brand,
+                  last4: item.last4,
+                  expMonth: item.expMonth,
+                  expYear: item.expYear,
+                });
+              }}
+            >
+              <View style={styles.cardContainer}>
+                <Text style={styles.cardText}>
+                  {`${item.brand} **** **** **** ${item.last4}`}
+                </Text>
+              </View>
+            </TouchableOpacity>
           )}
         />
         <TouchableOpacity

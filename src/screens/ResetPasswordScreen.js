@@ -5,7 +5,7 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import InputValidator from '../helpers/InputValidator'
 import CustomButton from "../components/CustomButton";
-import {localApi} from "../helpers/api";
+import {localApi, userApi} from "../helpers/api";
 import Toast from "react-native-toast-message";
 import {ActivityIndicator, Paragraph} from "react-native-paper";
 
@@ -19,7 +19,7 @@ export const ResetPasswordScreen = ({route, navigation}) => {
         setLoading(true);
         console.log(verificationCode)
         try {
-            const response = await localApi.post(`/passwordResetStageThree/${verificationCode}/${password}`)
+            const response = await userApi.post(`/passwordResetStageThree/${verificationCode}/${password}`)
             console.log(response)
 
             if (response.data.status === 400 || response.data.status === 404) {

@@ -5,7 +5,7 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import InputValidator from '../helpers/InputValidator'
 import Toast from "react-native-toast-message";
-import {localApi, touristApi} from "../helpers/api";
+import {localApi, touristApi, userApi} from "../helpers/api";
 import {ActivityIndicator} from "react-native-paper";
 
 export const ForgotPasswordScreen = ({navigation}) => {
@@ -20,7 +20,7 @@ export const ForgotPasswordScreen = ({navigation}) => {
 
         setLoading(true);
         try {
-            const response = await localApi.post(`/passwordResetStageOne/${email.value}`)
+            const response = await userApi.post(`/passwordResetStageOne/${email.value}`)
             console.log(response);
             if (response.data.status === 400 || response.data.status === 404) {
                 Toast.show({

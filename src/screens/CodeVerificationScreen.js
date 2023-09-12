@@ -5,7 +5,7 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import InputValidator from '../helpers/InputValidator'
 import CustomButton from "../components/CustomButton";
-import {localApi} from "../helpers/api";
+import {localApi, userApi} from "../helpers/api";
 import Toast from "react-native-toast-message";
 import {ActivityIndicator, Paragraph} from "react-native-paper";
 
@@ -16,7 +16,7 @@ export const CodeVerificationScreen = ({navigation}) => {
         setLoading(true);
 
         try {
-            const response = await localApi.post(`/passwordResetStageTwo/${code}`)
+            const response = await userApi.post(`/passwordResetStageTwo/${code}`)
 
             if (response.data.status === 400 || response.data.status === 404) {
                 Toast.show({

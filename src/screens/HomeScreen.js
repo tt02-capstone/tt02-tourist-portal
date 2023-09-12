@@ -1,4 +1,4 @@
-import React from 'react'
+import React , { useState, useEffect } from 'react'
 import Background from '../components/CardBackground'
 import Header from '../components/Header'
 import Button from '../components/Button'
@@ -9,9 +9,23 @@ import RestaurantImg from '../image/restaurant.jpg'
 import AccomsImg from '../image/accoms.jpg'
 import TeleImg from '../image/telecom.png'
 import DealImg from '../image/discount.png'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState([]);
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  async function getUser() {
+    const data = await AsyncStorage.getItem('user');
+    const user = JSON.parse(data); // only one user 
+    const userType = user.userTypeEnum; // can get any attribute u wan
+
+    setUser(user);
+    console.log(user);
+  }
 
   const viewAttractions = () => {
     navigation.navigate('AttractionScreen')
@@ -22,7 +36,7 @@ const HomeScreen = ({ navigation }) => {
       <ScrollView>
       <View style={styles.container}>
       <Card>
-          <Card.Title>Attractions</Card.Title>
+          <Card.Title style={styles.header}>Attractions</Card.Title>
           <Card.Image
             style={{ padding: 0}}
             source={{
@@ -107,6 +121,9 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    fontSize : 15
   },
   fonts: {
     marginBottom: 8,

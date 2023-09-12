@@ -9,6 +9,7 @@ import InputValidator from "../helpers/InputValidator";
 import CustomButton from "../components/CustomButton";
 import { loginUser } from '../redux/login'
 import Toast from "react-native-toast-message";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState({ value: '', error: '' })
@@ -27,7 +28,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       let touristLogin = await loginUser(email,password)
       if (touristLogin.status) {
-        localStorage.setItem("user", JSON.stringify(touristLogin.data));
+        AsyncStorage.setItem('user', JSON.stringify(touristLogin.data));
         
         navigation.reset({
           index: 0,
@@ -48,7 +49,7 @@ const LoginScreen = ({ navigation }) => {
         })
       }
     } catch (error) {
-      alert('An error hass occurred' + error)
+      alert('An error has occurred' + error)
     }
   }
 

@@ -12,7 +12,7 @@ export const ForgotPasswordScreen = ({navigation}) => {
     const [email, setEmail] = useState({value: '', error: ''})
     const [loading, setLoading] = useState(false)
 
-    const sendForgotPasswordEmail = () => {
+    const sendForgotPasswordEmail = async () => {
         const emailError = InputValidator.email(email.value)
         if (emailError) {
             setEmail({...email, error: emailError})
@@ -20,9 +20,9 @@ export const ForgotPasswordScreen = ({navigation}) => {
 
         setLoading(true);
         try {
-            const response = localApi.post(`/passwordResetStageOne/${email.value}`)
+            const response = await localApi.post(`/passwordResetStageOne/${email.value}`)
             console.log(response);
-            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+            if (response.data.status === 400 || response.data.status === 404) {
                 Toast.show({
                     type: 'error',
                     text1: response.data.errorMessage
@@ -30,17 +30,11 @@ export const ForgotPasswordScreen = ({navigation}) => {
                 setLoading(false);
             } else {
                 Toast.show({
-                    type: 'Please check your email for the instructions to reset your password.',
-                    position: Toast.POSITION.TOP_RIGHT,
-                    text1: response.data.errorMessage
+                    type: 'success',
+                    text1: 'Please check your email for the instructions to reset your password.'
                 })
                 setLoading(false);
-                setTimeout(() => {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: 'LoginScreen'}],
-                    })
-                }, 2000);
+                navigation.navigate('CodeVerificationScreen')
             }
         } catch (error) {
             console.error("Axios Error : ", error)

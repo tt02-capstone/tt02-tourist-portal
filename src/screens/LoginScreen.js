@@ -9,7 +9,7 @@ import TextInput from '../components/TextInput'
 import {theme} from '../core/theme'
 import Toast from "react-native-toast-message";
 import InputValidator from "../helpers/InputValidator";
-import {touristApi} from "../helpers/api";
+import {localApi, touristApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
 
 export const LoginScreen = ({navigation}) => {
@@ -26,10 +26,10 @@ export const LoginScreen = ({navigation}) => {
         }
 
         try {
-            const response = await touristApi.post(`/login/${email.value}/${password.value}`)
+            const response = await localApi.post(`/login/${email.value}/${password.value}`)
             if (
-                response.data.httpStatusCode === 400 ||
-                response.data.httpStatusCode === 404
+                response.data.status === 400 ||
+                response.data.status === 404
             ) {
                 console.log('error')
                 Toast.show({

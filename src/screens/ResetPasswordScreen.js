@@ -5,42 +5,72 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import InputValidator from '../helpers/InputValidator'
 import CustomButton from "../components/CustomButton";
+import {localApi} from "../helpers/api";
+import Toast from "react-native-toast-message";
+import {ActivityIndicator, Paragraph} from "react-native-paper";
 
 export const ResetPasswordScreen = ({navigation}) => {
-    const [email, setEmail] = useState({value: '', error: ''})
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    const sendResetPasswordEmail = () => {
-        const emailError = InputValidator.email(email.value)
-        if (emailError) {
-            setEmail({...email, error: emailError})
-            return
+    const sendResetPassword = () => {
+        setLoading(true);
+
+        try {
+            const response = localApi.post(`/passwordResetStageTwo/${new URLSearchParams(document.location.search)
+                .get('token')}/${password}`)
+
+            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage
+                })
+                setLoading(false);
+            } else {
+                Toast.show({
+                    type: 'Password changed successfully.',
+                    position: Toast.POSITION.TOP_RIGHT,
+                    text1: response.data.errorMessage
+                })
+                setLoading(false);
+                setTimeout(() => {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'LoginScreen'}],
+                    })
+                }, 2000);
+            }
+        } catch (error) {
+            console.error("Axios Error : ", error)
         }
-        navigation.navigate('LoginScreen')
     }
 
     return (
         <Background>
-            <Header>Have you forgotten your WithinSG account password?</Header>
+            <Header>Reset WithinSG account password</Header>
+            <Paragraph>Key in the new password that you would like to change to.</Paragraph>
+            <ActivityIndicator size="large" animating={loading}/>
             <TextInput
-                label="E-mail address"
-                returnKeyType="done"
-                value={email.value}
-                onChangeText={(text) => setEmail({value: text, error: ''})}
-                error={!!email.error}
-                errorText={email.error}
-                autoCapitalize="none"
-                autoCompleteType="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-                description="You will receive email with password reset link."
+                label="Password"
+                value={password.value}
+                onChangeText={(text) => setPassword(text)}
+                errorText={InputValidator.password(password)}
+                secureTextEntry
+            />
+            <TextInput
+                label="Confirm Password"
+                value={confirmPassword.value}
+                onChangeText={(text) => setPassword(text)}
+                errorText={InputValidator.confirmPassword(password, confirmPassword)}
+                secureTextEntry
             />
             <Button
-                text="Send Instructions"
+                text="Reset Password"
                 // viewStyle={{ marginTop: 16 }}
                 mode="contained"
-                onPress={sendResetPasswordEmail}
+                onPress={sendResetPassword}
             />
         </Background>
     )
 }
-

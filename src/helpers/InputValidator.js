@@ -30,6 +30,13 @@ const passport = (passport) => {
     return passport.length > 10 ? 'Passport must not be longer than 10 characters' : '';
 }
 
+const confirmPassword = (originalp, newp) => {
+    if (originalp !== newp) {
+        return "Passwords do not match";
+    }
+    return ''
+}
+
 const mobileNo = (mobileNo) => {
     if (!mobileNo) {
         return "Mobile number can't be empty.";
@@ -45,4 +52,4 @@ const nric = (nric) => {
 
     return nric.length !== 9 ? 'NRIC should be 9 characters' : '';
 }
-export default {password, email, name, passport, mobileNo, nric}
+export default {password, email, name, passport, mobileNo, nric, confirmPassword}

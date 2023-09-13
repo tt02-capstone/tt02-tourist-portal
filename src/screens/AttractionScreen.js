@@ -76,10 +76,10 @@ const AttractionScreen = ({ navigation }) => {
                                 />
 
                                 <Text style={styles.description}>{item.description}</Text>
-                                <div style={{ display: 'inline-block'}}>
+                                <View style={{ display: 'inline-block'}}>
                                     <Text style={[styles.tag, {backgroundColor:getColorForType(item.attraction_category)}]}>{item.attraction_category}</Text>
                                     <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
-                                </div>
+                                </View>
                             </Card>
                         </TouchableOpacity>
                         )) 
@@ -118,16 +118,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
+        width: 110,
         fontSize: 11,
         fontWeight: 'bold'
     },
-    redirect: {
-        color: 'gray',
-        margin: 5,
-        width: 90,
-        fontSize: 13,
-        fontWeight: 'bold'
+    header:{
+        color: '#044537',
+        fontSize: 15
     }
 });
 

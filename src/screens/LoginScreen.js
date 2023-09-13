@@ -11,6 +11,7 @@ import Toast from "react-native-toast-message";
 import InputValidator from "../helpers/InputValidator";
 import {localApi, touristApi, userApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
+import {storeUser} from "../helpers/LocalStorage";
 
 export const LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState({value: '', error: ''})
@@ -26,7 +27,8 @@ export const LoginScreen = ({navigation}) => {
         }
 
         try {
-            const response = await userApi.post(`/login/${email.value}/${password.value}`)
+            const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)
+            console.log(localApi)
             if (
                 response.data.status === 400 ||
                 response.data.status === 404
@@ -43,13 +45,17 @@ export const LoginScreen = ({navigation}) => {
                 })
 
                 console.log('success', response.data)
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'HomeScreen'}],
-                })
+                await storeUser(response.data);
+                setTimeout(() => {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'HomeScreen'}],
+                    })
+                }, 1000);
+
             }
         } catch (error) {
-            alert('An error hass occurred' + error)
+            alert('An error has occurred' + error)
         }
     }
 

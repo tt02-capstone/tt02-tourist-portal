@@ -1,48 +1,44 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import Background from '../components/Background'
 import Header from '../components/Header'
 import Button from '../components/Button'
-import { createStripeCustomer } from '../redux/creditCard'
+import {clearStorage, getUser, getUserType} from "../helpers/LocalStorage";
+import {Paragraph} from "react-native-paper";
+import {loggedUserApi} from "../helpers/api";
 
+export const HomeScreen = ({navigation}) => {
+    const [userData, setUserData] = useState('')
 
-
-const HomeScreen = ({ navigation }) => {
-
-  const testStripeCustomer = () => {
-    // Insert logic to test Stripe Customer here
-    createStripeCustomer("checkmate4103@gmail.com","Checmkate")
-    console.log("Testing Stripe Customer");
-  }
-
-  return (
-    <Background>
-      <Header>Home Screen</Header>
-      <Button
-        text = "Logout"
-        mode ="contained"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'LoginScreen' }],
-          })
+    useEffect(() => {
+        async function fetchData() {
+            const userData = await getUser()
+            setUserData(userData)
+            const usertype =  await getUserType()
+            console.log(usertype)
+            console.log(loggedUserApi(usertype))
         }
-      />
-      <Button
-        text = "Test Card"
-        mode ="contained"
-        onPress={() =>
-          navigation.reset({
+
+        fetchData();
+    }, [])
+
+    const onLogoutPressed = async () => {
+        await clearStorage();
+
+        navigation.reset({
             index: 0,
-            routes: [{ name: 'CreditCardsScreen' }],
-          })
-        }
-      />
-      <Button
-        text="Test Stripe Customer"
-        mode="contained"
-        onPress={testStripeCustomer}
-      />
-    </Background>
-  )
+            routes: [{name: 'LoginScreen'}],
+        })
+    }
+
+    return (
+        <Background>
+            <Header>Home Screen</Header>
+            <Paragraph>Welcome {userData.name}</Paragraph>
+            <Button
+                text="Logout"
+                mode="contained"
+                onPress={onLogoutPressed}
+            />
+        </Background>
+    )
 }
-export default HomeScreen

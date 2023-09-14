@@ -27,8 +27,8 @@ export const LoginScreen = ({navigation}) => {
     try {
       const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)
       if (
-          response.data.status === 400 ||
-          response.data.status === 404
+          response.data.httpStatusCode === 400 ||
+          response.data.httpStatusCode === 404
       ) {
         console.log('error')
         Toast.show({
@@ -78,7 +78,7 @@ export const LoginScreen = ({navigation}) => {
             text="Forgot your password?"
             viewStyle={styles.forgotPassword}
             textStyle={styles.forgot}
-            // onPress={() => navigation.navigate('ForgotPasswordScreen')}
+            onPress={() => navigation.navigate('ForgotPasswordScreen')}
         />
         <Button text="Login" mode="contained" onPress={onLoginPressed}/>
         <CustomButton

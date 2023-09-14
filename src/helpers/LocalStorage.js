@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 export const storeUser = async (userData) => {
     try {
         const jsonUser = JSON.stringify(userData);
-        console.log(userData)
-        console.log(userData.user_type)
+        // console.log(userData)
+        // console.log(userData.user_type)
         await AsyncStorage.setItem('user', jsonUser);
         await AsyncStorage.setItem('usertype', userData.user_type);
     } catch (e) {

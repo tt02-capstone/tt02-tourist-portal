@@ -9,32 +9,18 @@ import {ResetPasswordScreen} from "./src/screens/ResetPasswordScreen";
 import {ForgotPasswordScreen} from "./src/screens/ForgotPasswordScreen";
 import {SignUpScreen} from "./src/screens/SignUpScreen";
 import {CodeVerificationScreen} from "./src/screens/CodeVerificationScreen";
-import CreditCardsScreen from "./src/screens/CreditCard/CreditCardsScreen"
-import AddCreditCardScreen from './src/screens/CreditCard/AddCreditCardScreen';
-import CreditCardScreen from './src/screens/CreditCard/CreditCardScreen';
-import { initStripe } from '@stripe/stripe-react-native';
-
-
-initStripe({
-  // API Key is test key, will be masked via GitHub Actions for deployment
-  publishableKey: 'pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg',
-});
 
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
       <NavigationContainer>
         <Stack.Navigator>
-        <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
-        <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
+            <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{title: 'Sign Up '}}/>
             <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
             <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen} options={{title: 'Verify Code'}}/>
             <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{title: 'Reset Password'}}/>
             <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{title: 'Forgot Password'}}/>
-            <Stack.Screen name="CreditCardsScreen" component={CreditCardsScreen} options={{title: 'My Credit Cards'}}/>
-            <Stack.Screen name="AddCreditCardScreen" component={AddCreditCardScreen} options={{title: 'Add Credit Card'}}/>
-            <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

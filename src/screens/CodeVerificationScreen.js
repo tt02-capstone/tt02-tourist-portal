@@ -9,18 +9,14 @@ import {localApi, userApi} from "../helpers/api";
 import Toast from "react-native-toast-message";
 import {ActivityIndicator, Paragraph} from "react-native-paper";
 
-export const ResetPasswordScreen = ({route, navigation}) => {
-    const { verificationCode } = route.params;
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+export const CodeVerificationScreen = ({navigation}) => {
+    const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
-
-    const sendResetPassword = async () => {
+    const verifyCode = async () => {
         setLoading(true);
-        console.log(verificationCode)
+
         try {
-            const response = await userApi.post(`/passwordResetStageThree/${verificationCode}/${password}`)
-            console.log(response)
+            const response = await userApi.post(`/passwordResetStageTwo/${code}`)
 
             if (response.data.status === 400 || response.data.status === 404) {
                 Toast.show({
@@ -31,13 +27,12 @@ export const ResetPasswordScreen = ({route, navigation}) => {
             } else {
                 Toast.show({
                     type: 'success',
-                    text1: 'Password changed successfully.'
+                    text1: 'Code Verified!'
                 })
                 setLoading(false);
                 setTimeout(() => {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: 'LoginScreen'}],
+                    navigation.navigate('ResetPasswordScreen', {
+                        verificationCode: code
                     })
                 }, 2000);
             }
@@ -48,28 +43,20 @@ export const ResetPasswordScreen = ({route, navigation}) => {
 
     return (
         <Background>
-            <Header>Reset WithinSG account password</Header>
-            <Paragraph>Key in the new password that you would like to change to.</Paragraph>
+            <Header>Verify WithinSG code</Header>
+            <Paragraph>Key in the code send to your email.</Paragraph>
             <ActivityIndicator size="large" animating={loading}/>
             <TextInput
-                label="Password"
-                value={password.value}
-                onChangeText={(text) => setPassword(text)}
-                errorText={InputValidator.password(password)}
-                secureTextEntry
-            />
-            <TextInput
-                label="Confirm Password"
-                value={confirmPassword.value}
-                onChangeText={(text) => setConfirmPassword(text)}
-                errorText={InputValidator.confirmPassword(password, confirmPassword)}
+                label="Verification Code"
+                value={code}
+                onChangeText={(text) => setCode(text)}
                 secureTextEntry
             />
             <Button
-                text="Reset Password"
+                text="Verify"
                 // viewStyle={{ marginTop: 16 }}
                 mode="contained"
-                onPress={sendResetPassword}
+                onPress={verifyCode}
             />
         </Background>
     )

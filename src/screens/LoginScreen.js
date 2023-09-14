@@ -85,7 +85,7 @@ export const LoginScreen = ({navigation}) => {
             text="Sign up"
             viewStyle={styles.row}
             textStyle={styles.link}
-            // onPress={() => navigation.navigate('SignUpScreen')}
+            onPress={() => navigation.navigate('SignUpScreen')}
         />
       </Background>
   )

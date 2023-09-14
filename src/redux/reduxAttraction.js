@@ -1,11 +1,10 @@
 import axios from "axios";
-
-const HOST = ''
-const baseURL = `http://${HOST}:8080/attraction`
+import { attractionApi } from "../helpers/api";
 
 export async function getAttractionList() {
     try {
-        const response = await axios.get(`${baseURL}/getAllPublishedAttraction`);
+        // const response = await axios.get(`${attractionApi}/getAllPublishedAttraction`);
+        const response = await attractionApi.get('/getAllPublishedAttraction')
         if (response.data != []) {
             return response.data;
         }    

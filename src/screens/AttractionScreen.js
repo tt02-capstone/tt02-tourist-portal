@@ -5,20 +5,18 @@ import Button from '../components/Button'
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
 import { getAttractionList  } from '../redux/reduxAttraction';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
 
 const AttractionScreen = ({ navigation }) => {
-    const [user, setUser] = useState([]);
+    const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    async function getUser() {
-        const data = await AsyncStorage.getItem('user');
-        const user = JSON.parse(data); // only one user 
-        const userType = user.userTypeEnum; // can get any attribute u wan
+    async function fetchUser() {
+        const userData = await getUser()
+        setUser(userData)
     
-        setUser(user);
-        console.log(user);
+        const usertype =  await getUserType()
     }
 
     useEffect(() => {
@@ -36,7 +34,7 @@ const AttractionScreen = ({ navigation }) => {
                 setLoading(false);
             }    
         };
-        getUser();
+        fetchUser();
         fetchData();
     }, []);
 
@@ -57,7 +55,7 @@ const AttractionScreen = ({ navigation }) => {
         navigation.navigate('AttractionDetailsScreen', {attractionId : attraction_id}); // set the attraction id here 
     }
 
-    return user ? (
+    return (
         <Background>
             <ScrollView>
                 <View style={styles.container}>
@@ -87,9 +85,6 @@ const AttractionScreen = ({ navigation }) => {
                 </View>
             </ScrollView>
         </Background>
-    ) :
-    (
-        navigation.navigate('LoginScreen')
     )
 }
 

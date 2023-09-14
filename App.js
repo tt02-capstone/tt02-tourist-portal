@@ -4,10 +4,10 @@ import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import Toast from 'react-native-toast-message';
 import HomeScreen from "./src/screens/HomeScreen";
-import LoginScreen from "./src/screens/LoginScreen";
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import AttractionScreen from './src/screens/AttractionScreen';
 import AttractionDetailsScreen from './src/screens/AttractionDetails';
+import { LoginScreen } from './src/screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 export default function App() {

@@ -1,11 +1,10 @@
 import axios from "axios";
-
-const HOST = ''
-const baseURL = `http://${HOST}:8080/attraction`
+import { attractionApi } from "../helpers/api";
 
 export async function getAttraction(attraction_id) {
     try {
-        const response = await axios.get(`${baseURL}/getAttraction/${attraction_id}`);
+        // const response = await axios.get(`${attractionApi}/getAttraction/${attraction_id}`);
+        const response = await attractionApi.get(`/getAttraction/${attraction_id}`);
         if (response.data != []) {
             return response.data;
         }    
@@ -16,7 +15,8 @@ export async function getAttraction(attraction_id) {
 
 export async function getAttractionRecommendation(attraction_id) {
     try {
-        const response = await axios.get(`${baseURL}/getAttractionRecommendation/${attraction_id}`);
+        // const response = await axios.get(`${attractionApi}/getAttractionRecommendation/${attraction_id}`);
+        const response = await attractionApi.get(`/getAttractionRecommendation/${attraction_id}`);
         if (response.data != []) {
             return response.data;
         }    
@@ -27,7 +27,8 @@ export async function getAttractionRecommendation(attraction_id) {
 
 export async function saveAttraction(user_id,attraction_id) {
     try {
-        const response = await axios.put(`${baseURL}/updateSavedAttractionListForTouristAndLocal/${user_id}/${attraction_id}`);
+        // const response = await axios.put(`${attractionApi}/saveAttractionForTouristAndLocal/${user_id}/${attraction_id}`);
+        const response = await attractionApi.put(`/saveAttractionForTouristAndLocal/${user_id}/${attraction_id}`);
         console.log(response)
         if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404) {
             return {status:true, info:response.data.errorMessage};

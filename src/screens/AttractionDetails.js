@@ -3,17 +3,17 @@ import Background from '../components/CardBackground'
 import { Button } from 'react-native-paper';
 import CartButton from '../components/Button'
 import { theme } from '../core/theme'
+import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
-// import { HeartOutlined, HeartTwoTone } from '@ant-design/icons';
 import { getAttraction, getAttractionRecommendation, saveAttraction } from '../redux/reduxAttractionDetails'; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
+import {storeUser} from "../helpers/LocalStorage";
 
 const AttractionDetailsScreen = ({ navigation }) => {
-    const [user, setUser] = useState([]);
+    const [user, setUser] = useState('');
     const [attraction, setAttraction] = useState([]);
     const [recommendation, setRecommendation] = useState([]);
     const [priceList, setPriceList] = useState([]);
@@ -23,12 +23,11 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const route = useRoute();
     const { attractionId } = route.params;
 
-    async function getUser() {
-        const data = await AsyncStorage.getItem('user');
-        const user = JSON.parse(data); // only one user 
+    async function fetchUser() {
+        const userData = await getUser()
+        setUser(userData)
     
-        setUser(user);
-        console.log(user);
+        const usertype =  await getUserType()
     }
 
     const formattedPriceList = priceList.map(item => {
@@ -78,7 +77,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setRecommendation(reccoms)
 
             setLoading(false);
-            getUser();
+            fetchUser();
         } catch (error) {
             alert ('An error occur! Failed to retrieve attraction list!');
             setLoading(false);
@@ -90,19 +89,19 @@ const AttractionDetailsScreen = ({ navigation }) => {
     }, []);
 
     const viewRecommendedAttraction = (redirect_attraction_id) => {
-        console.log(redirect_attraction_id);
         navigation.push('AttractionDetailsScreen', {attractionId : redirect_attraction_id}); // push on to the nxt nav stack 
     }
 
     const saveAttr = async () => {
         let response = await saveAttraction(user.user_id, attraction.attraction_id);
         if (!response.status) {
-            AsyncStorage.setItem('user', JSON.stringify(response.info)); // update the user in local storage 
-
+            await storeUser(response.info); // update the user in local storage 
+            fetchUser();
             Toast.show({
                 type: 'success',
                 text1: 'Attraction has been saved!'
             });
+
         } else {
             Toast.show({
                 type: 'error',
@@ -116,7 +115,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
         console.log('Checked Boxes:', checkedBoxes);
     }
 
-    return user ? (
+    return (
         <Background>
             <ScrollView>
                 <Card>
@@ -183,10 +182,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 </Card>
             </ScrollView>
         </Background>
-    ) : 
-    (
-        navigation.navigate('LoginScreen')
-    )
+    ) 
 }
 
 const styles = StyleSheet.create({

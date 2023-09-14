@@ -13,8 +13,6 @@ import {localApi, touristApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
 import {ProgressBar, MD3Colors} from 'react-native-paper';
 import {LocalForm} from "../helpers/LocalForm";
-// import {CountryPicker} from "react-native-country-codes-picker";
-// import CountryPicker from 'react-native-country-picker-modal';
 import {ForeignerForm} from "../helpers/ForeignerForm";
 
 export const SignUpScreen = ({navigation}) => {

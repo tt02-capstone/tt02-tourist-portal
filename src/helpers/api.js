@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST = '172.18.28.167'
+const HOST = '192.168.18.61'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({

@@ -7,10 +7,21 @@ export const storeUser = async (userData) => {
         console.log(userData.user_type)
         await AsyncStorage.setItem('user', jsonUser);
         await AsyncStorage.setItem('usertype', userData.user_type);
+        await AsyncStorage.setItem('email', userData.email);
     } catch (e) {
         console.log('Async Storage storeUser fail', e)
     }
 };
+
+export const getEmail = async () => {
+    try {
+        return await AsyncStorage.getItem('email');
+        
+    } catch (e) {
+        console.log('Async Storage getEmail fail', e)
+    }
+};
+
 
 export const getUser = async () => {
     try {

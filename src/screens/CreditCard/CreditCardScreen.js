@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Button, Modal, StyleSheet, TouchableOpacity, DatePickerAndroid } from 'react-native';
 import { deletePaymentMethod } from '../../redux/creditCard';
-import { Picker } from '@react-native-picker/picker';
+//import { Picker } from '@react-native-picker/picker';
 
-const CreditCardScreen = ({ route, navigation }) => {
+export const CreditCardScreen = ({ route, navigation }) => {
   const { id, brand, last4, expMonth, expYear } = route.params;
   const [selectedMonth, setSelectedMonth] = React.useState(expMonth.toString());
   const [selectedYear, setSelectedYear] = React.useState(expYear.toString());
@@ -59,14 +59,14 @@ const CreditCardScreen = ({ route, navigation }) => {
           transparent={true}
           visible={showMonthPicker}
         >
-          <Picker
+         {/*  <Picker
             selectedValue={selectedMonth}
             onValueChange={(itemValue) => setSelectedMonth(itemValue)}
           >
             {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
               <Picker.Item key={month} label={month.toString().padStart(2, '0')} value={month.toString()} />
             ))}
-          </Picker>
+          </Picker> */}
           <Button title="Done" onPress={() => setShowMonthPicker(false)} />
         </Modal>
         <TouchableOpacity onPress={() => setShowYearPicker(true)}>
@@ -77,14 +77,14 @@ const CreditCardScreen = ({ route, navigation }) => {
           transparent={true}
           visible={showYearPicker}
         >
-          <Picker
+         {/*  <Picker
             selectedValue={selectedYear}
             onValueChange={(itemValue) => setSelectedYear(itemValue)}
           >
             {years.map((year) => (
               <Picker.Item key={year} label={year} value={year} />
             ))}
-          </Picker>
+          </Picker> */}
           <Button title="Done" onPress={() => setShowYearPicker(false)} />
         </Modal>
           </>
@@ -124,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreditCardScreen;
+

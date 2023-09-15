@@ -1,57 +1,93 @@
-import React,{useState} from "react";
+import React,{useEffect, useState} from "react";
 import { CardForm, useStripe } from '@stripe/stripe-react-native';
-import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
+import { View,  FlatList, StyleSheet } from 'react-native';
 import Background from '../../components/Background'
 import Header from '../../components/Header'
-import { addPaymentMethod } from '../../redux/creditCard'
 import Toast from "react-native-toast-message";
+import { Text, Card, Button, Icon, ListItem } from '@rneui/themed';
+import {getEmail, getUserType} from "../../helpers/LocalStorage";
+import {paymentsApi} from "../../helpers/api";
 
 
 
-const AddCardScreen = ({ navigation }) => {
-  
+export const AddCreditCardScreen = ({ navigation }) => {
+  const [tourist_email, setTouristEmail] = useState('');
+  const [user_type, setUserType] = useState('');
   const { confirmPayment, createPaymentMethod } = useStripe();
   const [cardDetails, setCardDetails] = useState(null);
+
+
+  useEffect(() => {
+    
+    
+    
+    async function onLoad() {
+      try {
+        setTouristEmail(await getEmail());
+        setUserType(await getUserType());        
+        
+      } catch (error) {
+        console.error("Error with loading email and user type:", error);
+      }
+    }
+    
+    onLoad();
+  }, []);
 
   const handleSaveCard = async () => {
     const { paymentMethod, error } = await createPaymentMethod({
         paymentMethodType: 'Card',
       })
     if (error) {
-      console.log(error)
-      // To use some snackbar to show error message 
+      console.log(error) // To use Toast
     } else if (paymentMethod) {
-      // API call to associate paymentMethod.id with customer on your server
-      console.log(paymentMethod.id)
-      const tourist_email = "hardcoded@gmail.com"
-      const result = await addPaymentMethod(tourist_email, paymentMethod.id); 
-      console.log(result.status)
-      if (result.status) {
-        console.log('checkmate')
-        Toast.show({
-          type: 'success',
-          text1: 'Successfully added card'
-      });
-        navigation.navigate('CreditCardsScreen');
+      const payment_method_id = paymentMethod.id;
+      const response = await paymentsApi.post(`/addPaymentMethod/${user_type}/${tourist_email}/${payment_method_id}`)
+      console.log(response.data.httpStatusCode)
+      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+          console.log('error',response.data)
+
       } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Unable to add card'
-      });
+          console.log('success', response.data)
+          if (response.data) {
+            Toast.show({
+              type: 'success',
+              text1: 'Successfully added card'
+          });
+            navigation.navigate('CreditCardsScreen');
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: 'Unable to add card'
+          });
+          }
+          
+              
+      };
+ 
+
+    
       }
+    
+    
+
 
     }
-  };
+  
+
 
   return (
 
       
     <View style={{flex:1}}>
-    <Header>Card Details</Header>
+   
+    <Card>
+    <Card.Title >
+        Card Details       
+    </Card.Title>
+    
     <CardForm
-      placeholder={{
-        number: "4242 4242 4242 4242",
-      }}
+
       onFormComplete={(cardDetails) => {
         console.log("card details", cardDetails)
         setCardDetails(cardDetails)
@@ -71,6 +107,8 @@ const AddCardScreen = ({ navigation }) => {
     <Button title="Save Card" onPress={handleSaveCard} />
     <Button
         title = "Cancel"
+        style={{ marginTop: 10 }}
+        type="outline"
         mode ="contained"
         onPress={() =>
           navigation.reset({
@@ -79,24 +117,12 @@ const AddCardScreen = ({ navigation }) => {
           })
         }
       />
+      </Card>
 </View>
 
     
 
     
   );
-}
+};
 
-export default AddCardScreen
-
-/* const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  cardFormContainer: {
-    height: 300, // Adjust the height as needed
-    marginBottom: 20,
-  },
-}); */

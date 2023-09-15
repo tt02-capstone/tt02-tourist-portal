@@ -9,10 +9,12 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@rneui/themed": "^4.0.0-rc.8",
     "@expo/webpack-config": "^19.0.0",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
+    "@stripe/stripe-react-native": "0.28.0",
     "axios": "^1.5.0",
     "expo": "~49.0.8",
     "expo-status-bar": "~1.6.0",

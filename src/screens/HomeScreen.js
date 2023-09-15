@@ -39,6 +39,16 @@ export const HomeScreen = ({navigation}) => {
                 mode="contained"
                 onPress={onLogoutPressed}
             />
+            <Button
+        text = "Manage Payments"
+        mode ="contained"
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'CreditCardsScreen' }],
+          })
+        }
+      />
         </Background>
     )
 }

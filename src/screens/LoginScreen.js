@@ -30,8 +30,8 @@ export const LoginScreen = ({navigation}) => {
             const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)
             console.log(localApi)
             if (
-                response.data.status === 400 ||
-                response.data.status === 404
+                response.data.httpStatusCode === 400 ||
+                response.data.httpStatusCode === 404
             ) {
                 console.log('error')
                 Toast.show({

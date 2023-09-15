@@ -18,7 +18,7 @@ export const CodeVerificationScreen = ({navigation}) => {
         try {
             const response = await userApi.post(`/passwordResetStageTwo/${code}`)
 
-            if (response.data.status === 400 || response.data.status === 404) {
+            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
                 Toast.show({
                     type: 'error',
                     text1: response.data.errorMessage

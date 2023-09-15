@@ -13,8 +13,6 @@ import {localApi, touristApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
 import {ProgressBar, MD3Colors} from 'react-native-paper';
 import {LocalForm} from "../helpers/LocalForm";
-// import {CountryPicker} from "react-native-country-codes-picker";
-// import CountryPicker from 'react-native-country-picker-modal';
 import {ForeignerForm} from "../helpers/ForeignerForm";
 
 export const SignUpScreen = ({navigation}) => {
@@ -127,8 +125,8 @@ export const SignUpScreen = ({navigation}) => {
         try {
             const response = isLocal === "Yes"? await localApi.post(`/create`,user ): await touristApi.post(`/create`,user )
             if (
-                response.data.status === 400 ||
-                response.data.status === 404
+                response.data.httpStatusCode === 400 ||
+                response.data.httpStatusCode === 404
             ) {
                 console.log('error')
                 Toast.show({
@@ -145,7 +143,7 @@ export const SignUpScreen = ({navigation}) => {
                 console.log('success', response.data)
                 navigation.reset({
                     index: 0,
-                    routes: [{name: 'HomeScreen'}],
+                    routes: [{name: 'LoginScreen'}],
                 })
             }
         } catch (error) {

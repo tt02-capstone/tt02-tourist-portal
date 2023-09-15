@@ -8,6 +8,9 @@ import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import AttractionScreen from './src/screens/AttractionScreen';
 import AttractionDetailsScreen from './src/screens/AttractionDetails';
 import { LoginScreen } from './src/screens/LoginScreen';
+import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
+import BookingDetailsScreen from './src/screens/BookingDetailsScreen';
+import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -19,6 +22,9 @@ export default function App() {
             <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{ title : 'Reset Password' }} />
             <Stack.Screen name="AttractionScreen" component={AttractionScreen} options={{ title : 'Attractions' }} />
             <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
+            <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
+            <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
+            <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

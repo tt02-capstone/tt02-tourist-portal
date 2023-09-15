@@ -27,3 +27,7 @@ export const touristApi = axios.create({
 export const attractionApi = axios.create({
     baseURL: HOST_WITH_PORT + '/attraction'
 })
+
+export const bookingApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/booking'
+})

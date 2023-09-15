@@ -21,6 +21,10 @@ export const HomeScreen = ({navigation}) => {
         fetchData();
     }, [])
 
+    const onProfileScreenPressed = () => {
+        navigation.navigate('ViewProfileScreen');
+    }
+
     const onLogoutPressed = async () => {
         await clearStorage();
 
@@ -34,6 +38,11 @@ export const HomeScreen = ({navigation}) => {
         <Background>
             <Header>Home Screen</Header>
             <Paragraph>Welcome {userData.name}</Paragraph>
+            <Button
+                text="Profile"
+                mode="contained"
+                onPress={onProfileScreenPressed}
+            />
             <Button
                 text="Logout"
                 mode="contained"

@@ -1,23 +1,19 @@
-import axios from "axios";
+import { userApi } from "../helpers/api";
 
-const userURL = "http://localhost:8080/user";
-const touristURL = "http://localhost:8080/tourist";
-const localURL = "http://localhost:8080/local";
-
-export async function userLogin(email, password) { // both tourist and local combined
-    console.log("Enter userLogin function", email, password);
-    return await axios.put(`${userURL}/login/${email}/${password}`)
-    .then((response) => {
-      console.log(response);
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422 || response.data.httpStatusCode === 404) { // error
-        console.log('failure in userRedux :: userLogin');
-        return {status: false, data: response.data};
-      } else { // success
-        console.log("success in userRedux :: userLogin");
-        return {status: true, data: response.data};
-      }
-    })
-    .catch((error) => {
-      console.error("userRedux userLogin Error : ", error);
-    });
+export async function editPassword(userId, oldPassword, newPassword) {
+  console.log("Enter editUserPassword function");
+  return await userApi.put(`/editPassword/${userId}/${oldPassword}/${newPassword}`)
+  .then((response) => {
+    console.log(response);
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+      console.log('failure in userRedux :: editPassword')
+      return {status: false, data: response.data};
+    } else { // success
+      console.log("success in userRedux :: editPassword");
+      return {status: true, data: response.data};
+    }
+  })
+  .catch((error) => {
+    console.error("userRedux editPassword Error : ", error);
+  });
 }

@@ -15,11 +15,20 @@ const name = (name) => {
 }
 
 const password = (password) => {
+    var regExp = /[a-zA-Z]/g;
+    var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+
     if (!password) {
         return "Password can't be empty.";
+    } else if (!regExp.test(password)) {
+        return "Password must contain at least 1 letter";
+    } else if (/[0-9]/.test(password) === false) {
+        return "Password must contain at least 1 number";
+    } else if (!format.test(password)) {
+        return "Password must contain at least 1 symbol";
     }
 
-    return password.length < 5 ? 'Password must be at least 5 characters long.' : '';
+    return password.length < 8 ? 'Password must be at least 8 characters long.' : '';
 }
 
 const passport = (passport) => {
@@ -37,6 +46,14 @@ const confirmPassword = (originalp, newp) => {
     return ''
 }
 
+const countryCode = (countryCode) => {
+    if (!mobileNo) {
+        return "Country code can't be empty.";
+    }
+
+    return mobileNo.length > 3 ? 'Please enter a valid country code' : '';
+}
+
 const mobileNo = (mobileNo) => {
     if (!mobileNo) {
         return "Mobile number can't be empty.";
@@ -52,4 +69,5 @@ const nric = (nric) => {
 
     return nric.length !== 9 ? 'NRIC should be 9 characters' : '';
 }
-export default {password, email, name, passport, mobileNo, nric, confirmPassword}
+
+export default {password, email, name, passport, countryCode, mobileNo, nric, confirmPassword}

@@ -11,12 +11,18 @@ import { LoginScreen } from './src/screens/LoginScreen';
 import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
+import { Cart } from './src/components/Cart';
 
 const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
+    
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="LoginScreen">
+        
+        <Stack.Navigator screenOptions={{
+      headerRight: () => <Cart />,
+    }} initialRouteName="LoginScreen">
             <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Exploration'}}/>
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login'}}/>
             <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{ title : 'Reset Password' }} />
@@ -28,6 +34,7 @@ export default function App() {
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>
+      
 );
 }
 

@@ -117,12 +117,12 @@ const AttractionDetailsScreen = ({ navigation }) => {
         const tourist_email = user.email;
         const activity_name = attraction.name;
         const cartItems = [];
-        let count = 12;
+
         for (const type of checkedBoxes) {
             const cartItem = {}
             cartItem.type = "ATTRACTION";
             cartItem.activity_selection = type
-            cartItem.quantity = count++;
+            cartItem.quantity = 1;
             cartItem.start_datetime = new Date();
             cartItem.end_datetime = new Date();
             cartItem.price = 0;

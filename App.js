@@ -11,6 +11,7 @@ import { LoginScreen } from './src/screens/LoginScreen';
 import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
+import {CartScreen} from './src/screens/CartScreen';
 import { Cart } from './src/components/Cart';
 
 const Stack = createNativeStackNavigator();
@@ -31,6 +32,7 @@ export default function App() {
             <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
             <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
             <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
+            <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

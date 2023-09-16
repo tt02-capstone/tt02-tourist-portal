@@ -3,8 +3,9 @@ import { TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FAB,Icon } from '@rneui/themed';
 
-export const Cart = ({ navigation }) => {
+export const Cart = () => {
     const route = useRoute();
+    const navigation = useNavigation();
     const isLoginScreen = route.name === 'LoginScreen';
     const isCartScreen = route.name === 'CartScreen';
 
@@ -12,7 +13,7 @@ export const Cart = ({ navigation }) => {
         return null;
       }
 
-      
+
     return (
 
         <TouchableOpacity

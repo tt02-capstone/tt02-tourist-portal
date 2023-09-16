@@ -11,6 +11,7 @@ import { getAttraction, getAttractionRecommendation, saveAttraction } from '../r
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import {storeUser} from "../helpers/LocalStorage";
+import { cartApi } from '../helpers/api';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -41,6 +42,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
               checked={checkedBoxes.includes(item.ticket_type)} 
               onPress={() => handleCheckboxChange(item.ticket_type)}
             />
+            
         );
     });
 
@@ -73,8 +75,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttraction(attraction);
             setPriceList(attraction.price_list);
 
-            let reccoms = await getAttractionRecommendation(attractionId);
-            setRecommendation(reccoms)
+            //let reccoms = await getAttractionRecommendation(attractionId);
+            //setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();
@@ -110,9 +112,50 @@ const AttractionDetailsScreen = ({ navigation }) => {
         }
     }
 
-    const toCart = () => {
-        // for alvin to continue 
-        console.log('Checked Boxes:', checkedBoxes);
+    const toCart = async () => {
+        const user_type = user.userTypeEnum;
+        const tourist_email = user.email;
+        const activity_name = attraction.name;
+        const cartItems = [];
+        let count = 12;
+        for (const type of checkedBoxes) {
+            const cartItem = {}
+            cartItem.type = "ATTRACTION";
+            cartItem.activity_selection = type
+            cartItem.quantity = count++;
+            cartItem.start_datetime = new Date();
+            cartItem.end_datetime = new Date();
+            cartItem.price = 0;
+            cartItems.push(cartItem);
+            
+        }
+
+        const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
+        console.log(response.data.httpStatusCode)
+        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+            console.log('error',response.data)
+  
+        } else {
+            console.log('success', response.data)
+            if (response.data) {
+              Toast.show({
+                type: 'success',
+                text1: 'Added Items to Cart!'
+            });
+            // Update Cart Badge 
+              
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: 'Unable to add items to cart'
+            });
+            }
+  
+  
+        };
+      
+
+
     }
 
     return (

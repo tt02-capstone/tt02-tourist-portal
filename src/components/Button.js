@@ -22,14 +22,15 @@ const Button = ({ text, mode, onPress, style,...props }) => {
 
 const styles = StyleSheet.create({
   button: {
-    width: '100%',
+    width: '80%',
     marginVertical: 10,
     paddingVertical: 2,
-    backgroundColor:  '#044537'
+    backgroundColor:  '#044537',
   },
   text: {
     fontWeight: 'bold',
     fontSize: 15,
+    color: 'white',
     lineHeight: 26,
   },
 })

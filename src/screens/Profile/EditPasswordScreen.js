@@ -36,20 +36,25 @@ export const EditPasswordScreen = ({route, navigation}) => {
 
     const onSubmitPressed = async () => {
         try {
-            let response = await editPassword(user.user_id, formData.oldPassword, formData.newPasswordOne);
-            if (response && response.status) {
-                console.log('password edit success!');
-                Toast.show({
-                    type: 'success',
-                    text1: 'Password Successful Changed!'
-                })
-                navigation.navigate('ViewProfileScreen')
-            } else {
-                console.log('password edit failed!');
-                Toast.show({
-                    type: 'error',
-                    text1: response.data.errorMessage
-                })
+            if (InputValidator.password(formData.oldPassword) === '' && 
+                InputValidator.password(formData.newPasswordOne) === '' &&
+                InputValidator.confirmPassword(formData.newPasswordOne, formData.newPasswordTwo) === '') {
+                let response = await editPassword(user.user_id, formData.oldPassword, formData.newPasswordOne);
+                if (response && response.status) {
+                    console.log('password edit success!');
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Password Successful Changed!'
+                    })
+                    setFormData({oldPassword: '', newPasswordOne: '', newPasswordTwo: ''});
+                    navigation.navigate('ViewProfileScreen')
+                } else {
+                    console.log('password edit failed!');
+                    Toast.show({
+                        type: 'error',
+                        text1: response.data.errorMessage
+                    })
+                }
             }
         } catch (error) {
             console.log(error)
@@ -68,13 +73,16 @@ export const EditPasswordScreen = ({route, navigation}) => {
                     label="Old Password"
                     returnKeyType="next"
                     value={formData.oldPassword}
+                    secureTextEntry={true}
                     onChangeText={(oldPassword) => setFormData({...formData, oldPassword})}
+                    errorText={InputValidator.password(formData.oldPassword)}
                 />
 
                 <TextInput
                     label="New Password"
                     returnKeyType="next"
                     value={formData.newPasswordOne}
+                    secureTextEntry={true}
                     onChangeText={(newPasswordOne) => setFormData({...formData, newPasswordOne})}
                     errorText={InputValidator.password(formData.newPasswordOne)}
                 />
@@ -83,21 +91,18 @@ export const EditPasswordScreen = ({route, navigation}) => {
                     label="Repeat New Password"
                     returnKeyType="next"
                     value={formData.newPasswordTwo}
+                    secureTextEntry={true}
                     onChangeText={(newPasswordTwo) => setFormData({...formData, newPasswordTwo})}
                     errorText={InputValidator.confirmPassword(formData.newPasswordOne, formData.newPasswordTwo)}
                 />
 
-                <Button
-                    mode="contained"
-                    text={"Submit"}
-                    onPress={onSubmitPressed}
-                />
-
-                <Button
-                    mode="contained"
-                    text={"Cancel"}
-                    onPress={() => navigation.navigate('ViewProfileScreen')}
-                />
+                <div style={{marginLeft: '30px'}}>
+                    <Button
+                        mode="contained"
+                        text={"Submit"}
+                        onPress={onSubmitPressed}
+                    />
+                </div>
             </View>
         </Background>
     ) : (<div></div>)

@@ -41,42 +41,55 @@ export const EditProfileScreen = ({route, navigation}) => {
     }, [])
 
     const onEditProfilePressed = async () => {
-        console.log(inputDate);
-        let obj = {
-            user_id: user.user_id,
-            name: formData.name,
-            email: formData.email,
-            date_of_birth: inputDate,
-            country_code: formData.countryCode,
-            mobile_num: formData.mobileNum,
-        }
+        if (InputValidator.name(formData.name) === '' &&
+            InputValidator.email(formData.email) === '' &&
+            InputValidator.countryCode(formData.countryCode) === '' &&
+            InputValidator.mobileNo(formData.mobileNum) === '') {
 
-        try {
-            let response;
-            if (user.user_type === 'LOCAL') {
-                response = await editLocalProfile(obj);
-            } else if (user.user_type === 'TOURIST') {
-                response = await editTouristProfile(obj);
+            // console.log(inputDate)
+            let newDate = inputDate;
+            newDate.setHours(inputDate.getHours() + 16)
+            let obj = {
+                user_id: user.user_id,
+                name: formData.name,
+                email: formData.email,
+                date_of_birth: newDate,
+                country_code: formData.countryCode,
+                mobile_num: formData.mobileNum,
             }
-
-            if (response && response.status) {
-                console.log('edit profile success!');
-                Toast.show({
-                    type: 'success',
-                    text1: 'Edit Profile Successful!'
-                })
-                await storeUser(response.data);
-                navigation.navigate('ViewProfileScreen')
-            } else {
-                console.log('edit profile failed!');
-                Toast.show({
-                    type: 'error',
-                    text1: response.data.errorMessage
-                })
+    
+            try {
+                let response;
+                if (user.user_type === 'LOCAL') {
+                    response = await editLocalProfile(obj);
+                } else if (user.user_type === 'TOURIST') {
+                    response = await editTouristProfile(obj);
+                }
+    
+                if (response && response.status) {
+                    console.log('edit profile success!');
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Edit Profile Successful!'
+                    })
+                    await storeUser(response.data);
+                    navigation.navigate('ViewProfileScreen')
+                } else {
+                    console.log('edit profile failed!');
+                    Toast.show({
+                        type: 'error',
+                        text1: response.data.errorMessage
+                    })
+                }
+            } catch (error) {
+                console.log(error)
+                alert('An error hass occurred' + error);
             }
-        } catch (error) {
-            console.log(error)
-            alert('An error hass occurred' + error);
+        } else if (InputValidator.dob(inputDate) !== '') {
+            Toast.show({
+                type: 'error',
+                text1: 'Please select a valid date!',
+            })
         }
     }
 
@@ -130,17 +143,13 @@ export const EditProfileScreen = ({route, navigation}) => {
                     errorText={InputValidator.mobileNo(formData.mobileNum)}
                 />
 
-                <Button
-                    mode="contained"
-                    text={"Submit"}
-                    onPress={onEditProfilePressed}
-                />
-
-                <Button
-                    mode="contained"
-                    text={"Cancel"}
-                    onPress={() => navigation.navigate('ViewProfileScreen')}
-                />
+                <div style={{marginLeft: '47px'}}>
+                    <Button
+                        mode="contained"
+                        text={"Submit"}
+                        onPress={onEditProfilePressed}
+                    />
+                </div>
             </View>
         </Background>
     ) : (<div></div>)

@@ -18,8 +18,6 @@ export default function App() {
   return (
       <NavigationContainer>
         <Stack.Navigator>
-            {/* <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} options={{title: 'Edit Profile'}}/> */}
-            {/* <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{title: 'View Profile'}}/> */}
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
             <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{title: 'Sign Up '}}/>

@@ -13,16 +13,6 @@ export const storeUser = async (userData) => {
     }
 };
 
-export const getEmail = async () => {
-    try {
-        return await AsyncStorage.getItem('email');
-        
-    } catch (e) {
-        console.log('Async Storage getEmail fail', e)
-    }
-};
-
-
 export const getUser = async () => {
     try {
         const jsonValue = await AsyncStorage.getItem('user');
@@ -45,5 +35,14 @@ export const clearStorage = async () => {
         await AsyncStorage.clear();
     } catch (e) {
         console.log('Async Storage clearStorage fail', e)
+    }
+};
+
+export const getEmail = async () => {
+    try {
+        return await AsyncStorage.getItem('email');
+        
+    } catch (e) {
+        console.log('Async Storage getEmail fail', e)
     }
 };

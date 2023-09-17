@@ -12,7 +12,7 @@ import AccomsImg from '../image/accoms.jpg'
 import TeleImg from '../image/telecom.png'
 import DealImg from '../image/discount.png'
 
-const BookingDetailsScreen = ({ navigation }) => {
+export const BookingDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [booking, setBooking] = useState('');
     const [loading, setLoading] = useState(false);
@@ -195,5 +195,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     }
 });
-
-export default BookingDetailsScreen

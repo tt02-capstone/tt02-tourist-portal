@@ -7,7 +7,7 @@ import { getPaymentHistoryList } from '../redux/reduxBooking';
 import { getUser, getUserType } from '../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
 
-const PaymentHistoryScreen = ({ navigation }) => {
+export const PaymentHistoryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -121,5 +121,3 @@ const styles = StyleSheet.create({
         fontSize: 15
     }
 });
-
-export default PaymentHistoryScreen

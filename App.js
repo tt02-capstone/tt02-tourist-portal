@@ -13,6 +13,13 @@ import {CreditCardsScreen} from "./src/screens/CreditCard/CreditCardsScreen"
 import {AddCreditCardScreen} from './src/screens/CreditCard/AddCreditCardScreen';
 import {CreditCardScreen} from './src/screens/CreditCard/CreditCardScreen';
 import { initStripe } from '@stripe/stripe-react-native';
+import {AttractionScreen} from './src/screens/AttractionScreen';
+import {AttractionDetailsScreen} from './src/screens/AttractionDetails';
+import {BookingHistoryScreen} from './src/screens/BookingHistoryScreen';
+import {BookingDetailsScreen} from './src/screens/BookingDetailsScreen';
+import {PaymentHistoryScreen} from './src/screens/PaymentHistoryScreen';
+import {CartScreen} from './src/screens/CartScreen';
+import { Cart } from './src/components/Cart';
 
 
 initStripe({
@@ -25,16 +32,24 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{
+      headerRight: () => <Cart />,
+    }} initialRouteName="LoginScreen">
+            <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Exploration'}}/>
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{title: 'Sign Up '}}/>
-            <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
             <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen} options={{title: 'Verify Code'}}/>
             <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{title: 'Reset Password'}}/>
             <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{title: 'Forgot Password'}}/>
             <Stack.Screen name="CreditCardsScreen" component={CreditCardsScreen} options={{title: 'My Credit Cards'}}/>
             <Stack.Screen name="AddCreditCardScreen" component={AddCreditCardScreen} options={{title: 'Add Credit Card'}}/>
             <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
+            <Stack.Screen name="AttractionScreen" component={AttractionScreen} options={{ title : 'Attractions' }} />
+            <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
+            <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
+            <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
+            <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
+            <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

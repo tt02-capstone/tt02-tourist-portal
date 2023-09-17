@@ -88,14 +88,17 @@ export const CartScreen = ({navigation}) => {
 
   useEffect(() => {
     async function onLoad() {
-
+      console.log("WAT")
       try {
         
         const user_type = await getUserType();
         const userData = await getUser()
         setUser(userData)
+        console.log("User", userData)
         setUserType(user_type)
         const tourist_email = userData.email
+        
+        
         const response = await cartApi.get(`/viewCart/${user_type}/${tourist_email}`)
           if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
               console.log('error',response.data)

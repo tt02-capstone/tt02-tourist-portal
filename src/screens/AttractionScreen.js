@@ -7,7 +7,7 @@ import { Text, Card, Icon } from '@rneui/themed';
 import { getAttractionList  } from '../redux/reduxAttraction';
 import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
 
-const AttractionScreen = ({ navigation }) => {
+export const AttractionScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -122,5 +122,3 @@ const styles = StyleSheet.create({
         fontSize: 15
     }
 });
-
-export default AttractionScreen

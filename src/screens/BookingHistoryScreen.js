@@ -11,7 +11,7 @@ import TeleImg from '../image/telecom.png'
 import DealImg from '../image/discount.png'
 import { useFocusEffect } from '@react-navigation/native';
 
-const BookingHistoryScreen = ({ navigation }) => {
+export const BookingHistoryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -181,5 +181,3 @@ const styles = StyleSheet.create({
         fontSize: 15
     }
 });
-
-export default BookingHistoryScreen

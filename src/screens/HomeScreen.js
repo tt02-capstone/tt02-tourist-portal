@@ -40,7 +40,7 @@ const HomeScreen = ({ navigation }) => {
             Embark on an exciting journey in Singapore and explore a diverse array of attractions that cater to every interest
             from iconic landmarks to hidden gems!
             </Text>
-            <Button text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
+            <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
           
           <Card>
@@ -55,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
               Discover a wide range of accommodation options in Singapore, tailored to suit every traveler's preferences.
               Start exploring your options now!
             </Text>
-            <Button text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
+            <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
 
           <Card>
@@ -70,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
               Indulge your taste buds in Singapore's vibrant culinary scene, where a myriad of restaurants await to 
               delight your palate. Come and savor the extraordinary culinary delights that await you!
             </Text>
-            <Button text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
+            <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
 
           <Card>
@@ -78,14 +78,14 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 0 }}
               source={{
-                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.jpg'
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png'
               }}
             />
             <Text style={styles.description}>
               Stay connected during your Singapore adventure with tailored telecom packages designed especially for tourists. 
               Choose from a variety of cost-effective plans and make the most of your visit with our telecom packages!
             </Text>
-            <Button text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
+            <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
 
           <Card>
@@ -93,14 +93,14 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 10 }}
               source={{
-                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.jpg'
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.png'
               }}
             />
             <Text style={styles.description}>
               Unlock unbeatable deals and discounts that add extra value to your Singapore journey. Don't miss out 
               on the chance to save while indulging in the best Singapore can offer!
             </Text>
-            <Button text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
+            <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
         </View>
       </ScrollView>  
@@ -133,6 +133,9 @@ const styles = StyleSheet.create({
   },
   description: {
     marginBottom: 10, fontSize: 13, marginTop : 10 
+  },
+  button: {
+    width: '100%'
   }
 });
 

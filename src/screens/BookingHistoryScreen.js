@@ -88,9 +88,9 @@ const BookingHistoryScreen = ({ navigation }) => {
         } else if (item.tour != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
         } else if (item.telecom.name != null) {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.jpg';
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
         } else {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.jpg';
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.png';
         }
     }
 

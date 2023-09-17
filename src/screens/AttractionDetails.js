@@ -215,6 +215,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
                 <View style={styles.cartOut}> 
                     <CartButton 
+                        style = {styles.cartButton}
                         text = "Add to Cart" 
                         mode="contained" 
                         onPress={addToCart}
@@ -331,6 +332,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor:  '#044537'
+    },
+    cartButton:{
+        width: '100%'
     }
     
 });

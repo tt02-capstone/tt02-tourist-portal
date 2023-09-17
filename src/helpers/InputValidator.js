@@ -52,4 +52,5 @@ const nric = (nric) => {
 
     return nric.length !== 9 ? 'NRIC should be 9 characters' : '';
 }
+
 export default {password, email, name, passport, mobileNo, nric, confirmPassword}

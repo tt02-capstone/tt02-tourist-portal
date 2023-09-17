@@ -18,7 +18,8 @@ import {AttractionDetailsScreen} from './src/screens/AttractionDetails';
 import {BookingHistoryScreen} from './src/screens/BookingHistoryScreen';
 import {BookingDetailsScreen} from './src/screens/BookingDetailsScreen';
 import {PaymentHistoryScreen} from './src/screens/PaymentHistoryScreen';
-import {CartScreen} from './src/screens/CartScreen';
+import {CartScreen} from './src/screens/Cart/CartScreen';
+import {CheckoutScreen} from './src/screens/Cart/CheckoutScreen';
 import { Cart } from './src/components/Cart';
 
 
@@ -50,6 +51,7 @@ export default function App() {
             <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
             <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
             <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
+            <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

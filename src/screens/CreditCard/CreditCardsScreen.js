@@ -23,7 +23,10 @@ export const CreditCardsScreen = ({ navigation }) => {
     async function onLoad() {
       try {
         const tourist_email = await getEmail();
+
+        console.log(tourist_email)
         const user_type = await getUserType();
+        console.log(user_type)
         setTouristEmail(await getEmail());
         setUserType(await getUserType()); 
         const response = await paymentsApi.get(`/getPaymentMethods/${user_type}/${tourist_email}`)
@@ -159,10 +162,7 @@ export const CreditCardsScreen = ({ navigation }) => {
        
         <TouchableOpacity
           onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'AddCreditCardScreen' }],
-            })
+            navigation.navigate('AddCreditCardScreen')
           }
         >
           <View style={{ width: 400, height: 150 }}>

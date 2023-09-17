@@ -1,16 +1,20 @@
 import React , { useState, useEffect } from 'react';
-import { View, FlatList, ScrollView } from 'react-native';
-import { ListItem, Button, CheckBox } from '@rneui/themed';
-import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
+import { View, FlatList, ScrollView, TouchableOpacity} from 'react-native';
+import { ListItem, Button, CheckBox, Card, Text, Icon } from '@rneui/themed';
+import { clearStorage, getUser, getUserType, getEmail } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
-import { cartApi } from '../helpers/api';
+import { cartApi } from '../../helpers/api';
+import { useRoute } from '@react-navigation/native';
 
 
-export const CartScreen = ({navigation}) => {
+export const CheckoutScreen = ({navigation}) => {
+    const route = useRoute();
     const [user, setUser] = useState('');
     const [cartItems, setCartItems] = useState([]); 
     const [user_type, setUserType] = useState('');
     const [deletion, setDeletion] = useState(false);
+    const [cards, setCards] = useState([]); 
+    const { booking_ids } = route.params;
 
   function formatDateAndTime(date) {
     const options = {
@@ -27,10 +31,13 @@ export const CartScreen = ({navigation}) => {
   }
 
   const checkout = async () => {
-    const booking_ids = [];
+    if (cartItems.length > 0) {
+      const booking_ids = [];
     cartItems.forEach((cartItem) => {
         booking_ids.push(cartItem.id);
     })
+
+  
     const tourist_email = user.email;
     const payment_method_id = 1;
     const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}`, booking_ids)
@@ -54,6 +61,8 @@ export const CartScreen = ({navigation}) => {
     });
     }
     }
+    }
+    
 
   }
 
@@ -88,13 +97,11 @@ export const CartScreen = ({navigation}) => {
 
   useEffect(() => {
     async function onLoad() {
-      console.log("WAT")
       try {
         
         const user_type = await getUserType();
         const userData = await getUser()
         setUser(userData)
-        console.log("User", userData)
         setUserType(user_type)
         const tourist_email = userData.email
         
@@ -135,6 +142,39 @@ export const CartScreen = ({navigation}) => {
       } catch (error) {
         console.error("Error fetching cart items:", error);
       }
+
+      try {
+        const tourist_email = await getEmail();
+        const user_type = await getUserType();
+
+        const response = await paymentsApi.get(`/getPaymentMethods/${user_type}/${tourist_email}`)
+          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+              console.log('error',response.data)
+              //return JSON.parse(response.data);
+  
+          } else {
+              const paymentMethods = response.data;
+              console.log(paymentMethods)
+              const extractedDetails = paymentMethods.map(paymentMethod => {
+                const { card } = paymentMethod;
+                console.log(card)
+                return {
+                  id: paymentMethod.id,
+                  last4: card.last4,
+                  brand: card.brand,
+                  expMonth: card.expMonth,
+                  expYear: card.expYear,
+                  
+                };
+              });
+              setCards(extractedDetails)
+        
+          }
+        
+        
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+      }
     }
 
     onLoad();
@@ -144,6 +184,7 @@ export const CartScreen = ({navigation}) => {
   return (
     <ScrollView>
     <View>
+        <Card containerStyle={padding= 20}>
       {
           cartItems.map((cartItem) => (
           <ListItem.Swipeable
@@ -184,14 +225,100 @@ export const CartScreen = ({navigation}) => {
             <ListItem.Chevron />
           </ListItem.Swipeable>
         ))}
+        <View>
+<Text> Select Payment Method</Text>
 
-        <Button title="Checkout" onPress={() => {
+{
+          cards.map((card) => (
+            
+            <ListItem.Swipeable
+  leftWidth={80}
+  rightWidth={90}
+  minSlideWidth={40}
+  shouldCancelWhenOutside={false} 
+  leftContent={(action) => (
+    <Button
+      containerStyle={{
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: "#f4f4f4",
+      }}
+      type="clear"
+      icon={{
+        name: "credit-card-edit-outline",
+        type: "material-community",
+      }}
+      onPress={action}
+    />
+  )}
+  rightContent={(action) => (
+    <Button
+      containerStyle={{
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: "#DC143C",
+      }}
+      type="clear"
+      icon={{ name: "delete-outline" }}
+      onPress={() => {
+        handleDeleteCard(card.id);
+        action();
+      }}
+    />
+  )}
+>
+
+  <Icon name={`${card.brand.toLowerCase()}`} type="fontisto" />
+  <ListItem.Content>
+  <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('CreditCardScreen', {
+                  id: card.id,
+                  brand: card.brand,
+                  last4: card.last4,
+                  expMonth: card.expMonth,
+                  expYear: card.expYear,
+                });
+              }}
+            >
+    <ListItem.Title>**** **** **** {card.last4}</ListItem.Title>
+    <ListItem.Subtitle>Expires {card.expMonth.toString().padStart(2, '0')}/{card.expYear} </ListItem.Subtitle>
+    </TouchableOpacity>
+  </ListItem.Content>
+  
+  <ListItem.Chevron />
+</ListItem.Swipeable>
+
+        ))}
+       
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('AddCreditCardScreen')
+
+          }
+        >
+          <View style={{ width: 400, height: 150 }}>
+        <Card containerStyle={{marginTop: 20,
+    padding: 20}}>
+          <Text>+ Add a Credit/ Debit Card</Text>
+        </Card>
+       
+
+      </View>
+        </TouchableOpacity>
+</View>
+</Card>
+
+        <Button title="Place Booking" onPress={() => {
                   checkout();
                 }} />
     
       
         
     </View>
+    
+
     </ScrollView>
+
   );
 };

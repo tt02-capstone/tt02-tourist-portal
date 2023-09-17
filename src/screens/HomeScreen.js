@@ -111,10 +111,7 @@ export const HomeScreen = ({ navigation }) => {
         text = "Manage Payments"
         mode ="contained"
         onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'CreditCardsScreen' }],
-          })
+          navigation.navigate('CreditCardsScreen')
         }
       />
         </View>

@@ -8,8 +8,9 @@ export const Cart = () => {
     const navigation = useNavigation();
     const isLoginScreen = route.name === 'LoginScreen';
     const isCartScreen = route.name === 'CartScreen';
+    const isCheckoutScreen = route.name === 'CheckoutScreen';
 
-    if (isLoginScreen || isCartScreen) {
+    if (isLoginScreen || isCartScreen || isCheckoutScreen) {
         return null;
       }
 

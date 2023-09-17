@@ -5,10 +5,6 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { getBookingHistoryList } from '../redux/reduxBooking';
 import { getUser, getUserType } from '../helpers/LocalStorage';
-import AttractionImg from '../image/attractions.jpg'
-import AccomsImg from '../image/accoms.jpg'
-import TeleImg from '../image/telecom.png'
-import DealImg from '../image/discount.png'
 import { useFocusEffect } from '@react-navigation/native';
 
 const BookingHistoryScreen = ({ navigation }) => {
@@ -86,15 +82,15 @@ const BookingHistoryScreen = ({ navigation }) => {
 
     const getImage = (item) => {
         if (item.attraction != null) {
-            return AttractionImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
         } else if (item.room != null) {
-            return AccomsImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
-            return AttractionImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
         } else if (item.telecom.name != null) {
-            return TeleImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.jpg';
         } else {
-            return DealImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.jpg';
         }
     }
 

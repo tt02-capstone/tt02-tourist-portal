@@ -7,10 +7,6 @@ import { Text, Card, CheckBox } from '@rneui/themed';
 import { getBookingByBookingId, cancelBookingByBookingId } from '../redux/reduxBooking';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import AttractionImg from '../image/attractions.jpg'
-import AccomsImg from '../image/accoms.jpg'
-import TeleImg from '../image/telecom.png'
-import DealImg from '../image/discount.png'
 
 const BookingDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -72,15 +68,15 @@ const BookingDetailsScreen = ({ navigation }) => {
 
     const getImage = (item) => {
         if (item.attraction != null) {
-            return AttractionImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
         } else if (item.room != null) {
-            return AccomsImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
-            return AttractionImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
         } else if (item.telecom.name != null) {
-            return TeleImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.jpg';
         } else {
-            return DealImg;
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.jpg';
         }
     }
 

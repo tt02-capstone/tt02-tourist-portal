@@ -3,12 +3,12 @@ import Background from '../components/CardBackground'
 import { Button } from 'react-native-paper';
 import CartButton from '../components/Button';
 import { theme } from '../core/theme'
-import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
+import { getUser, getUserType } from '../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
-import { getAttraction, getAttractionRecommendation, saveAttraction } from '../redux/reduxAttractionDetails'; 
+import { getAttraction, getAttractionRecommendation, saveAttraction , checkTicketInventory} from '../redux/reduxAttractionDetails'; 
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import {storeUser} from "../helpers/LocalStorage";
@@ -54,7 +54,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
     };
 
     const formattedPriceList = priceList.map(item => {
-        const userType = user.user_type; // can get any attribute u wan
+        const userType = user.user_type; 
         const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
         const ticket_type = item.ticket_type;
 
@@ -66,19 +66,39 @@ const AttractionDetailsScreen = ({ navigation }) => {
         };
     });
 
-    const addToCart = () => {
+    const addToCart = async () => {
         const selectedTickets = [];
-        for (const ticketType in quantityByTicketType) { // Corrected variable name here
+        
+        // format date
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
+        const formattedDate = `${year}-${month}-${day}`;
+
+        for (const ticketType in quantityByTicketType) { 
             if (quantityByTicketType[ticketType] > 0) {
                 selectedTickets.push({
                     ticket_type: ticketType,
-                    quantity: quantityByTicketType[ticketType],
-                    amount: formattedPriceList.find(item => item.ticket_type === ticketType).amount
+                    ticket_date: formattedDate,
+                    ticket_count: quantityByTicketType[ticketType],
+                    ticket_price: formattedPriceList.find(item => item.ticket_type === ticketType).amount // price per ticket 
                 });
             }
         }
-        selectedTickets.push(selectedDate);
-        console.log(selectedTickets);
+
+        let checkInventory = await checkTicketInventory(attraction.attraction_id,formattedDate,selectedTickets);
+        if (checkInventory.status) {
+            Toast.show({
+                type: 'error',
+                text1: checkInventory.error
+            })
+        } else {
+            // continue w any logic u need here 
+            Toast.show({
+                type: 'success',
+                text1: 'Attraction added to cart!'
+            });
+        }
     };
 
 
@@ -94,27 +114,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
         return labelColorMap[label] || 'gray';
     };
-
-    const fetchAttraction = async() => {
-        try {
-            let attraction = await getAttraction(attractionId);
-            setAttraction(attraction);
-            setPriceList(attraction.price_list);
-
-            let reccoms = await getAttractionRecommendation(attractionId);
-            setRecommendation(reccoms)
-
-            setLoading(false);
-            fetchUser();
-        } catch (error) {
-            alert ('An error occur! Failed to retrieve attraction list!');
-            setLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        fetchAttraction(); // when the page load the first time
-    }, []);
 
     const viewRecommendedAttraction = (redirect_attraction_id) => {
         navigation.push('AttractionDetailsScreen', {attractionId : redirect_attraction_id}); // push on to the nxt nav stack 
@@ -137,6 +136,27 @@ const AttractionDetailsScreen = ({ navigation }) => {
             })
         }
     }
+
+    const fetchAttraction = async() => {
+        try {
+            let attraction = await getAttraction(attractionId);
+            setAttraction(attraction);
+            setPriceList(attraction.price_list);
+
+            let reccoms = await getAttractionRecommendation(attractionId);
+            setRecommendation(reccoms)
+
+            setLoading(false);
+            fetchUser();
+        } catch (error) {
+            alert ('An error occur! Failed to retrieve attraction list!');
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchAttraction(); // when the page load the first time
+    }, []);
 
     return (
         <Background>
@@ -194,7 +214,12 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 </Card>
 
                 <View style={styles.cartOut}> 
-                    <CartButton text = "Add to Cart" mode="contained" onPress={addToCart}/>
+                    <CartButton 
+                        text = "Add to Cart" 
+                        mode="contained" 
+                        onPress={addToCart}
+                        disabled={!selectedDate || formattedPriceList.every(item => quantityByTicketType[item.ticket_type] === 0)}
+                    />
                 </View>
         
                 <Card containerStyle={styles.dropBorder}>
@@ -253,7 +278,8 @@ const styles = StyleSheet.create({
     header:{
         textAlign: 'left',
         fontSize: 15,
-        color: '#044537'
+        color: '#044537',
+        flexDirection: 'row'
     },
     image: {
         width: 30,height: 30,marginRight: 10,

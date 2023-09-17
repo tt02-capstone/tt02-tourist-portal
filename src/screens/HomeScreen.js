@@ -4,11 +4,6 @@ import Header from '../components/Header'
 import Button from '../components/Button'
 import { View, ScrollView, StyleSheet, Image } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
-import AttractionImg from '../image/attractions.jpg'
-import RestaurantImg from '../image/restaurant.jpg'
-import AccomsImg from '../image/accoms.jpg'
-import TeleImg from '../image/telecom.png'
-import DealImg from '../image/discount.png'
 import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
 
 const HomeScreen = ({ navigation }) => {
@@ -38,7 +33,7 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 0}}
               source={{
-                uri: AttractionImg
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg'
               }}
             />
             <Text style={styles.description}>
@@ -53,7 +48,7 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 0 }}
               source={{
-                uri: AccomsImg
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg'
               }}
             />
             <Text style={styles.description}>
@@ -68,7 +63,7 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 0 }}
               source={{
-                uri: RestaurantImg
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/restaurant.jpg'
               }}
             />
             <Text style={styles.description}>
@@ -83,7 +78,7 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 0 }}
               source={{
-                uri: TeleImg
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.jpg'
               }}
             />
             <Text style={styles.description}>
@@ -98,7 +93,7 @@ const HomeScreen = ({ navigation }) => {
             <Card.Image
               style={{ padding: 10 }}
               source={{
-                uri: DealImg
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.jpg'
               }}
             />
             <Text style={styles.description}>

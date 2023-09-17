@@ -1,25 +1,25 @@
 import React , { useState, useEffect } from 'react'
 import Background from '../components/CardBackground'
 import { Button } from 'react-native-paper';
-import CartButton from '../components/Button'
+import CartButton from '../components/Button';
 import { theme } from '../core/theme'
 import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Text, Card, CheckBox } from '@rneui/themed';
+import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { DatePickerInput } from 'react-native-paper-dates';
 import { getAttraction, getAttractionRecommendation, saveAttraction } from '../redux/reduxAttractionDetails'; 
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import {storeUser} from "../helpers/LocalStorage";
-import { cartApi } from '../helpers/api';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [attraction, setAttraction] = useState([]);
     const [recommendation, setRecommendation] = useState([]);
     const [priceList, setPriceList] = useState([]);
-    const [checkedBoxes, setCheckedBoxes] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [selectedDate, setSelectedDate] = useState();
 
     const route = useRoute();
     const { attractionId } = route.params;
@@ -31,30 +31,56 @@ const AttractionDetailsScreen = ({ navigation }) => {
         const usertype =  await getUserType()
     }
 
-    const formattedPriceList = priceList.map(item => {
-        const userType = user.userTypeEnum; // can get any attribute u wan
-        const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
-
-        return (
-            <CheckBox
-              key={item.ticket_type}
-              title={`${item.ticket_type} TICKET @ $${amount}`}
-              checked={checkedBoxes.includes(item.ticket_type)} 
-              onPress={() => handleCheckboxChange(item.ticket_type)}
-            />
-            
-        );
-    });
-
-    const handleCheckboxChange = (label) => {
-        setCheckedBoxes((prevCheckedBoxes) => {
-          if (prevCheckedBoxes.includes(label)) {
-            return prevCheckedBoxes.filter((box) => box !== label);
-          } else {
-            return [...prevCheckedBoxes, label];
-          }
+    const [quantityByTicketType, setQuantityByTicketType] = useState({});
+    
+    const handleIncrease = (ticketType) => {
+        setQuantityByTicketType((prevQuantity) => {
+          const updatedQuantity = {
+            ...prevQuantity,
+            [ticketType]: (prevQuantity[ticketType] || 0) + 1,
+          };
+          return updatedQuantity;
         });
     };
+    
+    const handleDecrease = (ticketType) => {
+        setQuantityByTicketType((prevQuantity) => {
+          const updatedQuantity = {
+            ...prevQuantity,
+            [ticketType]: Math.max((prevQuantity[ticketType] || 0) - 1, 0),
+          };
+          return updatedQuantity;
+        });
+    };
+
+    const formattedPriceList = priceList.map(item => {
+        const userType = user.user_type; // can get any attribute u wan
+        const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
+        const ticket_type = item.ticket_type;
+
+        return {
+            ...item, 
+            userType,
+            amount,
+            ticket_type
+        };
+    });
+
+    const addToCart = () => {
+        const selectedTickets = [];
+        for (const ticketType in quantityByTicketType) { // Corrected variable name here
+            if (quantityByTicketType[ticketType] > 0) {
+                selectedTickets.push({
+                    ticket_type: ticketType,
+                    quantity: quantityByTicketType[ticketType],
+                    amount: formattedPriceList.find(item => item.ticket_type === ticketType).amount
+                });
+            }
+        }
+        selectedTickets.push(selectedDate);
+        console.log(selectedTickets);
+    };
+
 
     const getColorForType = (label) => {
         const labelColorMap = {
@@ -75,8 +101,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttraction(attraction);
             setPriceList(attraction.price_list);
 
-            //let reccoms = await getAttractionRecommendation(attractionId);
-            //setRecommendation(reccoms)
+            let reccoms = await getAttractionRecommendation(attractionId);
+            setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();
@@ -112,52 +138,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
         }
     }
 
-    const toCart = async () => {
-        const user_type = user.userTypeEnum;
-        const tourist_email = user.email;
-        const activity_name = attraction.name;
-        const cartItems = [];
-
-        for (const type of checkedBoxes) {
-            const cartItem = {}
-            cartItem.type = "ATTRACTION";
-            cartItem.activity_selection = type
-            cartItem.quantity = 1;
-            cartItem.start_datetime = new Date();
-            cartItem.end_datetime = new Date();
-            cartItem.price = 0;
-            cartItems.push(cartItem);
-            
-        }
-
-        const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
-        console.log(response.data.httpStatusCode)
-        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-            console.log('error',response.data)
-  
-        } else {
-            console.log('success', response.data)
-            if (response.data) {
-              Toast.show({
-                type: 'success',
-                text1: 'Added Items to Cart!'
-            });
-            // Update Cart Badge 
-              
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: 'Unable to add items to cart'
-            });
-            }
-  
-  
-        };
-      
-
-
-    }
-
     return (
         <Background>
             <ScrollView>
@@ -177,13 +157,44 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 
                 <Card containerStyle={styles.dropBorder}>
                     <Card.Title style={styles.header}>
-                        Ticket Pricing
+                        Tickets
                     </Card.Title>
-                    <>{formattedPriceList}</>
+
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 320, height: 150 }}>
+                        <DatePickerInput
+                            locale="en"
+                            label="Ticket Date"
+                            value={selectedDate}
+                            onChange={(d) => setSelectedDate(d)}
+                            inputMode="start"
+                        />
+                    </View>
+
+                    <View>
+                        {formattedPriceList.map(item => (
+                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10}}>
+                                <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}</Text>
+                                <Text style={{marginLeft: 10 }}></Text> 
+
+                                <Button mode="contained" style={styles.quantity} onPress={() => handleDecrease(item.ticket_type)}>
+                                    -
+                                </Button>
+                                <Text style={{marginLeft: 10 }}></Text> 
+                                <Text>{quantityByTicketType[item.ticket_type] || 0}</Text>
+                                <Text style={{marginLeft: 10 }}></Text> 
+                                <Button mode="contained" style={styles.quantity} onPress={() => handleIncrease(item.ticket_type)}>
+                                    +
+                                </Button>
+
+                                <Text style={{margin: 20 }}></Text> 
+                            
+                            </View>
+                        ))}
+                    </View>
                 </Card>
 
                 <View style={styles.cartOut}> 
-                    <CartButton text = "Add to Cart" mode="contained" onPress={toCart}/>
+                    <CartButton text = "Add to Cart" mode="contained" onPress={addToCart}/>
                 </View>
         
                 <Card containerStyle={styles.dropBorder}>
@@ -282,11 +293,20 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surface,
     },
     cartOut: {
-        width: 360,
+        width: 330,
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    quantity: {
+        width: 20,
+        height: 20,
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor:  '#044537'
     }
+    
 });
 
 export default AttractionDetailsScreen

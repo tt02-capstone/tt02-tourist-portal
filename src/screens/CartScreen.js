@@ -32,7 +32,8 @@ export const CartScreen = ({navigation}) => {
         booking_ids.push(cartItem.id);
     })
     const tourist_email = user.email;
-    const response = await cartApi.put(`/checkoutCart/${user_type}/${tourist_email}`, booking_ids)
+    const payment_method_id = 1;
+    const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}`, booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error',response.data)
 
@@ -109,9 +110,6 @@ export const CartScreen = ({navigation}) => {
                 console.log(user_type)
 
 
-                const localPrice = priceItem ? priceItem.local_amount : 0;
-                const touristPrice = priceItem ? priceItem.tourist_amount : 0;
-                console.log(priceItem)
                 console.log(detail.type)
                 return {
                     id: parseInt(detail.booking_id),
@@ -119,7 +117,7 @@ export const CartScreen = ({navigation}) => {
                     item_name: detail.activity_selection, // Needs to be conditional
                     activity_name: detail.attraction.name, // Needs to be conditional
                     //image: detail.attraction.attraction_image_list[0],
-                    quantity: parseInt(detail.quantity),
+                    //quantity: parseInt(detail.quantity),
                     startTime: formatDateAndTime(detail.start_datetime),
                     endTime: formatDateAndTime(detail.end_datetime),
                     //price: detail.price.toFixed(2),

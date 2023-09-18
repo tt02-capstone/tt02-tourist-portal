@@ -68,36 +68,52 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
     const addToCart = async () => {
         const selectedTickets = [];
-        
-        // format date
-        const year = selectedDate.getFullYear();
-        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
-        const formattedDate = `${year}-${month}-${day}`;
-
-        for (const ticketType in quantityByTicketType) { 
-            if (quantityByTicketType[ticketType] > 0) {
-                selectedTickets.push({
-                    ticket_type: ticketType,
-                    ticket_date: formattedDate,
-                    ticket_count: quantityByTicketType[ticketType],
-                    ticket_price: formattedPriceList.find(item => item.ticket_type === ticketType).amount // price per ticket 
-                });
-            }
-        }
-
-        let checkInventory = await checkTicketInventory(attraction.attraction_id,formattedDate,selectedTickets);
-        if (checkInventory.status) {
+        if (!selectedDate) { // check if date is selected 
             Toast.show({
                 type: 'error',
-                text1: checkInventory.error
+                text1: "Please Select a Booking Date!"
             })
+
         } else {
-            // continue w any logic u need here 
-            Toast.show({
-                type: 'success',
-                text1: 'Attraction added to cart!'
-            });
+            // format date
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
+            const formattedDate = `${year}-${month}-${day}`;
+
+            for (const ticketType in quantityByTicketType) { 
+                if (quantityByTicketType[ticketType] > 0) {
+                    selectedTickets.push({
+                        ticket_type: ticketType,
+                        ticket_date: formattedDate,
+                        ticket_count: quantityByTicketType[ticketType],
+                        ticket_price: formattedPriceList.find(item => item.ticket_type === ticketType).amount // price per ticket 
+                    });
+                }
+            }
+
+            if (selectedTickets.length === 0) { // when ticket date is select but ticket types quantity r all 0
+                Toast.show({
+                    type: 'error',
+                    text1: "Please Select your Ticket Quantity!"
+                })
+
+            } else { // when both ticket date + ticket types are selected 
+                let checkInventory = await checkTicketInventory(attraction.attraction_id,formattedDate,selectedTickets);
+                
+                if (checkInventory.status) {
+                    Toast.show({
+                        type: 'error',
+                        text1: checkInventory.error
+                    })
+                } else {
+                    // continue w any logic u need here 
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Attraction Ticket(s) Added to Cart!'
+                    });
+                }
+            }
         }
     };
 
@@ -184,7 +200,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         <DatePickerInput
                             locale='en-GB'
                             format
-                            label="Ticket Date"
+                            label="Ticket Booking Date"
                             value={selectedDate}
                             onChange={(d) => setSelectedDate(d)}
                             inputMode="start"
@@ -218,7 +234,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         text = "Add to Cart" 
                         mode="contained" 
                         onPress={addToCart}
-                        disabled={!selectedDate || formattedPriceList.every(item => quantityByTicketType[item.ticket_type] === 0)}
                     />
                 </View>
         

@@ -17,6 +17,8 @@ import AttractionDetailsScreen from './src/screens/AttractionDetails';
 import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
+import { enGB, registerTranslation } from 'react-native-paper-dates'
+registerTranslation('en-GB', enGB)
 
 const Stack = createNativeStackNavigator();
 export default function App() {

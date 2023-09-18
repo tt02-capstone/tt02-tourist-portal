@@ -4,16 +4,18 @@ import Header from '../../components/Header'
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { CardForm, useStripe } from '@stripe/stripe-react-native';
 //import { getPaymentMethods } from '../../redux/creditCard'
-import {getEmail, getUserType} from "../../helpers/LocalStorage";
+import {getEmail, getUserType, getUser} from "../../helpers/LocalStorage";
 import {paymentsApi} from "../../helpers/api";
 import { Text, Card, Icon, Button, ListItem } from '@rneui/themed';
 import Toast from "react-native-toast-message";
+import { useIsFocused } from '@react-navigation/native';
 
 
 export const CreditCardsScreen = ({ navigation }) => {
   const [cards, setCards] = useState([]); 
   const [tourist_email, setTouristEmail] = useState('');
   const [user_type, setUserType] = useState('');
+  const isFocused = useIsFocused();
 
 
   useEffect(() => {
@@ -22,7 +24,8 @@ export const CreditCardsScreen = ({ navigation }) => {
     
     async function onLoad() {
       try {
-        const tourist_email = await getEmail();
+        const userData = await getUser();
+        setTouristEmail(userData.email);
 
         console.log(tourist_email)
         const user_type = await getUserType();
@@ -60,7 +63,7 @@ export const CreditCardsScreen = ({ navigation }) => {
     }
     
     onLoad();
-  }, []);
+  }, [isFocused]);
   
   const cardHeight = 150 + cards.length * 50;
 
@@ -162,7 +165,9 @@ export const CreditCardsScreen = ({ navigation }) => {
        
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('AddCreditCardScreen')
+            navigation.navigate('AddCreditCardScreen', {
+              previousScreen: 'CreditCardsScreen',
+            })
           }
         >
           <View style={{ width: 400, height: 150 }}>

@@ -21,7 +21,7 @@ import {CreditCardsScreen} from "./src/screens/CreditCard/CreditCardsScreen"
 import {AddCreditCardScreen} from './src/screens/CreditCard/AddCreditCardScreen';
 import {CreditCardScreen} from './src/screens/CreditCard/CreditCardScreen';
 import {CartScreen} from './src/screens/Cart/CartScreen';
-//import {CheckoutScreen} from './src/screens/Cart/CheckoutScreen';
+import {CheckoutScreen} from './src/screens/Cart/CheckoutScreen';
 import { Cart } from './src/components/Cart';
 import { initStripe } from '@stripe/stripe-react-native';
 
@@ -55,6 +55,7 @@ export default function App() {
             <Stack.Screen name="AddCreditCardScreen" component={AddCreditCardScreen} options={{title: 'Add Credit Card'}}/>
             <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
             <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
+            <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

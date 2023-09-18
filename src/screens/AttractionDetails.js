@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 import CartButton from '../components/Button';
 import { theme } from '../core/theme'
 import { getUser, getUserType } from '../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
@@ -164,7 +164,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 <Card>
                     <Card.Title style={styles.header}>
                         {attraction.name} 
-                        <Button mode="text" style={styles.save} onPress={saveAttr}>
+                        <Button mode="text" style={{ marginTop: -13}} onPress={saveAttr} >
                             <Icon name="heart" size={20} color='blue'/>
                         </Button>
                     </Card.Title>
@@ -180,9 +180,10 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         Tickets
                     </Card.Title>
 
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 320, height: 150 }}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 360, height: 100 , marginTop: -15}}>
                         <DatePickerInput
-                            locale="en"
+                            locale='en-GB'
+                            format
                             label="Ticket Date"
                             value={selectedDate}
                             onChange={(d) => setSelectedDate(d)}
@@ -192,24 +193,22 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
                     <View>
                         {formattedPriceList.map(item => (
-                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10}}>
+                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 20}}>
                                 <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}</Text>
-                                <Text style={{marginLeft: 10 }}></Text> 
-
-                                <Button mode="contained" style={styles.quantity} onPress={() => handleDecrease(item.ticket_type)}>
+                                
+                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 40}} onPress={() => handleDecrease(item.ticket_type)}>
                                     -
                                 </Button>
-                                <Text style={{marginLeft: 10 }}></Text> 
-                                <Text>{quantityByTicketType[item.ticket_type] || 0}</Text>
-                                <Text style={{marginLeft: 10 }}></Text> 
-                                <Button mode="contained" style={styles.quantity} onPress={() => handleIncrease(item.ticket_type)}>
+                                
+                                <Text style={{ marginLeft: 20 }}>{quantityByTicketType[item.ticket_type] || 0}</Text>
+                                
+                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleIncrease(item.ticket_type)}>
                                     +
                                 </Button>
 
-                                <Text style={{margin: 20 }}></Text> 
-                            
                             </View>
                         ))}
+                        
                     </View>
                 </Card>
 
@@ -325,16 +324,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    quantity: {
-        width: 20,
-        height: 20,
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor:  '#044537'
-    },
     cartButton:{
-        width: '100%'
+        marginTop: -5,
+        width: '110%'
     }
     
 });

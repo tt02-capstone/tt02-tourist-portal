@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import Background from '../components/CardBackground'
-import Button from '../components/Button'
+import Background from '../../components/CardBackground'
+import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getBookingHistoryList } from '../redux/reduxBooking';
-import { getUser, getUserType } from '../helpers/LocalStorage';
+import { getBookingHistoryList } from '../../redux/reduxBooking';
+import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
 
 const BookingHistoryScreen = ({ navigation }) => {

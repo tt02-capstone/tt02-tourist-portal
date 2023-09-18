@@ -12,10 +12,10 @@ import { CodeVerificationScreen } from "./src/screens/CodeVerificationScreen";
 import { ViewProfileScreen } from './src/screens/Profile/ViewProfileScreen';
 import { EditProfileScreen } from './src/screens/Profile/EditProfileScreen';
 import { EditPasswordScreen } from './src/screens/Profile/EditPasswordScreen';
-import AttractionScreen from './src/screens/AttractionScreen';
-import AttractionDetailsScreen from './src/screens/AttractionDetails';
-import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
-import BookingDetailsScreen from './src/screens/BookingDetailsScreen';
+import AttractionScreen from './src/screens/Attraction/AttractionScreen';
+import AttractionDetailsScreen from './src/screens/Attraction/AttractionDetailsScreen';
+import BookingHistoryScreen from './src/screens/Booking/BookingHistoryScreen';
+import BookingDetailsScreen from './src/screens/Booking/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
 import { enGB, registerTranslation } from 'react-native-paper-dates'
 registerTranslation('en-GB', enGB)

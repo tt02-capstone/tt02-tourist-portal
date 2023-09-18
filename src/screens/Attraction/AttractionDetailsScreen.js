@@ -1,17 +1,17 @@
 import React , { useState, useEffect } from 'react'
-import Background from '../components/CardBackground'
+import Background from '../../components/CardBackground'
 import { Button } from 'react-native-paper';
-import CartButton from '../components/Button';
-import { theme } from '../core/theme'
-import { getUser, getUserType } from '../helpers/LocalStorage';
+import CartButton from '../../components/Button';
+import { theme } from '../../core/theme'
+import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
-import { getAttraction, getAttractionRecommendation, saveAttraction , checkTicketInventory} from '../redux/reduxAttractionDetails'; 
+import { getAttraction, getAttractionRecommendation, saveAttraction , checkTicketInventory} from '../../redux/reduxAttractionDetails'; 
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import {storeUser} from "../helpers/LocalStorage";
+import {storeUser} from "../../helpers/LocalStorage";
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');

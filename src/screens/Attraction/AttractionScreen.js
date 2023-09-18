@@ -1,11 +1,11 @@
-import React , { useState, useEffect } from 'react'
-import Background from '../components/CardBackground'
-import Header from '../components/Header'
-import Button from '../components/Button'
+import React , { useState, useEffect } from 'react';
+import Background from '../../components/CardBackground';
+import Header from '../../components/Header';
+import Button from '../../components/Button';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
-import { getAttractionList  } from '../redux/reduxAttraction';
-import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
+import { getAttractionList  } from '../../redux/reduxAttraction';
+import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
 
 const AttractionScreen = ({ navigation }) => {
     const [user, setUser] = useState('');

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import Background from '../components/CardBackground'
-import Button from '../components/Button'
-import { getUser, getUserType } from '../helpers/LocalStorage';
+import Background from '../../components/CardBackground'
+import Button from '../../components/Button'
+import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
-import { getBookingByBookingId, cancelBookingByBookingId } from '../redux/reduxBooking';
+import { getBookingByBookingId, cancelBookingByBookingId } from '../../redux/reduxBooking';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 

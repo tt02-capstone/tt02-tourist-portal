@@ -132,7 +132,7 @@ const BookingHistoryScreen = ({ navigation }) => {
                                             }}
                                         />
                                     </View>
-                                    <Button text="View Details" mode="contained" onPress={() => viewBooking(item.booking_id)} />
+                                    <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewBooking(item.booking_id)} />
                                 </Card>
                             </TouchableOpacity>
                         ))
@@ -194,6 +194,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'gray',
         textAlign: 'center'
+    }, 
+    button: {
+        width: '100%'
     }
 });
 

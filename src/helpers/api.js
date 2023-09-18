@@ -36,3 +36,7 @@ export const paymentsApi = axios.create({
     baseURL: HOST_WITH_PORT + '/payment'
 
 })
+
+export const cartApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/cart'
+})

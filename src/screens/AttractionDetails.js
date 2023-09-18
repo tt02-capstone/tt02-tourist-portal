@@ -12,6 +12,7 @@ import { getAttraction, getAttractionRecommendation, saveAttraction , checkTicke
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import {storeUser} from "../helpers/LocalStorage";
+import { cartApi } from '../helpers/api';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -67,7 +68,11 @@ const AttractionDetailsScreen = ({ navigation }) => {
     });
 
     const addToCart = async () => {
+        const cartItems = [];
         const selectedTickets = [];
+        const user_type = user.userTypeEnum;
+        const tourist_email = user.email;
+        const activity_name = attraction.name;
         
         // format date
         const year = selectedDate.getFullYear();
@@ -77,12 +82,22 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
         for (const ticketType in quantityByTicketType) { 
             if (quantityByTicketType[ticketType] > 0) {
+                cartItems.push({
+                    type : "ATTRACTION",
+                    activity_selection: ticketType,
+                    quantity: quantityByTicketType[ticketType],
+                    price: formattedPriceList.find(item => item.ticket_type === ticketType).amount, // price per ticket
+                    start_datetime: formattedDate,
+                    end_datetime: formattedDate,
+                });
+
                 selectedTickets.push({
                     ticket_type: ticketType,
                     ticket_date: formattedDate,
                     ticket_count: quantityByTicketType[ticketType],
                     ticket_price: formattedPriceList.find(item => item.ticket_type === ticketType).amount // price per ticket 
                 });
+
             }
         }
 
@@ -93,11 +108,30 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 text1: checkInventory.error
             })
         } else {
-            // continue w any logic u need here 
-            Toast.show({
-                type: 'success',
-                text1: 'Attraction added to cart!'
+            const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
+            console.log(response.data.httpStatusCode)
+            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+                console.log('error',response.data)
+  
+            } else {
+                console.log('success', response.data)
+                if (response.data) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Added Items to Cart!'
+                });
+            // Update Cart Badge 
+              
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: 'Unable to add items to cart'
             });
+            }
+  
+  
+        };
+            
         }
     };
 
@@ -143,8 +177,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttraction(attraction);
             setPriceList(attraction.price_list);
 
-            let reccoms = await getAttractionRecommendation(attractionId);
-            setRecommendation(reccoms)
+            //let reccoms = await getAttractionRecommendation(attractionId);
+            //setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();

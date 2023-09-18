@@ -177,8 +177,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttraction(attraction);
             setPriceList(attraction.price_list);
 
-            //let reccoms = await getAttractionRecommendation(attractionId);
-            //setRecommendation(reccoms)
+            let reccoms = await getAttractionRecommendation(attractionId);
+            setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();

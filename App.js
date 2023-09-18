@@ -19,13 +19,27 @@ import BookingHistoryScreen from './src/screens/Booking/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/Booking/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
 import SavedListingScreen from './src/screens/Profile/SaveListingScreen';
+import {CreditCardsScreen} from "./src/screens/CreditCard/CreditCardsScreen"
+import {AddCreditCardScreen} from './src/screens/CreditCard/AddCreditCardScreen';
+import {CreditCardScreen} from './src/screens/CreditCard/CreditCardScreen';
+import {CartScreen} from './src/screens/Cart/CartScreen';
+//import {CheckoutScreen} from './src/screens/Cart/CheckoutScreen';
+import { Cart } from './src/components/Cart';
+import { initStripe } from '@stripe/stripe-react-native';
+
+initStripe({
+  // API Key is test key, will be masked via GitHub Actions for deployment
+  publishableKey: 'pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg',
+});
 
 registerTranslation('en-GB', enGB)
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="LoginScreen">
+        <Stack.Navigator screenOptions={{
+      headerRight: () => <Cart />,
+    }}   initialRouteName="LoginScreen">
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
             <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{title: 'Sign Up '}}/>
@@ -41,6 +55,10 @@ export default function App() {
             <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
             <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} /> 
             <Stack.Screen name="SavedListingScreen" component={ SavedListingScreen } options={{ title : 'Saved Listing' }} /> 
+            <Stack.Screen name="CreditCardsScreen" component={CreditCardsScreen} options={{title: 'My Credit Cards'}}/>
+            <Stack.Screen name="AddCreditCardScreen" component={AddCreditCardScreen} options={{title: 'Add Credit Card'}}/>
+            <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
+            <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

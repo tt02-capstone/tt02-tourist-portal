@@ -19,10 +19,8 @@ export const LoginScreen = ({navigation}) => {
 
     const onLoginPressed = async () => {
         const emailError = InputValidator.email(email.value)
-        const passwordError = InputValidator.password(password.value)
-        if (emailError || passwordError) {
+        if (emailError) {
             setEmail({...email, error: emailError})
-            setPassword({...password, error: passwordError})
             return
         }
 

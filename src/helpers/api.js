@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST = '192.168.84.148'
+const HOST = 'localhost'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -30,4 +30,13 @@ export const attractionApi = axios.create({
 
 export const bookingApi = axios.create({
     baseURL: HOST_WITH_PORT + '/booking'
+})
+
+export const paymentsApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/payment'
+
+})
+
+export const cartApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/cart'
 })

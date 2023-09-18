@@ -18,6 +18,7 @@ import AttractionDetailsScreen from './src/screens/Attraction/AttractionDetailsS
 import BookingHistoryScreen from './src/screens/Booking/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/Booking/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
+import SavedListingScreen from './src/screens/Profile/SaveListingScreen';
 
 registerTranslation('en-GB', enGB)
 const Stack = createNativeStackNavigator();
@@ -39,6 +40,7 @@ export default function App() {
             <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
             <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
             <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} /> 
+            <Stack.Screen name="SavedListingScreen" component={ SavedListingScreen } options={{ title : 'Saved Listing' }} /> 
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

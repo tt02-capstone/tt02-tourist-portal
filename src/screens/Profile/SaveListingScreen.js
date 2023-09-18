@@ -1,33 +1,36 @@
 import React , { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
-import Header from '../../components/Header';
 import Button from '../../components/Button';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
-import { getAttractionList  } from '../../redux/reduxAttraction';
-import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
+import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
+import { getSavedAttractionList, deleteSavedAttraction } from '../../redux/reduxAttraction';
+import Toast from "react-native-toast-message";
 
-const AttractionScreen = ({ navigation }) => {
+const SavedListingScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
 
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
-    
-        const usertype =  await getUserType()
+    }
+
+    async function updateData() {
+        const savedAttractions = await getSavedAttractionList(user.user_id);
+        setData(savedAttractions);
     }
 
     useEffect(() => {
         const fetchData = async() => {
             try {
-                let listOfAttractions = await getAttractionList();
-                setData(listOfAttractions);
-                setLoading(false);
+                const userData = await getUser()
+                setUser(userData)
+
+                let savedAttractions = await getSavedAttractionList(userData.user_id);
+                setData(savedAttractions);
             } catch (error) {
-                alert ('An error occur! Failed to retrieve attraction list!');
-                setLoading(false);
+                alert ('An error occur! Failed to retrieve saved attraction listing!');
             }    
         };
         fetchUser();
@@ -47,8 +50,27 @@ const AttractionScreen = ({ navigation }) => {
         return labelColorMap[label] || 'gray';
     };
 
-    const viewAttraction = (attraction_id) => {
+    const viewListing = (attraction_id) => {
         navigation.navigate('AttractionDetailsScreen', {attractionId : attraction_id}); // set the attraction id here 
+    }
+
+    const removeListing = async (attraction_id) => {
+        let response = await deleteSavedAttraction(user.user_id,attraction_id);
+        if (!response.status) {
+            await storeUser(response.info); // update the user in local storage 
+            fetchUser();
+            Toast.show({
+                type: 'success',
+                text1: 'Listing has been removed!'
+            });
+
+            updateData();
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: response.info
+            })
+        }
     }
 
     return (
@@ -57,8 +79,7 @@ const AttractionScreen = ({ navigation }) => {
                 <View style={styles.container}>
                     { 
                         data.map((item, index) => (
-                        <TouchableOpacity key={index} onPress={() => viewAttraction(item.attraction_id)}>
-                            <Card>
+                            <Card key={index}>
                                 <Card.Title style={styles.header}>
                                     {item.name} 
                                 </Card.Title>
@@ -70,12 +91,17 @@ const AttractionScreen = ({ navigation }) => {
                                 />
 
                                 <Text style={styles.description}>{item.description}</Text>
-                                <View style={{ flexDirection: 'row' }}>
+                                <View style={{ flexDirection: 'row'}}>
                                     <Text style={[styles.tag, {backgroundColor:getColorForType(item.attraction_category)}]}>{item.attraction_category}</Text>
                                     <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
                                 </View>
+
+                                <View style={{ flexDirection: 'row'}}>
+                                    <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeListing(item.attraction_id)} />
+                                    <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewListing(item.attraction_id)}/>
+                                </View>
+
                             </Card>
-                        </TouchableOpacity>
                         )) 
                     }
                 </View>
@@ -116,7 +142,10 @@ const styles = StyleSheet.create({
     header:{
         color: '#044537',
         fontSize: 15
+    },
+    button: {
+        width: "50%"
     }
 });
 
-export default AttractionScreen
+export default SavedListingScreen

@@ -24,7 +24,7 @@ const BookingHistoryScreen = ({ navigation }) => {
             const fetchData = async () => {
                 try {
                     // To update when nav bar is up
-                    let listOfBookings = await getBookingHistoryList(1);
+                    let listOfBookings = await getBookingHistoryList(3);
                     // let listOfBookings = await getBookingHistoryList(user.user_id);
                     setData(listOfBookings.sort((a, b) => b.booking_id - a.booking_id));
                     console.log(listOfBookings);
@@ -37,7 +37,7 @@ const BookingHistoryScreen = ({ navigation }) => {
             fetchUser();
             fetchData();
         }, [])
-      );
+    );
 
     const getColorForStatus = (label) => {
         const labelColorMap = {
@@ -94,7 +94,7 @@ const BookingHistoryScreen = ({ navigation }) => {
         }
     }
 
-    return (
+    return data.length !== 0 ? (
         <Background>
             <ScrollView>
                 <View style={styles.container}>
@@ -105,12 +105,12 @@ const BookingHistoryScreen = ({ navigation }) => {
                                     <Card.Title style={styles.header}>
                                         {getNameForBooking(item)}
                                         <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
-                                    </View>
+                                            <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
+                                        </View>
                                     </Card.Title>
                                     <View style={{
-                                        flexDirection: 'row', 
-                                        alignItems: 'start', 
+                                        flexDirection: 'row',
+                                        alignItems: 'start',
                                         padding: 16,
                                     }}>
                                         {/* Text on the left */}
@@ -123,7 +123,7 @@ const BookingHistoryScreen = ({ navigation }) => {
                                         {/* Image on the right */}
                                         <Card.Image
                                             style={{
-                                                width: 120, 
+                                                width: 120,
                                                 height: 120,
                                                 marginLeft: 40,
                                             }}
@@ -137,6 +137,14 @@ const BookingHistoryScreen = ({ navigation }) => {
                             </TouchableOpacity>
                         ))
                     }
+                </View>
+            </ScrollView>
+        </Background>
+    ) : (
+        <Background>
+            <ScrollView>
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyMessage}>No bookings made</Text>
                 </View>
             </ScrollView>
         </Background>
@@ -175,6 +183,17 @@ const styles = StyleSheet.create({
     header: {
         color: '#044537',
         fontSize: 15
+    },
+    emptyContainer: {
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 8
+    },
+    emptyMessage: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'gray',
+        textAlign: 'center'
     }
 });
 

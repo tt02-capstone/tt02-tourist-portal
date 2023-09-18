@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import { enGB, registerTranslation } from 'react-native-paper-dates'
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -17,9 +18,8 @@ import AttractionDetailsScreen from './src/screens/Attraction/AttractionDetailsS
 import BookingHistoryScreen from './src/screens/Booking/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/Booking/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
-import { enGB, registerTranslation } from 'react-native-paper-dates'
-registerTranslation('en-GB', enGB)
 
+registerTranslation('en-GB', enGB)
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (

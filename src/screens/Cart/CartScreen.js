@@ -5,6 +5,7 @@ import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import Background from '../../components/Background';
+import { useIsFocused } from '@react-navigation/native';
 
 
 export const CartScreen = ({navigation}) => {
@@ -12,6 +13,9 @@ export const CartScreen = ({navigation}) => {
     const [cartItems, setCartItems] = useState([]); 
     const [user_type, setUserType] = useState('');
     const [deletion, setDeletion] = useState(false);
+    const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
+    const [totalPrice, setTotalPrice] = useState(0);
+    const isFocused = useIsFocused();
 
   function formatDateAndTime(date) {
     const options = {
@@ -26,17 +30,29 @@ export const CartScreen = ({navigation}) => {
   }
 
   const checkout = async () => {
-    if (cartItems.length >= 0) {
-      const booking_ids = [];
-    cartItems.forEach((cartItem) => {
-        booking_ids.push(cartItem.id);
-    })
+    const booking_ids = [];
+      const selectedCartItems = [];
+      itemChecked.forEach((isChecked, index) => {
+        if (isChecked) {
+            console.log("WATTT " + cartItems[index])
+            console.log(cartItems[index])
+            booking_ids.push(cartItems[index].id);
+            selectedCartItems.push(cartItems[index]);
+        }
+    });
 
-    navigation.navigate('CheckoutScreen', { booking_ids, cartItems });
+    if (selectedCartItems.length > 0) {
+    
+        console.log(booking_ids)
+        navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
+    } 
 
+    // Should give warning
 
-  }
+  
 }
+
+
 
   const handleDeleteCartItem = async (cart_item_id) => {
     
@@ -51,6 +67,7 @@ export const CartScreen = ({navigation}) => {
     console.log('success', response.data)
     if (response.data) {
         navigation.navigate('CartScreen');
+        // Should navigate to Bookings Screen?
         setDeletion(!deletion);
       Toast.show({
         type: 'success',
@@ -84,33 +101,41 @@ const getFields = (cartItems) => {
 }
     
 
-const styles = StyleSheet.create({
-    list: {
-      width: '100%',
-      backgroundColor: '#000',
-    },
-    item: {
-      aspectRatio: 1,
-      width: '100%',
-      flex: 1,
-    },
-    bottomBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: 'lightgray', // Background color of the bottom bar
-        paddingVertical: 10, // Adjust the padding as needed
-      },
-      button: {
-        flex: 1,
-        alignItems: 'center',
-      },
-      buttonText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: 'blue', // Text color of the buttons
-      },
-    });
+const handleCheckBoxToggle = (index) => {
+    const updatedChecked = [...itemChecked];
+    if (updatedChecked[index]) {
+        const cartItem = cartItems[index];
+        const newPrice = totalPrice - parseFloat(cartItem.price);
+        setTotalPrice(newPrice);
+    } else {
+        const cartItem = cartItems[index];
+        const newPrice = totalPrice + parseFloat(cartItem.price);
+        setTotalPrice(newPrice);
+    }
+
+    updatedChecked[index] = !updatedChecked[index];
+    setItemChecked(updatedChecked);
+    
+  };
+
+  const isAllChecked = () => {
+
+    return itemChecked.every((isChecked) => isChecked);
+  };
+
+  const handleCheckAllToggle = () => {
+    const updatedChecked = itemChecked.map(() => !isAllChecked());
+    if (isAllChecked()) {
+        setTotalPrice(0);
+    } else {
+        let newPrice = 0;
+        cartItems.forEach((cartItem) => {
+            newPrice += parseFloat(cartItem.price);
+        });
+        setTotalPrice(newPrice);
+    }
+    setItemChecked(updatedChecked);
+  };
 
   useEffect(() => {
     async function onLoad() {
@@ -132,11 +157,11 @@ const styles = StyleSheet.create({
               const cartDetails = response.data;
               const extractedDetails = cartDetails.map((detail) => {
                 console.log(detail)
-                console.log(detail.attraction.attraction_id)
+                //console.log(detail.attraction.attraction_id)
                 const { subtotal, selections, quantities } = getFields(detail.cart_item_list);
   
                 return {
-                    id: parseInt(detail.booking_id),
+                    id: parseInt(detail.cart_booking_id),
                     type: detail.type,
                     attraction_id: detail.attraction.attraction_id,
                     image: detail.attraction.attraction_image_list[0],
@@ -153,6 +178,10 @@ const styles = StyleSheet.create({
                     };
               })
               setCartItems(extractedDetails);
+              if (extractedDetails.length > 0) {
+                setItemChecked(Array(extractedDetails.length).fill(false));
+              } 
+              
               
           }
 
@@ -163,7 +192,7 @@ const styles = StyleSheet.create({
     }
 
     onLoad();
-  }, [deletion]);
+  }, [deletion,isFocused]);
 
   
 
@@ -174,13 +203,13 @@ const styles = StyleSheet.create({
     <ScrollView>
     <View>
       {
-          cartItems.map((cartItem) => (
+          cartItems.map((cartItem, index) => (
             
           <ListItem.Swipeable
             shouldCancelWhenOutside={false} 
             rightWidth={90}
             minSlideWidth={40}
-            key={cartItem.id}
+            key={index}
             rightContent={
                 <Button
                 containerStyle={{
@@ -200,11 +229,12 @@ const styles = StyleSheet.create({
 
 <CheckBox
       left
-      checkedIcon="dot-circle-o"
-      uncheckedIcon="circle-o"
+      iconType="material-community"
+           checkedIcon="checkbox-outline"
+           uncheckedIcon={'checkbox-blank-outline'}
       containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
-      //checked={check2}
-      //onPress={() => setCheck2(!check2)}
+      checked={itemChecked[index]}
+      onPress={() => handleCheckBoxToggle(index)}
       
     />
     
@@ -234,8 +264,8 @@ const styles = StyleSheet.create({
               </View>
               <View style={{ flexDirection: "column" }}>
               {
-          cartItem.items.map((item) => (
-            <Text>{item.activity_selection} Quantity: {item.quantity}</Text> 
+          cartItem.items.map((item, index) => (
+            <Text key={index}>{item.activity_selection} Quantity: {item.quantity}</Text> 
           ))
 
           }
@@ -262,16 +292,17 @@ const styles = StyleSheet.create({
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <CheckBox
       left
-      checkedIcon="dot-circle-o"
-      uncheckedIcon="circle-o"
+      iconType="material-community"
+           checkedIcon="checkbox-outline"
+           uncheckedIcon={'checkbox-blank-outline'}
       title="All"
       style={{ borderWidth: 0, margin: 0, padding: 0 }}
       containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent' }}
-      //checked={check2}
-      //onPress={() => setCheck2(!check2)}
+      checked={isAllChecked()} // Check if all items are checked
+     onPress={handleCheckAllToggle}
       
     />
-        <Text>Total Price: $0.00</Text>
+        <Text>Total Price: ${totalPrice.toFixed(2)}</Text>
       </View>
       <Button title="Checkout" onPress={() => {
         checkout();
@@ -280,5 +311,7 @@ const styles = StyleSheet.create({
 
       </View>
   );
+
+ 
   
 };

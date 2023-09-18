@@ -18,6 +18,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const [attraction, setAttraction] = useState([]);
     const [recommendation, setRecommendation] = useState([]);
     const [priceList, setPriceList] = useState([]);
+    const [attrTicketList, setAttrTicketList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
 
@@ -57,12 +58,15 @@ const AttractionDetailsScreen = ({ navigation }) => {
         const userType = user.user_type; 
         const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
         const ticket_type = item.ticket_type;
+        const matchingTicket = attrTicketList.find(ticket => ticket.ticket_type === item.ticket_type);
+        const ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
 
         return {
             ...item, 
             userType,
             amount,
-            ticket_type
+            ticket_type,
+            ticket_type_id
         };
     });
 
@@ -98,6 +102,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     });
 
                     selectedTickets.push({
+                        ticket_per_day_id: formattedPriceList.find(item => item.ticket_type === ticketType).ticket_type_id, 
                         ticket_type: ticketType,
                         ticket_date: formattedDate,
                         ticket_count: quantityByTicketType[ticketType],
@@ -185,6 +190,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
             let attraction = await getAttraction(attractionId);
             setAttraction(attraction);
             setPriceList(attraction.price_list);
+            setAttrTicketList(attraction.ticket_per_day_list);
 
             let reccoms = await getAttractionRecommendation(attractionId);
             setRecommendation(reccoms)

@@ -17,6 +17,15 @@ import AttractionDetailsScreen from './src/screens/AttractionDetails';
 import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
 import BookingDetailsScreen from './src/screens/BookingDetailsScreen';
 import PaymentHistoryScreen from './src/screens/PaymentHistoryScreen';
+import {CreditCardsScreen} from "./src/screens/CreditCard/CreditCardsScreen"
+import {AddCreditCardScreen} from './src/screens/CreditCard/AddCreditCardScreen';
+import {CreditCardScreen} from './src/screens/CreditCard/CreditCardScreen';
+import { initStripe } from '@stripe/stripe-react-native';
+
+initStripe({
+  // API Key is test key, will be masked via GitHub Actions for deployment
+  publishableKey: 'pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg',
+});
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -37,6 +46,9 @@ export default function App() {
             <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
             <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
             <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} /> 
+            <Stack.Screen name="CreditCardsScreen" component={CreditCardsScreen} options={{title: 'My Credit Cards'}}/>
+            <Stack.Screen name="AddCreditCardScreen" component={AddCreditCardScreen} options={{title: 'Add Credit Card'}}/>
+            <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
         </Stack.Navigator>
           <Toast />
       </NavigationContainer>

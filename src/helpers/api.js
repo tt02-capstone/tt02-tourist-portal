@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST = '172.31.77.26'
+const HOST = 'localhost'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -24,10 +24,31 @@ export const touristApi = axios.create({
     baseURL: HOST_WITH_PORT + '/tourist'
 })
 
+export const attractionApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/attraction'
+})
+
+export const bookingApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/booking'
+})
+
+export const paymentsApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/payment'
+
+})
+
+export const cartApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/cart'
+})
+
 
 export const updateApiInstances = (token) => {
     const bearerToken = token?  `Bearer ${token}`: ``;
     console.log('Bearer Token',bearerToken)
     localApi.defaults.headers.common['Authorization'] = bearerToken
-    touristApi.defaults.headers.common['Authorization'] = bearerToken
+    attractionApi.defaults.headers.common['Authorization'] = bearerToken
+    bookingApi.defaults.headers.common['Authorization'] = bearerToken
+    paymentsApi.defaults.headers.common['Authorization'] = bearerToken
+    cartApi.defaults.headers.common['Authorization'] = bearerToken
+
 }

@@ -37,3 +37,12 @@ export const clearStorage = async () => {
         console.log('Async Storage clearStorage fail', e)
     }
 };
+
+export const getEmail = async () => {
+    try {
+        return await AsyncStorage.getItem('email');
+        
+    } catch (e) {
+        console.log('Async Storage getEmail fail', e)
+    }
+};

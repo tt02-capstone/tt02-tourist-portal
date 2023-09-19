@@ -82,7 +82,11 @@ const BookingHistoryScreen = ({ navigation }) => {
 
     const getImage = (item) => {
         if (item.attraction != null) {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
+            if (Array.isArray(item.attraction.attraction_image_list)) {
+                return item.attraction.attraction_image_list[0];
+            } else {
+                return item.attraction.attraction_image_list;
+            }    
         } else if (item.room != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {

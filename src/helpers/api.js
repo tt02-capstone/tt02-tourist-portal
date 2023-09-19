@@ -40,3 +40,15 @@ export const paymentsApi = axios.create({
 export const cartApi = axios.create({
     baseURL: HOST_WITH_PORT + '/cart'
 })
+
+
+export const updateApiInstances = (token) => {
+    const bearerToken = token?  `Bearer ${token}`: ``;
+    console.log('Bearer Token',bearerToken)
+    localApi.defaults.headers.common['Authorization'] = bearerToken
+    attractionApi.defaults.headers.common['Authorization'] = bearerToken
+    bookingApi.defaults.headers.common['Authorization'] = bearerToken
+    paymentsApi.defaults.headers.common['Authorization'] = bearerToken
+    cartApi.defaults.headers.common['Authorization'] = bearerToken
+
+}

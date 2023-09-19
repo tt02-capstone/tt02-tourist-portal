@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {Pressable, StyleSheet, View} from 'react-native'
 import {Text} from 'react-native-paper'
 import axios from 'axios'
@@ -9,11 +9,14 @@ import TextInput from '../components/TextInput'
 import {theme} from '../core/theme'
 import Toast from "react-native-toast-message";
 import InputValidator from "../helpers/InputValidator";
-import {localApi, touristApi, userApi} from "../helpers/api";
+import {localApi, touristApi, updateApiInstances, userApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
 import {storeUser} from "../helpers/LocalStorage";
+import {AuthContext, TOKEN_KEY} from "../helpers/AuthContext";
+import * as SecureStore from 'expo-secure-store';
 
 export const LoginScreen = ({navigation}) => {
+    const authContext = useContext(AuthContext);
     const [email, setEmail] = useState({value: '', error: ''})
     const [password, setPassword] = useState({value: '', error: ''})
 
@@ -26,10 +29,10 @@ export const LoginScreen = ({navigation}) => {
 
         try {
             const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)
-            console.log(localApi)
             if (
                 response.data.httpStatusCode === 400 ||
-                response.data.httpStatusCode === 404
+                response.data.httpStatusCode === 404 ||
+                response.data.httpStatusCode === 422
             ) {
                 console.log('error')
                 Toast.show({
@@ -42,15 +45,21 @@ export const LoginScreen = ({navigation}) => {
                     text1: 'Login Successful'
                 })
 
-                console.log('success', response.data)
-                await storeUser(response.data);
-                setTimeout(() => {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: 'HomeScreen'}],
-                    })
-                }, 1000);
 
+                console.log('success', response.data)
+                console.log('response.data.toke', response.data.token)
+
+                await SecureStore.setItemAsync(
+                    TOKEN_KEY,
+                    response.data.token
+                )
+
+                await storeUser(response.data.user)
+
+                authContext.setAuthState({
+                    accessToken: response.data.token,
+                    authenticated: true
+                });
             }
         } catch (error) {
             alert('An error has occurred' + error)
@@ -66,6 +75,7 @@ export const LoginScreen = ({navigation}) => {
                 onChangeText={(text) => setEmail({value: text, error: ''})}
                 error={!!email.error}
                 errorText={email.error}
+                autoCapitalize="none"
             />
             <TextInput
                 label="Password"

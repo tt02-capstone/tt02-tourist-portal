@@ -26,7 +26,15 @@ import {AddCreditCardScreen} from "./src/screens/CreditCard/AddCreditCardScreen"
 import {CreditCardScreen} from "./src/screens/CreditCard/CreditCardScreen";
 import {CartScreen} from "./src/screens/Cart/CartScreen";
 import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
+import { enGB, registerTranslation } from 'react-native-paper-dates'
+import { initStripe } from '@stripe/stripe-react-native';
 
+initStripe({
+  // API Key is test key, will be masked via GitHub Actions for deployment
+  publishableKey: 'pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg',
+});
+
+registerTranslation('en-GB', enGB)
 const Stack = createNativeStackNavigator();
 
 export default function App() {

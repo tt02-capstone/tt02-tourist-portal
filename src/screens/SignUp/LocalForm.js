@@ -1,20 +1,22 @@
 import {Pressable, Text, View} from "react-native";
-import TextInput from "../components/TextInput";
-import InputValidator from "./InputValidator";
-export const ForeignerForm = ({formData, setFormData}) => {
+import TextInput from "../../components/TextInput";
+import InputValidator from "../../helpers/InputValidator";
+
+
+export const LocalForm = ({formData, setFormData}) => {
 
     return (
         <View>
             <TextInput
-                label="Passport Number"
+                label="NRIC Number"
                 returnKeyType="next"
-                value={formData.passport}
-                onChangeText={(passport) => setFormData({...formData, passport })}
+                value={formData.nric}
+                onChangeText={(nric) => setFormData({...formData, nric })}
                 // error={!!email.error}
-                errorText={InputValidator.passport(formData.passport)}
+                errorText={InputValidator.nric(formData.nric)}
                 autoCapitalize="none"
-                autoCompleteType="passport"
-                textContentType="passport"
+                autoCompleteType="nric"
+                textContentType="nric"
             />
             <TextInput
                 label="Mobile Number"

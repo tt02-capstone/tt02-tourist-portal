@@ -5,10 +5,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Toast from 'react-native-toast-message';
 import { HomeScreen } from "./src/screens/HomeScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
-import { ResetPasswordScreen } from "./src/screens/ResetPasswordScreen";
-import { ForgotPasswordScreen } from "./src/screens/ForgotPasswordScreen";
-import { SignUpScreen } from "./src/screens/SignUpScreen";
-import { CodeVerificationScreen } from "./src/screens/CodeVerificationScreen";
+import { ResetPasswordScreen } from "./src/screens/ForgetPassword/ResetPasswordScreen";
+import { ForgotPasswordScreen } from "./src/screens/ForgetPassword/ForgotPasswordScreen";
+import { SignUpScreen } from "./src/screens/SignUp/SignUpScreen";
+import { CodeVerificationScreen } from "./src/screens/ForgetPassword/CodeVerificationScreen";
 import { ViewProfileScreen } from './src/screens/Profile/ViewProfileScreen';
 import { EditProfileScreen } from './src/screens/Profile/EditProfileScreen';
 import { EditPasswordScreen } from './src/screens/Profile/EditPasswordScreen';
@@ -28,6 +28,7 @@ import {CartScreen} from "./src/screens/Cart/CartScreen";
 import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
 import { enGB, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
+import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
 
 initStripe({
   // API Key is test key, will be masked via GitHub Actions for deployment
@@ -91,6 +92,8 @@ export const Layout = () => {
                                       options={{title: 'Reset Password'}}/>
                         <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen}
                                       options={{title: 'Forgot Password'}}/>
+                        <Stack.Screen name="EmailVerificationScreen" component={EmailVerificationScreen}
+                                      options={{title: 'Verify Email'}}/>
                     </>
                 )}
             </Stack.Navigator>

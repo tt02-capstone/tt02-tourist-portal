@@ -1,23 +1,23 @@
 import React, {useState} from 'react'
-import Background from '../components/Background'
-import Header from '../components/Header'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import InputValidator from '../helpers/InputValidator'
-import CustomButton from "../components/CustomButton";
-import {localApi, userApi} from "../helpers/api";
+import Background from '../../components/Background'
+import Header from '../../components/Header'
+import TextInput from '../../components/TextInput'
+import Button from '../../components/Button'
+import InputValidator from '../../helpers/InputValidator'
+import CustomButton from "../../components/CustomButton";
+import {localApi, userApi} from "../../helpers/api";
 import Toast from "react-native-toast-message";
 import {ActivityIndicator, Paragraph} from "react-native-paper";
 
-export const CodeVerificationScreen = ({navigation}) => {
+export const EmailVerificationScreen = ({navigation}) => {
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
     const verifyCode = async () => {
         setLoading(true);
 
         try {
-            const response = await userApi.post(`/passwordResetStageTwo/${code}`)
-
+            console.log(code)
+            const response = await userApi.get(`/verifyEmail/${code}`)
             if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
                 Toast.show({
                     type: 'error',
@@ -27,23 +27,22 @@ export const CodeVerificationScreen = ({navigation}) => {
             } else {
                 Toast.show({
                     type: 'success',
-                    text1: 'Code Verified!'
+                    text1: response.data
                 })
                 setLoading(false);
                 setTimeout(() => {
-                    navigation.navigate('ResetPasswordScreen', {
-                        verificationCode: code
-                    })
-                }, 2000);
+                    navigation.navigate('LoginScreen')
+                }, 200);
             }
         } catch (error) {
-            console.error("Axios Error : ", error)
+            console.error("Axios Error : ", error.message)
+            setLoading(false);
         }
     }
 
     return (
         <Background>
-            <Header>Verify WithinSG code</Header>
+            <Header>Email Verification for WithinSG</Header>
             <Paragraph>Key in the code send to your email.</Paragraph>
             <ActivityIndicator size="large" animating={loading}/>
             <TextInput
@@ -53,7 +52,7 @@ export const CodeVerificationScreen = ({navigation}) => {
                 secureTextEntry
             />
             <Button
-                text="Verify"
+                text="Verify Email"
                 // viewStyle={{ marginTop: 16 }}
                 mode="contained"
                 onPress={verifyCode}

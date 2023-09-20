@@ -1,22 +1,18 @@
 import {Pressable, Text, View} from "react-native";
-import TextInput from "../components/TextInput";
-import InputValidator from "./InputValidator";
-
-
-export const LocalForm = ({formData, setFormData}) => {
+import TextInput from "../../components/TextInput";
+import InputValidator from "../../helpers/InputValidator";
+export const ForeignerForm = ({formData, setFormData}) => {
 
     return (
         <View>
             <TextInput
-                label="NRIC Number"
+                label="Passport Number"
                 returnKeyType="next"
-                value={formData.nric}
-                onChangeText={(nric) => setFormData({...formData, nric })}
+                value={formData.passport}
+                onChangeText={(passport) => setFormData({...formData, passport })}
                 // error={!!email.error}
-                errorText={InputValidator.nric(formData.nric)}
+                errorText={InputValidator.passport(formData.passport)}
                 autoCapitalize="none"
-                autoCompleteType="nric"
-                textContentType="nric"
             />
             <TextInput
                 label="Mobile Number"
@@ -26,8 +22,6 @@ export const LocalForm = ({formData, setFormData}) => {
                 // error={!!email.error}
                 errorText={InputValidator.mobileNo(formData.mobile)}
                 autoCapitalize="none"
-                autoCompleteType="mobile"
-                textContentType="mobile"
                 keyboardType="phone-pad"
             />
         </View>

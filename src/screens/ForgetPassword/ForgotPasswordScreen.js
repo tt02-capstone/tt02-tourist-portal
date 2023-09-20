@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import Background from '../components/Background'
-import Header from '../components/Header'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import InputValidator from '../helpers/InputValidator'
+import Background from '../../components/Background'
+import Header from '../../components/Header'
+import TextInput from '../../components/TextInput'
+import Button from '../../components/Button'
+import InputValidator from '../../helpers/InputValidator'
 import Toast from "react-native-toast-message";
-import {localApi, touristApi, userApi} from "../helpers/api";
+import {localApi, touristApi, userApi} from "../../helpers/api";
 import {ActivityIndicator} from "react-native-paper";
 
 export const ForgotPasswordScreen = ({navigation}) => {

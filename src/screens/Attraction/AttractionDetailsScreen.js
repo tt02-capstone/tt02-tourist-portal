@@ -21,7 +21,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const [attrTicketList, setAttrTicketList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
-
+    const [formattedPriceList, setFormattedPriceList] = useState([]);
+    const [quantityByTicketType, setQuantityByTicketType] = useState({});
     const route = useRoute();
     const { attractionId } = route.params;
 
@@ -31,8 +32,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
     
         const usertype =  await getUserType()
     }
-
-    const [quantityByTicketType, setQuantityByTicketType] = useState({});
     
     const handleIncrease = (ticketType) => {
         setQuantityByTicketType((prevQuantity) => {
@@ -54,29 +53,12 @@ const AttractionDetailsScreen = ({ navigation }) => {
         });
     };
 
-    const formattedPriceList = priceList.map(item => {
-        const userType = user.user_type; 
-        const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
-        const ticket_type = item.ticket_type;
-        const matchingTicket = attrTicketList.find(ticket => ticket.ticket_type === item.ticket_type);
-        const ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
-
-        return {
-            ...item, 
-            userType,
-            amount,
-            ticket_type,
-            ticket_type_id
-        };
-    });
-
     const addToCart = async () => {
         const cartItems = [];
         const selectedTickets = [];
         const user_type = user.userTypeEnum;
         const tourist_email = user.email;
         const activity_name = attraction.name;
-
         
         if (!selectedDate) { // check if date is selected 
             Toast.show({
@@ -132,6 +114,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         console.log('error',response.data)
                     } else {
                         console.log('success', response.data)
+                        setSelectedDate(null); // must have = use this to reset date selection 
+                        setQuantityByTicketType(0) // must have = reset the quantity as well to 0 
                         if (response.data) {
                             Toast.show({
                                 type: 'success',
@@ -185,13 +169,13 @@ const AttractionDetailsScreen = ({ navigation }) => {
         }
     }
 
-    const fetchAttraction = async() => {
+    const fetchAttraction = async () => {
         try {
             let attraction = await getAttraction(attractionId);
             setAttraction(attraction);
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
-
+            
             let reccoms = await getAttractionRecommendation(attractionId);
             setRecommendation(reccoms)
 
@@ -203,9 +187,48 @@ const AttractionDetailsScreen = ({ navigation }) => {
         }
     }
 
+    const fetchPrice = () => {
+        const formattedPriceList = priceList.map(item => {
+            const userType = user.user_type; 
+            const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
+            const ticket_type = item.ticket_type;
+    
+            let ticket_count = 0; // default value 
+            let ticket_type_id = null;
+            
+            if (selectedDate) {
+                // format date 
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
+                const formattedDate = `${year}-${month}-${day}`;
+                const matchingTicket = attrTicketList.find(ticket => 
+                    ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
+                );
+        
+                if (matchingTicket) {
+                    ticket_count = matchingTicket.ticket_count;
+                    ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
+                }
+            }
+    
+            return {
+                ...item, 
+                userType,
+                amount,
+                ticket_type,
+                ticket_type_id,
+                ticket_count
+            };
+        });
+
+        setFormattedPriceList(formattedPriceList)
+    }
+
     useEffect(() => {
         fetchAttraction(); // when the page load the first time
-    }, []);
+        fetchPrice();
+    }, [selectedDate]);
 
     return (
         <Background>
@@ -242,8 +265,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
                     <View>
                         {formattedPriceList.map(item => (
-                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 20}}>
-                                <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}</Text>
+                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
+                                <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
                                 
                                 <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 40}} onPress={() => handleDecrease(item.ticket_type)}>
                                     -

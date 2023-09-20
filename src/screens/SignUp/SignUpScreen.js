@@ -2,18 +2,18 @@ import React, {useContext, useState} from 'react'
 import {Pressable, StyleSheet, TextComponent, View} from 'react-native'
 import {List, Paragraph, RadioButton, Text} from 'react-native-paper'
 import axios from 'axios'
-import Background from '../components/Background'
-import Header from '../components/Header'
-import Button from '../components/Button'
-import TextInput from '../components/TextInput'
-import {theme} from '../core/theme'
+import Background from '../../components/Background'
+import Header from '../../components/Header'
+import Button from '../../components/Button'
+import TextInput from '../../components/TextInput'
+import {theme} from '../../core/theme'
 import Toast from "react-native-toast-message";
-import InputValidator from "../helpers/InputValidator";
-import {localApi, touristApi} from "../helpers/api";
-import CustomButton from "../components/CustomButton";
+import InputValidator from "../../helpers/InputValidator";
+import {localApi, touristApi} from "../../helpers/api";
+import CustomButton from "../../components/CustomButton";
 import {ProgressBar, MD3Colors} from 'react-native-paper';
-import {LocalForm} from "../helpers/LocalForm";
-import {ForeignerForm} from "../helpers/ForeignerForm";
+import {LocalForm} from "./LocalForm";
+import {ForeignerForm} from "./ForeignerForm";
 
 export const SignUpScreen = ({navigation}) => {
     const [formData, setFormData] = useState({
@@ -137,18 +137,21 @@ export const SignUpScreen = ({navigation}) => {
                 console.log('success')
                 Toast.show({
                     type: 'success',
-                    text1: 'Sign Up Successful'
+                    text1: 'Sign Up Successful! Please check your email for verification code!'
                 })
 
                 console.log('success', response.data)
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'LoginScreen'}],
-                })
+                setTimeout(() => {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'EmailVerificationScreen'}],
+                    })
+                }, 2000);
+
             }
         } catch (error) {
             console.log(error)
-            alert('An error hass occurred' + error)
+            alert('An error has occurred' + error)
         }
 
         // navigation.reset({

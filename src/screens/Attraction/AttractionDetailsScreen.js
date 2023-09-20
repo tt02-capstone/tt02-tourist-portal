@@ -22,8 +22,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
     const [formattedPriceList, setFormattedPriceList] = useState([]);
-    const [refresh, setRefresh] = useState(false);
-
+    const [quantityByTicketType, setQuantityByTicketType] = useState({});
     const route = useRoute();
     const { attractionId } = route.params;
 
@@ -33,8 +32,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
     
         const usertype =  await getUserType()
     }
-
-    const [quantityByTicketType, setQuantityByTicketType] = useState({});
     
     const handleIncrease = (ticketType) => {
         setQuantityByTicketType((prevQuantity) => {
@@ -55,18 +52,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
           return updatedQuantity;
         });
     };
-
-    const refreshOnClick = () =>{
-        console.log(refresh)
-        console.log("hello")
-        if (refresh) {
-            setRefresh(false)
-        } else {
-            console.log("here")
-            setRefresh(true)
-        }
-        console.log(refresh)
-    }
 
     const addToCart = async () => {
         const cartItems = [];
@@ -129,8 +114,9 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         console.log('error',response.data)
                     } else {
                         console.log('success', response.data)
+                        setSelectedDate(null); // must have = use this to reset date selection 
+                        setQuantityByTicketType(0) // must have = reset the quantity as well to 0 
                         if (response.data) {
-                            refreshOnClick() // to refresh the page upon succesfully adding to cart 
                             Toast.show({
                                 type: 'success',
                                 text1: 'Added Items to Cart!'
@@ -183,12 +169,13 @@ const AttractionDetailsScreen = ({ navigation }) => {
         }
     }
 
-    const fetchAttraction = async() => {
+    const fetchAttraction = async () => {
         try {
             let attraction = await getAttraction(attractionId);
             setAttraction(attraction);
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
+            
             let reccoms = await getAttractionRecommendation(attractionId);
             setRecommendation(reccoms)
 
@@ -200,7 +187,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
         }
     }
 
-    const fetchPrice = async () => {
+    const fetchPrice = () => {
         const formattedPriceList = priceList.map(item => {
             const userType = user.user_type; 
             const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
@@ -215,7 +202,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
                 const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
                 const formattedDate = `${year}-${month}-${day}`;
-    
                 const matchingTicket = attrTicketList.find(ticket => 
                     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
                 );
@@ -223,8 +209,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 if (matchingTicket) {
                     ticket_count = matchingTicket.ticket_count;
                     ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
-                    console.log("check in")
-                    console.log(ticket_count)
                 }
             }
     
@@ -238,24 +222,13 @@ const AttractionDetailsScreen = ({ navigation }) => {
             };
         });
 
-        return formattedPriceList
-        // setFormattedPriceList(formattedPriceList)
+        setFormattedPriceList(formattedPriceList)
     }
 
-
     useEffect(() => {
-        // fetchAttraction(); // when the page load the first time
-        // fetchPrice();
-        const fetchData = async () => {
-            // fetch attraction first
-            await fetchAttraction();
-            console.log(attraction.ticket_per_day_list)
-            const formattedPriceList = await fetchPrice();
-            setFormattedPriceList(formattedPriceList);
-        }
-    
-        fetchData();
-    }, [selectedDate,refresh]);
+        fetchAttraction(); // when the page load the first time
+        fetchPrice();
+    }, [selectedDate]);
 
     return (
         <Background>

@@ -23,9 +23,7 @@ const BookingHistoryScreen = ({ navigation }) => {
         React.useCallback(() => {
             const fetchData = async () => {
                 try {
-                    // To update when nav bar is up
-                    let listOfBookings = await getBookingHistoryList(3);
-                    // let listOfBookings = await getBookingHistoryList(user.user_id);
+                    let listOfBookings = await getBookingHistoryList(user.user_id);
                     setData(listOfBookings.sort((a, b) => b.booking_id - a.booking_id));
                     console.log(listOfBookings);
                     setLoading(false);

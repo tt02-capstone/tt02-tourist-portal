@@ -1,28 +1,44 @@
-import React , { useState, useEffect } from 'react'
-import Background from '../components/CardBackground'
+import React, {useContext, useEffect, useState} from 'react'
+import Background from '../components/Background'
 import Header from '../components/Header'
 import Button from '../components/Button'
 import { View, ScrollView, StyleSheet, Image } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
 import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
+import {Paragraph} from "react-native-paper";
+import {localApi, loggedUserApi, touristApi, updateApiInstances} from "../helpers/api";
+import {AuthContext} from "../helpers/AuthContext";
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 
-const HomeScreen = ({ navigation }) => {
-  const [user, setUser] = useState('');
+export const HomeScreen = ({navigation}) => {
+    const [userData, setUserData] = useState('')
+    const authContext= useContext(AuthContext);
 
   useEffect(() => {
     fetchUser();
   }, []);
 
   async function fetchUser() {
-    const userData = await getUser()
-    setUser(userData)
-
-    const usertype =  await getUserType()
+      updateApiInstances(authContext.getAccessToken())
+      const userData = await getUser()
+      setUserData(userData)
+      const usertype =  await getUserType()
+      console.log(authContext.getAccessToken())
   }
 
   const viewAttractions = () => {
     navigation.navigate('AttractionScreen')
   }
+
+  const onLogoutPressed = async () => {
+        await clearStorage();
+        await authContext.logout();
+        navigation.reset({
+            index: 0,
+            routes: [{name: 'LoginScreen'}],
+        })
+    }
 
   return (
     <Background>
@@ -42,7 +58,7 @@ const HomeScreen = ({ navigation }) => {
             </Text>
             <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
-          
+
           <Card>
             <Card.Title>Accomodation</Card.Title>
             <Card.Image
@@ -67,7 +83,7 @@ const HomeScreen = ({ navigation }) => {
               }}
             />
             <Text style={styles.description}>
-              Indulge your taste buds in Singapore's vibrant culinary scene, where a myriad of restaurants await to 
+              Indulge your taste buds in Singapore's vibrant culinary scene, where a myriad of restaurants await to
               delight your palate. Come and savor the extraordinary culinary delights that await you!
             </Text>
             <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
@@ -82,7 +98,7 @@ const HomeScreen = ({ navigation }) => {
               }}
             />
             <Text style={styles.description}>
-              Stay connected during your Singapore adventure with tailored telecom packages designed especially for tourists. 
+              Stay connected during your Singapore adventure with tailored telecom packages designed especially for tourists.
               Choose from a variety of cost-effective plans and make the most of your visit with our telecom packages!
             </Text>
             <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
@@ -97,15 +113,20 @@ const HomeScreen = ({ navigation }) => {
               }}
             />
             <Text style={styles.description}>
-              Unlock unbeatable deals and discounts that add extra value to your Singapore journey. Don't miss out 
+              Unlock unbeatable deals and discounts that add extra value to your Singapore journey. Don't miss out
               on the chance to save while indulging in the best Singapore can offer!
             </Text>
             <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
           </Card>
+          <Button
+              text="Logout"
+              mode="contained"
+              onPress={onLogoutPressed}
+          />
         </View>
-      </ScrollView>  
+      </ScrollView>
     </Background>
-  ) 
+  )
 }
 
 const styles = StyleSheet.create({
@@ -132,11 +153,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   description: {
-    marginBottom: 10, fontSize: 13, marginTop : 10 
+    marginBottom: 10, fontSize: 13, marginTop : 10
   },
   button: {
     width: '100%'
   }
 });
 
-export default HomeScreen

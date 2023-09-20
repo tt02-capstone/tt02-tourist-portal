@@ -288,7 +288,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                                                 <Card.Image
                                                     style={{ padding: 0, width: 260, height: 100}}
                                                     source={{
-                                                    // uri: item.attraction_image_list[0] // KIV for image 
+                                                        uri: item.attraction_image_list[0] // KIV for image 
                                                     }}
                                                 />
                                                 <Text style={{marginBottom: 15 }}></Text> 

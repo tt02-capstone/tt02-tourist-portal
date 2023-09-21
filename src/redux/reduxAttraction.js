@@ -40,7 +40,7 @@ export async function getAttractionRecommendation(attraction_id) {
 export async function checkTicketInventory(attraction_id,ticket_date,request_body) {
     try {
         const response = await attractionApi.post(`/checkTicketInventory/${attraction_id}/${ticket_date}`,request_body);
-        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404) {
+        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404 || response.data.httpStatusCode == 422) {
             return {status:true, error:response.data.errorMessage};
         } else {
             return {status:false};
@@ -54,7 +54,7 @@ export async function checkTicketInventory(attraction_id,ticket_date,request_bod
 export async function saveAttraction(user_id,attraction_id) {
     try {
         const response = await attractionApi.put(`/saveAttractionForTouristAndLocal/${user_id}/${attraction_id}`);
-        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404) {
+        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404 || response.data.httpStatusCode == 422) {
             return {status:true, info:response.data.errorMessage};
         } else {
             return {status:false, info:response.data};

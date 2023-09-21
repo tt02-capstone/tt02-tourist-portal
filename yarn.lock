@@ -7492,6 +7492,11 @@
     "prop-types" "15.7.2"
     "react-async-hook" "3.6.1"
 
+"react-native-image-picker@^7.0.0":
+  "integrity" "sha512-eiDj0mJUPivranQJX/pwkGf/Ar9QrQ+BF3y0D8frHU3S7U86IGOnOzHN7Wh6ofXEnafRij0TpmRCdrSebBMV+Q=="
+  "resolved" "https://registry.npmjs.org/react-native-image-picker/-/react-native-image-picker-7.0.0.tgz"
+  "version" "7.0.0"
+
 "react-native-international-phone-number@^0.5.2":
   "integrity" "sha512-qkSzPVnX7XA9FJXkJ5B5bGoeMOQ+yCWhT6U3NTJaHgumGCkabfYVcRr/ApjeP96Cfbb8RjcVWJMSMbTgo3LJqA=="
   "resolved" "https://registry.npmjs.org/react-native-international-phone-number/-/react-native-international-phone-number-0.5.2.tgz"

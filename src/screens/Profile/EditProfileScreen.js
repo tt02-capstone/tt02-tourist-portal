@@ -103,6 +103,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                 <TextInput
                     label="Name"
                     returnKeyType="next"
+                    style={{minWidth: '100%'}}
                     value={formData.name}
                     onChangeText={(name) => setFormData({...formData, name})}
                     errorText={InputValidator.name(formData.name)}
@@ -110,13 +111,14 @@ export const EditProfileScreen = ({route, navigation}) => {
                 <TextInput
                     label="Email"
                     returnKeyType="next"
+                    style={{minWidth: '100%'}}
                     value={formData.email}
                     onChangeText={(email) => setFormData({...formData, email})}
                     errorText={InputValidator.email(formData.email)}
                 />
 
-                <SafeAreaProvider>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center' }}>
+                <SafeAreaProvider style={{maxHeight: '20%'}}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center'}}>
                         <DatePickerInput
                         locale="en"
                         label="Date of Birth"
@@ -131,6 +133,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                     label="Country Code"
                     returnKeyType="next"
                     value={formData.countryCode}
+                    style={{minWidth: '100%'}}
                     onChangeText={(countryCode) => setFormData({...formData, countryCode})}
                     errorText={InputValidator.countryCode(formData.countryCode)}
                 />
@@ -138,19 +141,20 @@ export const EditProfileScreen = ({route, navigation}) => {
                 <TextInput
                     label="Mobile Number"
                     returnKeyType="next"
+                    style={{minWidth: '100%'}}
                     value={formData.mobileNum}
                     onChangeText={(mobileNum) => setFormData({...formData, mobileNum})}
                     errorText={InputValidator.mobileNo(formData.mobileNum)}
                 />
 
-                <div style={{marginLeft: '47px'}}>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Button
                         mode="contained"
                         text={"Submit"}
                         onPress={onEditProfilePressed}
                     />
-                </div>
+                </View>
             </View>
         </Background>
-    ) : (<div></div>)
+    ) : (<Background></Background>)
 }

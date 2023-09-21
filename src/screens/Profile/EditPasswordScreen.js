@@ -72,6 +72,7 @@ export const EditPasswordScreen = ({route, navigation}) => {
                 <TextInput
                     label="Old Password"
                     returnKeyType="next"
+                    style={{minWidth: '100%'}}
                     value={formData.oldPassword}
                     secureTextEntry={true}
                     onChangeText={(oldPassword) => setFormData({...formData, oldPassword})}
@@ -81,6 +82,7 @@ export const EditPasswordScreen = ({route, navigation}) => {
                 <TextInput
                     label="New Password"
                     returnKeyType="next"
+                    style={{minWidth: '100%'}}
                     value={formData.newPasswordOne}
                     secureTextEntry={true}
                     onChangeText={(newPasswordOne) => setFormData({...formData, newPasswordOne})}
@@ -90,20 +92,21 @@ export const EditPasswordScreen = ({route, navigation}) => {
                 <TextInput
                     label="Repeat New Password"
                     returnKeyType="next"
+                    style={{minWidth: '100%'}}
                     value={formData.newPasswordTwo}
                     secureTextEntry={true}
                     onChangeText={(newPasswordTwo) => setFormData({...formData, newPasswordTwo})}
                     errorText={InputValidator.confirmPassword(formData.newPasswordOne, formData.newPasswordTwo)}
                 />
 
-                <div style={{marginLeft: '30px'}}>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Button
                         mode="contained"
                         text={"Submit"}
                         onPress={onSubmitPressed}
                     />
-                </div>
+                </View>
             </View>
         </Background>
-    ) : (<div></div>)
+    ) : (<Background></Background>)
 }

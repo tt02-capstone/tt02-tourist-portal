@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from "react";
+import { View, Text } from "react-native";
 import { ToastContainer, toast } from 'react-toastify';
+import Button from "./Button"
 import AWS from 'aws-sdk';
+
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 // BACKUP, DO NOT TOUCH THE NEXT 3 LINE OF CODE
@@ -94,10 +97,12 @@ export default function CustomFileUpload(props) {
   // COPY ENDS HERE
 
   return (
-    <div style={props.style}>
-        <input type="file" onChange={props.handleFileChange} />
-        <button onClick={props.uploadFile}>Upload</button>
+    <View style={props.style}>
+        {/* <input type="file" onChange={props.handleFileChange} /> */}
+        <Button onClick={props.uploadFile}>
+          <Text>Upload</Text>
+        </Button>
         <ToastContainer />
-    </div>
+    </View>
   );
 }

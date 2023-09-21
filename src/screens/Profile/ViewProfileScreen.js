@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View, Text, Image } from 'react-native'
+import Header from '../../components/Header';
 import { useIsFocused } from "@react-navigation/native";
 import { theme } from '../../core/theme';
 import Button from "../../components/Button";
@@ -9,6 +10,9 @@ import CustomFileUpload from '../../components/CustomFileUpload';
 import moment from 'moment';
 import AWS from 'aws-sdk';
 import { uploadNewProfilePic } from '../../redux/userRedux';
+import Background from '../../components/Background';
+import Testimage from '../../components/Testimage';
+
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export const ViewProfileScreen = ({route, navigation}) => {
@@ -107,43 +111,45 @@ export const ViewProfileScreen = ({route, navigation}) => {
     };
 
     return user ? (
-        <div>
-            <div style={{marginBottom: '60px'}}></div>
-            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <img 
-                    src={user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}
-                    style={{borderRadius: '50%', width: '200px', height: '200px'}}
+        <Background>
+            <View style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <Image
+                    style={styles.image}
+                    source={{uri: user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                 />
-            </div>
-            <div style={{marginTop: '30px'}}></div>
-            <CustomFileUpload style={styles.uploadButton} handleFileChange={handleFileChange} uploadFile={uploadFile}/>
-            <div style={{marginTop: '30px'}}></div>
-            <div >
-                <div style={styles.mainContent} >
+            </View>
+
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.mainContent} >
                     {user.name}
-                </div>
-                <div style={styles.content} >
+                </Text>
+                <Text style={styles.mainContent} >
                     {user.email}
-                </div>
-                <div style={styles.content} >
+                </Text>
+                <Text style={styles.mainContent} >
                     {moment(user.date_of_birth).format('LL')}
-                </div>
-                <div style={styles.content} >
+                </Text>
+                <Text style={styles.mainContent} >
                     {user.country_code + " " + user.mobile_num}
-                </div>
-                <div style={styles.content} >
-                    <Button text="Edit Profile" onPress={() => navigation.navigate('EditProfileScreen')} />
-                </div>
-                <div style={styles.content} >
-                    <Button text="Edit Password" onPress={() => navigation.navigate('EditPasswordScreen')} />
-                </div>
-            </div>
-        </div>
+                </Text>
+                <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
+                <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
+                {/* <Testimage /> */}
+                {/* <CustomFileUpload style={styles.uploadButton} handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
+            </View>
+        </Background>
     ) : 
-    (<div></div>)
+    (<Text></Text>)
 }
 
 const styles = StyleSheet.create({
+    image: {
+        marginTop: -100,
+        marginBottom: 50,
+        borderRadius: 300 / 2,
+        minWidth: 300,
+        minHeight: 300,
+    },
     uploadButton: {
         display: 'flex',
         alignSelf: 'center',
@@ -159,10 +165,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: '10px',
     },
-    content: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: '10px',
+    button: {
+        minWidth: '80%'
     }
 })

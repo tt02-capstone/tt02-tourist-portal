@@ -62,9 +62,11 @@ export const Layout = () => {
             }}   initialRouteName="LoginScreen">
                 {authState?.authenticated? (
                     <>
-                        <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
                         <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen}
                                       options={{title: 'View Profile'}}/>
+                        <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
+                        {/* <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen}
+                                      options={{title: 'View Profile'}}/> */}
                         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen}
                                       options={{title: 'Edit Profile'}}/>
                         <Stack.Screen name="EditPasswordScreen" component={EditPasswordScreen}

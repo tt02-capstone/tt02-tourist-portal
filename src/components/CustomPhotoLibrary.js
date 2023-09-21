@@ -3,7 +3,7 @@ import { Button, Image, View, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, CameraType } from 'expo-camera';
 
-export default function Testimage(props) {
+export default function CustomPhotoLibrary(props) {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const [type, setType] = useState(CameraType.back);

@@ -1,19 +1,15 @@
 import React, {useState, useEffect} from 'react'
 import { StyleSheet, View, Text, Image } from 'react-native'
-import Header from '../../components/Header';
 import { useIsFocused } from "@react-navigation/native";
 import { theme } from '../../core/theme';
 import Button from "../../components/Button";
 import { storeUser, getUser } from '../../helpers/LocalStorage'
 import Toast from "react-native-toast-message";
-import CustomFileUpload from '../../components/CustomFileUpload';
 import moment from 'moment';
 import * as ImagePicker from 'expo-image-picker';
-import AWS from 'aws-sdk';
 import { S3 } from 'aws-sdk';
 import { uploadNewProfilePic } from '../../redux/userRedux';
 import Background from '../../components/Background';
-import Testimage from '../../components/Testimage';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 

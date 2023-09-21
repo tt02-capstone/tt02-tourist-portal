@@ -176,8 +176,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
             
-            let reccoms = await getAttractionRecommendation(attractionId);
-            setRecommendation(reccoms)
+            //let reccoms = await getAttractionRecommendation(attractionId);
+            //setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();

@@ -15,6 +15,7 @@ export const CartScreen = ({navigation}) => {
     const [deletion, setDeletion] = useState(false);
     const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
     const [totalPrice, setTotalPrice] = useState(0);
+    const [apiCallTimer, setApiCallTimer] = useState(null);
     const isFocused = useIsFocused();
 
   function formatDateAndTime(date) {
@@ -53,21 +54,41 @@ export const CartScreen = ({navigation}) => {
 }
 
 
+React.useLayoutEffect(() => {
+  navigation.setOptions({
+    headerRight: () => (
+      <Button 
+        title="Delete" 
+        color="error"
+        onPress={() => {
+          handleDeleteCartItem();  // Call your delete function here
+        }}
+      />
+    ),
+  });
+}, [navigation, handleDeleteCartItem]);
 
-  const handleDeleteCartItem = async (cart_item_id) => {
-    
+
+  const handleDeleteCartItem = async () => {
+    console.log('wat')
+    console.log(user) //There seems to be a bug with the useLayoutEffect, it would not retrieve the user object
     const tourist_email = user.email;
-    const cart_item_ids = [cart_item_id];
-    console.log(cart_item_ids)
-    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`,cart_item_ids)
+    const booking_ids = [];
+      itemChecked.forEach((isChecked, index) => {
+        if (isChecked) {
+            booking_ids.push(cartItems[index].id);
+
+        }
+    });
+    console.log(tourist_email,booking_ids)
+    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`,booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error',response.data)
 
   } else {
     console.log('success', response.data)
     if (response.data) {
-        navigation.navigate('CartScreen');
-        // Should navigate to Bookings Screen?
+
         setDeletion(!deletion);
       Toast.show({
         type: 'success',
@@ -137,6 +158,36 @@ const handleCheckBoxToggle = (index) => {
     setItemChecked(updatedChecked);
   };
 
+  const updateQuantity = (cartItemIndex,itemIndex, delta) => {
+
+    // Update the cart items with new quantity for the specified ticket type
+    cartItems[cartItemIndex].items[itemIndex].quantity += delta;
+
+    setCartItems(cartItems);
+
+    // Clear any pending API call
+    if (apiCallTimer) {
+      clearTimeout(apiCallTimer);
+    }
+
+    const newTimer = setTimeout(async () => {
+
+      const tourist_email = user.email
+      const cart_item_id = cartItems[cartItemIndex].items[itemIndex].cart_item_id;
+      const quantity = cartItems[cartItemIndex].items[itemIndex].quantity;
+      const cart_booking_id = cartItems[cartItemIndex].id
+      const response = await cartApi.put(`/updateCartItem/${user_type}/${tourist_email}/${cart_item_id}/${cart_booking_id}/${quantity}`)
+          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+              console.log('error',response.data)
+
+          } else {
+              console.log('success',response.data)
+          }
+    }, 1000);
+
+    setApiCallTimer(newTimer);
+  };
+
   useEffect(() => {
     async function onLoad() {
       try {
@@ -203,13 +254,13 @@ const handleCheckBoxToggle = (index) => {
     <ScrollView>
     <View>
       {
-          cartItems.map((cartItem, index) => (
+          cartItems.map((cartItem, cartItemIndex) => (
             
           <ListItem.Swipeable
             shouldCancelWhenOutside={false} 
             rightWidth={90}
             minSlideWidth={40}
-            key={index}
+            key={cartItemIndex}
             rightContent={
                 <Button
                 containerStyle={{
@@ -233,8 +284,8 @@ const handleCheckBoxToggle = (index) => {
            checkedIcon="checkbox-outline"
            uncheckedIcon={'checkbox-blank-outline'}
       containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
-      checked={itemChecked[index]}
-      onPress={() => handleCheckBoxToggle(index)}
+      checked={itemChecked[cartItemIndex]}
+      onPress={() => handleCheckBoxToggle(cartItemIndex)}
       
     />
     
@@ -264,8 +315,45 @@ const handleCheckBoxToggle = (index) => {
               </View>
               <View style={{ flexDirection: "column" }}>
               {
-          cartItem.items.map((item, index) => (
-            <Text key={index}>{item.activity_selection} Quantity: {item.quantity}</Text> 
+          cartItem.items.map((item, itemIndex) => (
+            <View style={{ flexDirection: "row" }}>
+
+<Text key={itemIndex} style={{marginLeft: 10, }}>{item.activity_selection} </Text> 
+
+<TouchableOpacity 
+    style={{
+        backgroundColor: '#044537', 
+        height: 15, 
+        width: 15,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }} 
+    onPress={() => updateQuantity(cartItemIndex,itemIndex, -1)}
+>
+    <Text style={{color: 'white', fontSize: 10}}> - </Text>
+</TouchableOpacity>
+
+<Text>{item.quantity} </Text>
+
+<TouchableOpacity 
+    style={{
+        backgroundColor: '#044537', 
+
+        height: 15, 
+        width: 15,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }} 
+    onPress={() => updateQuantity(cartItemIndex,itemIndex, 1)}
+>
+    <Text style={{color: 'white', fontSize: 10}}> + </Text>
+</TouchableOpacity>
+                                
+                
+
+            
+
+            </View>
           ))
 
           }

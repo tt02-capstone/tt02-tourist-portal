@@ -26,7 +26,7 @@ import {AddCreditCardScreen} from "./src/screens/CreditCard/AddCreditCardScreen"
 import {CreditCardScreen} from "./src/screens/CreditCard/CreditCardScreen";
 import {CartScreen} from "./src/screens/Cart/CartScreen";
 import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
-import { enGB, registerTranslation } from 'react-native-paper-dates'
+import { enGB,en, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
 
@@ -36,6 +36,7 @@ initStripe({
 });
 
 registerTranslation('en-GB', enGB)
+registerTranslation('en', en)
 const Stack = createNativeStackNavigator();
 
 export default function App() {

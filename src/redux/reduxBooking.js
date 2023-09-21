@@ -26,7 +26,7 @@ export async function getBookingByBookingId(bookingId) {
 export async function cancelBookingByBookingId(bookingId) {
     try {
         const response = await bookingApi.put(`/cancelBooking/${bookingId}`);
-        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404) {
+        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404 || response.data.httpStatusCode == 422) {
             return {status:true, info:response.data.errorMessage};
         } else {
             return {status:false, info:response.data};

@@ -38,6 +38,7 @@ export const ForgotPasswordScreen = ({navigation}) => {
             }
         } catch (error) {
             console.error("Axios Error : ", error)
+            setLoading(false);
         }
         // navigation.navigate('LoginScreen')
     }

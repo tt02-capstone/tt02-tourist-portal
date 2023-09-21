@@ -15,6 +15,7 @@ window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export const ViewProfileScreen = ({route, navigation}) => {
 
+    const [fetchProfile, setFetchProfile] = useState(false);
     const isFocused = useIsFocused();
     const [user, setUser] = useState();
 
@@ -24,13 +25,14 @@ export const ViewProfileScreen = ({route, navigation}) => {
             const userData = await getUser()
             console.log(userData);
             setUser(userData)
+            setFetchProfile(null);
         }
 
-        if (isFocused) {
+        if (isFocused || fetchProfile) {
             fetchData();   
         }
 
-    }, [isFocused])
+    }, [isFocused, fetchProfile])
 
     // upload image
     const S3BUCKET ='tt02/user';
@@ -39,6 +41,7 @@ export const ViewProfileScreen = ({route, navigation}) => {
     const SECRET_ACCESS_KEY ='xsMGhdP0XsZKAzKdW3ED/Aa5uw91Ym5S9qz2HiJ0';
   
     const [file, setFile] = useState(null);
+    const [finalURL, setFinalURL] = useState();
 
     const onImagePicker = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -56,23 +59,21 @@ export const ViewProfileScreen = ({route, navigation}) => {
 
     useEffect(() => {
         if (file && user) {
-            console.log("here")
             const s3 = new S3({
                 accessKeyId: ACCESS_KEY,
                 secretAccessKey: SECRET_ACCESS_KEY,
                 region: TT02REGION,
             });
 
-            let finalURL;
-            const uploadImage = async (userId, uri) => {
+            const uploadImage = async (uri) => {
                 let arr = uri.split("/");
-                finalURL = "user_" + user.user_id + "_" + arr[arr.length-1];
+                let temp = "user_" + user.user_id + "_" + arr[arr.length-1];
     
                 const response = await fetch(uri);
                 const blob = await response.blob();
                 const params = {
                   Bucket: S3BUCKET,
-                  Key: finalURL,
+                  Key: temp,
                   Body: blob,
                 };
               
@@ -80,15 +81,27 @@ export const ViewProfileScreen = ({route, navigation}) => {
                 if (err) {
                     throw err;
                 }
+                    setFinalURL(temp);
                     console.log('Image upload to S3 successfully!');
                 });
+            }
+            
+            uploadImage(file.assets[0].uri);
+        }
+    }, [file]);
 
-                const apiResponse = await uploadNewProfilePic({user_id: userId, profile_pic: finalURL});
+    useEffect(() => {
+        if (finalURL) {
+            const saveToDB = async (userId, uri) => {
+                let temp = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + finalURL;
+                console.log("temp: " + temp);
+                const apiResponse = await uploadNewProfilePic({user_id: userId, profile_pic: temp});
                 if (apiResponse.status) {
                     console.log("image url saved in database")
                     await storeUser(apiResponse.data);
                     const userData = await getUser()
                     setUser(userData);
+                    setFetchProfile(true);
                     setFile(null);
                     Toast.show({
                         type: 'success',
@@ -103,11 +116,11 @@ export const ViewProfileScreen = ({route, navigation}) => {
                 };
             }
 
-            uploadImage(user.user_id, file.assets[0].uri);
+            saveToDB(user.user_id, finalURL);
+            setFinalURL(undefined);
+            setFile(null);
         }
-
-        setFile(null);
-    }, [file]);
+    }, [finalURL]);
 
     return user ? (
         <Background>

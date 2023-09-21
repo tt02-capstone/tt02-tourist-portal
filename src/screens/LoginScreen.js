@@ -67,7 +67,8 @@ export const LoginScreen = ({navigation}) => {
     }
 
     return (
-        <Background>
+        <Background >
+            <View style={{alignItems: 'center'}}>
             <Header>WithinSG</Header>
             <TextInput
                 label="Email"
@@ -98,6 +99,7 @@ export const LoginScreen = ({navigation}) => {
                 textStyle={styles.link}
                 onPress={() => navigation.navigate('SignUpScreen')}
             />
+            </View>
         </Background>
     )
 }

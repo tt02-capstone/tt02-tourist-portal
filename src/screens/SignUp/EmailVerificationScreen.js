@@ -27,7 +27,7 @@ export const EmailVerificationScreen = ({navigation}) => {
             } else {
                 Toast.show({
                     type: 'success',
-                    text1: response.data
+                    text1: "Verified successfully!"
                 })
                 setLoading(false);
                 setTimeout(() => {

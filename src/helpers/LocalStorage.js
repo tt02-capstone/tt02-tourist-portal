@@ -40,7 +40,7 @@ export const clearStorage = async () => {
 
 export const getEmail = async () => {
     try {
-        return await AsyncStorage.getItem('email');
+        return await SecureStore.getItemAsync('email');
         
     } catch (e) {
         console.log('Async Storage getEmail fail', e)

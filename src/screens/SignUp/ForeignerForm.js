@@ -1,8 +1,25 @@
 import {Pressable, Text, View} from "react-native";
 import TextInput from "../../components/TextInput";
 import InputValidator from "../../helpers/InputValidator";
-export const ForeignerForm = ({formData, setFormData}) => {
+import {DatePickerInput} from "react-native-paper-dates";
+import {SafeAreaProvider} from "react-native-safe-area-context";
+import React, {useState} from "react";
+import PhoneInput, {ICountry} from 'react-native-international-phone-number';
 
+export const ForeignerForm = ({formData, setFormData}) => {
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [selectedDate, setSelectedDate] = useState();
+
+    const setDate = (selectedDate) => {
+        console.log(selectedDate)
+        setSelectedDate(selectedDate)
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone
+        const dob = `${year}-${month}-${day}`;
+        console.log(dob)
+        setFormData({...formData, dob })
+    }
     return (
         <View>
             <TextInput
@@ -14,16 +31,32 @@ export const ForeignerForm = ({formData, setFormData}) => {
                 errorText={InputValidator.passport(formData.passport)}
                 autoCapitalize="none"
             />
-            <TextInput
-                label="Mobile Number"
-                returnKeyType="next"
-                value={formData.mobile}
-                onChangeText={(mobile) => setFormData({...formData, mobile })}
-                // error={!!email.error}
-                errorText={InputValidator.mobileNo(formData.mobile)}
-                autoCapitalize="none"
-                keyboardType="phone-pad"
-            />
+
+            <View style={{marginTop: 30, marginBottom: 30}}>
+                <DatePickerInput
+                    locale="en-GB"
+                    label="Date of Birth"
+                    value={selectedDate}
+                    onChange={setDate}
+                    inputMode="start"
+                />
+            </View>
+            <View style={{marginTop: 10, marginBottom: 10}}>
+                <PhoneInput
+                    value={formData.mobile}
+                    onChangePhoneNumber={(mobile) => {
+                        mobile = mobile.replace(' ', '')
+                        setFormData({...formData, mobile})
+                    }}
+                    defaultCountry={"SG"}
+                    selectedCountry={selectedCountry}
+                    onChangeSelectedCountry = {(country) => {
+                        setSelectedCountry(country);
+                        let countryCode = country.callingCode.replace('+', '')
+                        setFormData({...formData, countryCode})
+                    }}
+                />
+            </View>
         </View>
     )
 }

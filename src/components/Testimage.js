@@ -1,97 +1,45 @@
 import React, { useState } from 'react';
-import { Button, Image, View } from 'react-native';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker'
-// import * as ImagePicker from "react-native-image-picker"
+import { Button, Image, View, Text } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Camera, CameraType } from 'expo-camera';
 
 export default function Testimage(props) {
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // const openImagePicker = () => {
-    // const options = {
-    //   mediaType: 'photo',
-    //   includeBase64: false,
-    //   maxHeight: 2000,
-    //   maxWidth: 2000,
-    // };
+  const [type, setType] = useState(CameraType.back);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
 
-    // launchImageLibrary(options, (response) => {
-    //   console.log("here");
-    //   if (response.didCancel) {
-    //     console.log('User cancelled image picker');
-    //   } else if (response.error) {
-    //     console.log('Image picker error: ', response.error);
-    //   } else {
-    //     let imageUri = response.uri || response.assets?.[0]?.uri;
-    //     console.log("image chosen");
-    //     setSelectedImage(imageUri);
-    //   }
-    // });
-    // };
-    const openImagePicker =()=>{
-      const options = {
-        mediaType: 'photo',
-        includeBase64: false,
-        maxHeight: 2000,
-        maxWidth: 2000,
-      };
-      
-      launchImageLibrary(options, (response) => {
-        console.log('Response = ', response);
-      
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.error) {
-          console.log('ImagePicker Error: ', response.error);
-        } else if (response.customButton) {
-          console.log('User tapped custom button: ', response.customButton);
-        } else {
-          const source = { uri: response.uri };
-      
-          // You can also display the image using data:
-          // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-      
-          console.log(source)
-        }
-      })};
-  
-  // handleCameraLaunch = () => {
-  //   const options = {
-  //     mediaType: 'photo',
-  //     includeBase64: false,
-  //     maxHeight: 2000,
-  //     maxWidth: 2000,
-  //   };
-  
-  //   launchCamera(options, response => {
-  //     console.log('Response = ', response);
-  //     if (response.didCancel) {
-  //       console.log('User cancelled camera');
-  //     } else if (response.error) {
-  //       console.log('Camera Error: ', response.error);
-  //     } else {
-  //       // Process the captured image
-  //       let imageUri = response.uri || response.assets?.[0]?.uri;
-  //       setSelectedImage(imageUri);
-  //       console.log(imageUri);
-  //     }
-  //   });
-  // }
+  if (!permission) 
+
+  if (!permission.granted) 
+
+  function toggleCameraType() {
+    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+  }
+
+  const onImagePicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+
+  const onCameraPressed = async () => {
+
+  }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center' }}>
-     {selectedImage && (
-          <Image
-            source={{ uri: selectedImage }}
-            style={{ flex: 1 }}
-            resizeMode="contain"
-          />
-    )}
-    <View style={{ marginTop: 20 }}>
-      <Button title="Choose from Device" onPress={openImagePicker} />
+    <View style={{ marginTop: 20,marginBottom: 50 }}>
+      <Button title="Choose from Device" onPress={onImagePicker} />
+      <Button title="Open Camera" onPress={onCameraPressed} />
     </View>
-    {/* <View style={{ marginTop: 20,marginBottom: 50 }}>
-      <Button title="Open Camera" onPress={handleCameraLaunch} />
-    </View> */}
-  </View>
   );
 };

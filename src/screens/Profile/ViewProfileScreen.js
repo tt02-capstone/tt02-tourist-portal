@@ -132,9 +132,10 @@ export const ViewProfileScreen = ({route, navigation}) => {
                 <Text style={styles.mainContent} >
                     {user.country_code + " " + user.mobile_num}
                 </Text>
+                <Testimage />
                 <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
                 <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
-                {/* <Testimage /> */}
+           
                 {/* <CustomFileUpload style={styles.uploadButton} handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
             </View>
         </Background>

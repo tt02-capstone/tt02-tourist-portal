@@ -1,7 +1,7 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Icon } from '@rneui/themed';
+import { Icon, Button, Text} from '@rneui/themed';
 
 export const Cart = () => {
     const route = useRoute();
@@ -15,28 +15,29 @@ export const Cart = () => {
       }
 
 
-    return (
-
-        <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('CartScreen'); 
-      }}
-      style={{ marginRight: 20 }} 
-    >
-    
-        <Icon
-        color="#000000"
-        containerStyle={{}}
-        disabledStyle={{}}
-        iconProps={{}}
-        iconStyle={{}}
-        name="shopping-cart"
-        
-        size={40}
-        type="font-awesome"
-        />
-
-        </TouchableOpacity>
-    
-    )
+      if (!isCartScreen) {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('CartScreen'); 
+            }}
+            style={{ marginRight: 20 }} 
+          >
+            <Icon
+              color="#000000"
+              name="shopping-cart"
+              size={40}
+              type="font-awesome"
+            />
+          </TouchableOpacity>
+        );
+      } else {
+        // Render something else or return null
+        return (
+          <View>
+{/* onPress={() => navigation.navigate('Details')} */}
+      <Button title="Delete" onPress={{handleDeleteCartItem}}/>
+    </View>
+        );
+      }
     }

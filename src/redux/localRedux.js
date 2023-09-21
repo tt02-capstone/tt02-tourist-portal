@@ -15,5 +15,6 @@ export async function editLocalProfile(edittedProfile) {
   })
   .catch((error) => {
     console.error("localRedux editLocalProfile: ", error);
+    return {status: false, data: error.message};
   });
 }

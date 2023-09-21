@@ -9,6 +9,7 @@ export async function getAttractionList() {
         }    
     } catch (error) {
         console.error("Retrieve attraction list error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -20,6 +21,7 @@ export async function getAttraction(attraction_id) {
         }    
     } catch (error) {
         console.error("Retrieve attraction error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -31,6 +33,7 @@ export async function getAttractionRecommendation(attraction_id) {
         }    
     } catch (error) {
         console.error("Retrieve recommendation error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -44,6 +47,7 @@ export async function checkTicketInventory(attraction_id,ticket_date,request_bod
         }    
     } catch (error) {
         console.error("Check ticket inventory error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -57,6 +61,7 @@ export async function saveAttraction(user_id,attraction_id) {
         }    
     } catch (error) {
         console.error("Save attraction error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -68,6 +73,7 @@ export async function getSavedAttractionList(user_id) {
         }  
     } catch (error) {
         console.error("Retrieve attraction error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -82,6 +88,7 @@ export async function deleteSavedAttraction(user_id,attraction_id) {
         }    
     } catch (error) {
         console.error("Delete attraction error!");
+        return {status: false, data: error.message};
     }
 }
 

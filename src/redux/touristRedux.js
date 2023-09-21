@@ -8,6 +8,6 @@ export async function editTouristProfile(editedProfile) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("touristRedux editTouristProfile Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }

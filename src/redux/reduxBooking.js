@@ -9,6 +9,7 @@ export async function getBookingHistoryList(userId) {
         }    
     } catch (error) {
         console.error("Retrieve booking history list error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -20,6 +21,7 @@ export async function getBookingByBookingId(bookingId) {
         }    
     } catch (error) {
         console.error("Retrieve booking details error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -33,6 +35,7 @@ export async function cancelBookingByBookingId(bookingId) {
         }    
     } catch (error) {
         console.error("Cancel booking error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -44,5 +47,6 @@ export async function getPaymentHistoryList(userId) {
         }    
     } catch (error) {
         console.error("Retrieve payment history list error!");
+        return {status: false, data: error.message};
     }
 }

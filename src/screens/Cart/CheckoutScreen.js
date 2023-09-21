@@ -236,27 +236,28 @@ export const CheckoutScreen = ({navigation}) => {
 </ListItem >
 
         ))}
-       
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('AddCreditCardScreen', {
-                previousScreen: 'CheckoutScreen',
+
+<View style={{ justifyContent: 'center', alignItems: 'center' }}>
+  <Button 
+    title="+ Add a Credit/ Debit Card" 
+    type="outline" 
+    onPress={() => navigation.navigate('AddCreditCardScreen', {
+      previousScreen: 'CheckoutScreen',
                 booking_ids: booking_ids,
                 selectedCartItems: selectedCartItems,
                 totalPrice: totalPrice,
-
-            })
-
-          }
-        >
-          <View style={{ width: 400, height: 150 }}>
-        <Card >
-          <Text>+ Add a Credit/ Debit Card</Text>
-        </Card>
+    })}
+    buttonStyle={{
+      borderColor: 'blue', // Set the color of the border
+      borderWidth: 1, // Set the width of the border
+    }}
+    titleStyle={{
+      color: 'blue' // Set the color of the text
+    }}
+  />
+</View>
        
-
-      </View>
-        </TouchableOpacity>
+        
 </View>
 </View>
 </ListItem>

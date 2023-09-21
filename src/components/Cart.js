@@ -9,8 +9,9 @@ export const Cart = () => {
     const isLoginScreen = route.name === 'LoginScreen';
     const isCartScreen = route.name === 'CartScreen';
     const isCheckoutScreen = route.name === 'CheckoutScreen';
+    const isSignUpScreen = route.name === 'SignUpScreen';
 
-    if (isLoginScreen || isCartScreen || isCheckoutScreen) {
+    if (isLoginScreen || isCartScreen || isCheckoutScreen || isSignUpScreen) {
         return null;
       }
 

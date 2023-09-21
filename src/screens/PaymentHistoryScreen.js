@@ -23,9 +23,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         React.useCallback(() => {
             const fetchData = async () => {
                 try {
-                    // To update when nav bar is up
-                    let listOfPayments = await getPaymentHistoryList(1);
-                    // let listOfPayments = await getPaymentHistoryList(user.user_id);
+                    let listOfPayments = await getPaymentHistoryList(user.user_id);
                     setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
                     console.log(listOfPayments);
                     setLoading(false);
@@ -60,7 +58,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         navigation.navigate('BookingDetailsScreen', { bookingId: booking_id });
     }
 
-    return (
+    return data.length !== 0 ? (
         <Background>
             <ScrollView>
                 <View style={styles.container}>
@@ -77,10 +75,18 @@ const PaymentHistoryScreen = ({ navigation }) => {
                                     Payment Amount: S${item.payment_amount}<br /><br />
                                     Booking ID: {item.booking.booking_id}
                                 </Text>
-                                <Button text="View Booking" mode="contained" onPress={() => viewBooking(item.booking.booking_id)} />
+                                <Button style={styles.button} text="View Booking" mode="contained" onPress={() => viewBooking(item.booking.booking_id)} />
                             </Card>
                         ))
                     }
+                </View>
+            </ScrollView>
+        </Background>
+    ) : (
+        <Background>
+            <ScrollView>
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyMessage}>No payments made</Text>
                 </View>
             </ScrollView>
         </Background>
@@ -119,6 +125,20 @@ const styles = StyleSheet.create({
     header: {
         color: '#044537',
         fontSize: 15
+    },
+    emptyContainer: {
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 8
+    },
+    emptyMessage: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'gray',
+        textAlign: 'center'
+    }, 
+    button: {
+        width: '100%'
     }
 });
 

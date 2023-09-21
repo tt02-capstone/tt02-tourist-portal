@@ -9,14 +9,6 @@ export default function Testimage(props) {
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
 
-  if (!permission) 
-
-  if (!permission.granted) 
-
-  function toggleCameraType() {
-    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-  }
-
   const onImagePicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -32,14 +24,10 @@ export default function Testimage(props) {
     }
   };
 
-  const onCameraPressed = async () => {
-
-  }
 
   return (
     <View style={{ marginTop: 20,marginBottom: 50 }}>
       <Button title="Choose from Device" onPress={onImagePicker} />
-      <Button title="Open Camera" onPress={onCameraPressed} />
     </View>
   );
 };

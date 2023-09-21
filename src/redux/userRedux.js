@@ -33,5 +33,6 @@ export async function uploadNewProfilePic(user) {
   })
   .catch((error) => {
     console.error("userRedux uploadNewProfilePic Error : ", error);
+    return {status: false, data: error.message}
   });
 }

@@ -8,7 +8,9 @@ import { storeUser, getUser } from '../../helpers/LocalStorage'
 import Toast from "react-native-toast-message";
 import CustomFileUpload from '../../components/CustomFileUpload';
 import moment from 'moment';
+import * as ImagePicker from 'expo-image-picker';
 import AWS from 'aws-sdk';
+import { S3 } from 'aws-sdk';
 import { uploadNewProfilePic } from '../../redux/userRedux';
 import Background from '../../components/Background';
 import Testimage from '../../components/Testimage';
@@ -35,58 +37,60 @@ export const ViewProfileScreen = ({route, navigation}) => {
     }, [isFocused])
 
     // upload image
-
-
-    const S3BUCKET ='tt02/user'; // if you want to save in a folder called 'attraction', your S3BUCKET will instead be 'tt02/attraction'
+    const S3BUCKET ='tt02/user';
     const TT02REGION ='ap-southeast-1';
     const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
     const SECRET_ACCESS_KEY ='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';
   
     const [file, setFile] = useState(null);
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      setFile(file);
+
+    const onImagePicker = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          setFile(result);
+          console.log("xxx:" + result);
+        }
     };
-  
-    const uploadFile = async () => {
-        if (file) {
-            const S3_BUCKET = S3BUCKET;
-            const REGION = TT02REGION;
-        
-            AWS.config.update({
+
+    useEffect(() => {
+        if (file && user) {
+            console.log("here")
+            const s3 = new S3({
                 accessKeyId: ACCESS_KEY,
                 secretAccessKey: SECRET_ACCESS_KEY,
-            });
-            const s3 = new AWS.S3({
-                params: { Bucket: S3_BUCKET },
-                region: REGION,
-            });
-        
-            const params = {
-                Bucket: S3_BUCKET,
-                Key: file.name,
-                Body: file,
-            };
-        
-            var upload = s3
-                .putObject(params)
-                .on("httpUploadProgress", (evt) => {
-                console.log(
-                    "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-                );
-                })
-                .promise();
-        
-            await upload.then((err, data) => {
-                console.log(err);
+                region: TT02REGION,
             });
 
-            let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + file.name;
-            const fetchData = async (userId, str) => {
-                const response = await uploadNewProfilePic({user_id: userId, profile_pic: str});
-                if (response.status) {
+            let finalURL;
+            const uploadImage = async (userId, uri) => {
+                let arr = uri.split("/");
+                finalURL = "user_" + user.user_id + "_" + arr[arr.length-1];
+    
+                const response = await fetch(uri);
+                const blob = await response.blob();
+                const params = {
+                  Bucket: S3BUCKET,
+                  Key: finalURL,
+                  Body: blob,
+                };
+              
+                s3.upload(params, function(err, data) {
+                if (err) {
+                    throw err;
+                }
+                    console.log('Image upload to S3 successfully!');
+                });
+
+                const apiResponse = await uploadNewProfilePic({user_id: userId, profile_pic: finalURL});
+                if (apiResponse.status) {
                     console.log("image url saved in database")
-                    await storeUser(response.data);
+                    await storeUser(apiResponse.data);
                     const userData = await getUser()
                     setUser(userData);
                     setFile(null);
@@ -96,19 +100,18 @@ export const ViewProfileScreen = ({route, navigation}) => {
                     })
 
                 } else {
-                    console.log("User image URL in database not updated!");
-                }
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Please select a image!'
+                    })
+                };
             }
 
-            fetchData(user.user_id, str);
-            setFile(null);
-        } else {
-            Toast.show({
-                type: 'error',
-                text1: 'Please select a image!'
-            })
+            uploadImage(user.user_id, file.assets[0].uri);
         }
-    };
+
+        setFile(null);
+    }, [file]);
 
     return user ? (
         <Background>
@@ -132,7 +135,7 @@ export const ViewProfileScreen = ({route, navigation}) => {
                 <Text style={styles.mainContent} >
                     {user.country_code + " " + user.mobile_num}
                 </Text>
-                <Testimage />
+                <Button text="Enter Photo Gallery" style={styles.button} onPress={onImagePicker} />
                 <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
                 <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
            
@@ -145,7 +148,7 @@ export const ViewProfileScreen = ({route, navigation}) => {
 
 const styles = StyleSheet.create({
     image: {
-        marginTop: -100,
+        marginTop: -40,
         marginBottom: 50,
         borderRadius: 300 / 2,
         minWidth: 300,

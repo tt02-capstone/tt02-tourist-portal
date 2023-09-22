@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, Button, Modal, StyleSheet, TouchableOpacity, DatePickerAndroid } from 'react-native';
+import { View,  Button, Modal,TextInput,  StyleSheet, TouchableOpacity, DatePickerAndroid } from 'react-native';
+import {Text} from "@rneui/themed";
+import { CardForm, useStripe } from '@stripe/stripe-react-native';
 //import { deletePaymentMethod } from '../../redux/creditCard';
 //import { Picker } from '@react-native-picker/picker';
 
@@ -49,6 +51,7 @@ export const CreditCardScreen = ({ route, navigation }) => {
         <Text>Credit Card Details: **** **** ****{last4}</Text>
       </View>
       <View style={styles.box}>
+      <Button title="Update Expiry Date"  />
         {isEditMode ? (
           <>
             <TouchableOpacity onPress={() => setShowMonthPicker(true)}>

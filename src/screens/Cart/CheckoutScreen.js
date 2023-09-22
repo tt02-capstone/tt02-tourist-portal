@@ -47,14 +47,17 @@ export const CheckoutScreen = ({navigation}) => {
     const user_type = await getUserType();
     const payment_method_id = cards[getSelectedCard].id;
     console.log(booking_ids)
-    const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
+
+    try {
+
+      const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error',response.data)
 
   } else {
     console.log('success', response.data)
     if (response.data) {
-        navigation.navigate('CartScreen'); // Should navigate to Bookings Screen?
+        navigation.reset('BookingHistoryScreen'); // Should navigate to Bookings Screen?
         setDeletion(!deletion);
       Toast.show({
         type: 'success',
@@ -68,6 +71,14 @@ export const CheckoutScreen = ({navigation}) => {
     });
     }
     }
+
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating a booking'
+    });
+    }
+    
     
     
 
@@ -146,13 +157,13 @@ export const CheckoutScreen = ({navigation}) => {
 
 
     
-     <TouchableOpacity style={{ flexDirection: "row" }}
+     {/* <TouchableOpacity style={{ flexDirection: "row" }}
               onPress={() => {
                 navigation.navigate('AttractionDetailsScreen', {
                     attractionId: cartItem.attraction_id,
                 });
               }}
-            >
+            > */}
             
     <Image
                                     
@@ -181,7 +192,7 @@ export const CheckoutScreen = ({navigation}) => {
               </View>
               </View>       
             </ListItem.Content>
-            </TouchableOpacity>
+            {/* </TouchableOpacity> */}
             
             
           </ListItem.Swipeable>
@@ -236,27 +247,22 @@ export const CheckoutScreen = ({navigation}) => {
 </ListItem >
 
         ))}
-       
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('AddCreditCardScreen', {
-                previousScreen: 'CheckoutScreen',
+
+<View style={{ justifyContent: 'center', alignItems: 'center' }}>
+  <Button 
+    title="+ Add a Credit/ Debit Card" 
+    type="outline" 
+    onPress={() => navigation.navigate('AddCreditCardScreen', {
+      previousScreen: 'CheckoutScreen',
                 booking_ids: booking_ids,
                 selectedCartItems: selectedCartItems,
                 totalPrice: totalPrice,
-
-            })
-
-          }
-        >
-          <View style={{ width: 400, height: 150 }}>
-        <Card >
-          <Text>+ Add a Credit/ Debit Card</Text>
-        </Card>
+    })}
+  
+  />
+</View>
        
-
-      </View>
-        </TouchableOpacity>
+        
 </View>
 </View>
 </ListItem>

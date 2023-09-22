@@ -1,4 +1,4 @@
-import React , { useState, useEffect } from 'react';
+import React , { useState, useEffect, useRef } from 'react';
 import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { ListItem, Button, CheckBox, Card, Avatar, Image, Text } from '@rneui/themed';
 import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
@@ -54,23 +54,19 @@ export const CartScreen = ({navigation}) => {
 }
 
 
-React.useLayoutEffect(() => {
-  navigation.setOptions({
-    headerRight: () => (
-      <Button 
-        title="Delete" 
-        color="error"
-        onPress={() => {
-          handleDeleteCartItem();  // Call your delete function here
-        }}
-      />
-    ),
-  });
-}, [navigation, handleDeleteCartItem]);
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button 
+          title="Delete" 
+          type="error"
+          onPress={() => handleDeleteCartItem(user, itemChecked)}
+        />
+      ),
+    });
+  }, [navigation, user, itemChecked]);
 
-
-  const handleDeleteCartItem = async () => {
-    console.log('wat')
+  const handleDeleteCartItem = async (user,itemChecked) => {
     console.log(user) //There seems to be a bug with the useLayoutEffect, it would not retrieve the user object
     const tourist_email = user.email;
     const booking_ids = [];

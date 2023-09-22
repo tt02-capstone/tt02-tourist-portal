@@ -1,6 +1,8 @@
 import axios from "axios";
+import {TOKEN_KEY} from "./AuthContext";
+import * as SecureStore from "expo-secure-store";
 
-const HOST = '172.31.78.223'
+const HOST = '172.31.78.81'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -42,13 +44,13 @@ export const cartApi = axios.create({
 })
 
 
-export const updateApiInstances = (token) => {
-    const bearerToken = token?  `Bearer ${token}`: ``;
-    console.log('Bearer Token',bearerToken)
-    userApi.defaults.headers.common['Authorization'] = bearerToken
-    localApi.defaults.headers.common['Authorization'] = bearerToken
-    attractionApi.defaults.headers.common['Authorization'] = bearerToken
-    bookingApi.defaults.headers.common['Authorization'] = bearerToken
-    paymentsApi.defaults.headers.common['Authorization'] = bearerToken
-    cartApi.defaults.headers.common['Authorization'] = bearerToken
-}
+const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi]
+
+instanceList.map((api) => {
+    api.interceptors.request.use( async (config) => {
+        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        config.headers.Authorization = token ? `Bearer ${token}` : '';
+        return config;
+    });
+})
+

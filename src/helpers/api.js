@@ -54,3 +54,36 @@ instanceList.map((api) => {
     });
 })
 
+const refreshToken = async () => {
+    try {
+        const resp = await userApi.get("/refreshToken");
+        console.log("refresh token", resp.data);
+        return resp.data;
+    } catch (e) {
+        console.log("Error",e);
+    }
+};
+
+instanceList.map((api) => {
+    api.interceptors.response.use(
+        (response) => {
+            return response;
+        },
+        async function (error) {
+            const originalRequest = error.config;
+            console.log(error.response.status === 403 && !originalRequest._retry)
+            if (error.response.status === 403 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                const resp = await refreshToken();
+                const newToken = resp.refreshToken;
+                console.log("Refresh token", newToken)
+
+                await SecureStore.setItemAsync(TOKEN_KEY, newToken);
+                axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                return api(originalRequest);
+            }
+            return Promise.reject(error);
+        }
+    );
+})

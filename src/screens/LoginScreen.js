@@ -48,7 +48,7 @@ export const LoginScreen = ({navigation}) => {
 
 
                 console.log('success', response.data)
-                console.log('response.data.toke', response.data.token)
+                console.log('response.data.token', response.data.token)
 
                 await SecureStore.setItemAsync(
                     TOKEN_KEY,
@@ -58,7 +58,6 @@ export const LoginScreen = ({navigation}) => {
                 await storeUser(response.data.user)
 
                 authContext.setAuthState({
-                    accessToken: response.data.token,
                     authenticated: true
                 });
             }

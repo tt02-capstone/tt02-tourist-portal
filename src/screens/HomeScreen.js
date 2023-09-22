@@ -22,7 +22,6 @@ export const HomeScreen = ({navigation}) => {
       const userData = await getUser()
       setUserData(userData)
       const usertype =  await getUserType()
-      console.log(authContext.getAccessToken())
   }
 
   const viewAttractions = () => {

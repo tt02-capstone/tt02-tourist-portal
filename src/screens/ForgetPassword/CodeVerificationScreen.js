@@ -38,6 +38,7 @@ export const CodeVerificationScreen = ({navigation}) => {
             }
         } catch (error) {
             console.error("Axios Error : ", error)
+            setLoading(false);
         }
     }
 

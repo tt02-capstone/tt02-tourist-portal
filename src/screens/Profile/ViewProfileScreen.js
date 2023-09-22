@@ -1,18 +1,21 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View, Text, Image } from 'react-native'
 import { useIsFocused } from "@react-navigation/native";
 import { theme } from '../../core/theme';
 import Button from "../../components/Button";
 import { storeUser, getUser } from '../../helpers/LocalStorage'
 import Toast from "react-native-toast-message";
-import CustomFileUpload from '../../components/CustomFileUpload';
 import moment from 'moment';
-import AWS from 'aws-sdk';
+import * as ImagePicker from 'expo-image-picker';
+import { S3 } from 'aws-sdk';
 import { uploadNewProfilePic } from '../../redux/userRedux';
+import Background from '../../components/Background';
+
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export const ViewProfileScreen = ({route, navigation}) => {
 
+    const [fetchProfile, setFetchProfile] = useState(false);
     const isFocused = useIsFocused();
     const [user, setUser] = useState();
 
@@ -22,69 +25,83 @@ export const ViewProfileScreen = ({route, navigation}) => {
             const userData = await getUser()
             console.log(userData);
             setUser(userData)
+            setFetchProfile(null);
         }
 
-        if (isFocused) {
+        if (isFocused || fetchProfile) {
             fetchData();   
         }
 
-    }, [isFocused])
+    }, [isFocused, fetchProfile])
 
     // upload image
-
-
-    const S3BUCKET ='tt02/user'; // if you want to save in a folder called 'attraction', your S3BUCKET will instead be 'tt02/attraction'
+    const S3BUCKET ='tt02/user';
     const TT02REGION ='ap-southeast-1';
     const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
     const SECRET_ACCESS_KEY ='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';
   
     const [file, setFile] = useState(null);
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      setFile(file);
+    const [finalURL, setFinalURL] = useState();
+
+    const onImagePicker = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          setFile(result);
+          console.log("xxx:" + result);
+        }
     };
-  
-    const uploadFile = async () => {
-        if (file) {
-            const S3_BUCKET = S3BUCKET;
-            const REGION = TT02REGION;
-        
-            AWS.config.update({
+
+    useEffect(() => {
+        if (file && user) {
+            const s3 = new S3({
                 accessKeyId: ACCESS_KEY,
                 secretAccessKey: SECRET_ACCESS_KEY,
-            });
-            const s3 = new AWS.S3({
-                params: { Bucket: S3_BUCKET },
-                region: REGION,
-            });
-        
-            const params = {
-                Bucket: S3_BUCKET,
-                Key: file.name,
-                Body: file,
-            };
-        
-            var upload = s3
-                .putObject(params)
-                .on("httpUploadProgress", (evt) => {
-                console.log(
-                    "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-                );
-                })
-                .promise();
-        
-            await upload.then((err, data) => {
-                console.log(err);
+                region: TT02REGION,
             });
 
-            let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + file.name;
-            const fetchData = async (userId, str) => {
-                const response = await uploadNewProfilePic({user_id: userId, profile_pic: str});
-                if (response.status) {
+            const uploadImage = async (uri) => {
+                let arr = uri.split("/");
+                let temp = "user_" + user.user_id + "_" + arr[arr.length-1];
+    
+                const response = await fetch(uri);
+                const blob = await response.blob();
+                const params = {
+                  Bucket: S3BUCKET,
+                  Key: temp,
+                  Body: blob,
+                };
+              
+                s3.upload(params, function(err, data) {
+                if (err) {
+                    throw err;
+                }
+                    setFinalURL(temp);
+                    console.log('Image upload to S3 successfully!');
+                });
+            }
+            
+            uploadImage(file.assets[0].uri);
+        }
+    }, [file]);
+
+    useEffect(() => {
+        if (finalURL) {
+            const saveToDB = async (userId, uri) => {
+                let temp = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + finalURL;
+                console.log("temp: " + temp);
+                const apiResponse = await uploadNewProfilePic({user_id: userId, profile_pic: temp});
+                if (apiResponse.status) {
                     console.log("image url saved in database")
-                    await storeUser(response.data);
+                    await storeUser(apiResponse.data);
                     const userData = await getUser()
                     setUser(userData);
+                    setFetchProfile(true);
                     setFile(null);
                     Toast.show({
                         type: 'success',
@@ -92,58 +109,60 @@ export const ViewProfileScreen = ({route, navigation}) => {
                     })
 
                 } else {
-                    console.log("User image URL in database not updated!");
-                }
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Please select a image!'
+                    })
+                };
             }
 
-            fetchData(user.user_id, str);
+            saveToDB(user.user_id, finalURL);
+            setFinalURL(undefined);
             setFile(null);
-        } else {
-            Toast.show({
-                type: 'error',
-                text1: 'Please select a image!'
-            })
         }
-    };
+    }, [finalURL]);
 
     return user ? (
-        <div>
-            <div style={{marginBottom: '60px'}}></div>
-            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <img 
-                    src={user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}
-                    style={{borderRadius: '50%', width: '200px', height: '200px'}}
+        <Background>
+            <View style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <Image
+                    style={styles.image}
+                    source={{uri: user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                 />
-            </div>
-            <div style={{marginTop: '30px'}}></div>
-            <CustomFileUpload style={styles.uploadButton} handleFileChange={handleFileChange} uploadFile={uploadFile}/>
-            <div style={{marginTop: '30px'}}></div>
-            <div >
-                <div style={styles.mainContent} >
+            </View>
+
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.mainContent} >
                     {user.name}
-                </div>
-                <div style={styles.content} >
+                </Text>
+                <Text style={styles.mainContent} >
                     {user.email}
-                </div>
-                <div style={styles.content} >
+                </Text>
+                <Text style={styles.mainContent} >
                     {moment(user.date_of_birth).format('LL')}
-                </div>
-                <div style={styles.content} >
+                </Text>
+                <Text style={styles.mainContent} >
                     {user.country_code + " " + user.mobile_num}
-                </div>
-                <div style={styles.content} >
-                    <Button text="Edit Profile" onPress={() => navigation.navigate('EditProfileScreen')} />
-                </div>
-                <div style={styles.content} >
-                    <Button text="Edit Password" onPress={() => navigation.navigate('EditPasswordScreen')} />
-                </div>
-            </div>
-        </div>
+                </Text>
+                <Button text="Enter Photo Gallery" style={styles.button} onPress={onImagePicker} />
+                <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
+                <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
+           
+                {/* <CustomFileUpload style={styles.uploadButton} handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
+            </View>
+        </Background>
     ) : 
-    (<div></div>)
+    (<Text></Text>)
 }
 
 const styles = StyleSheet.create({
+    image: {
+        marginTop: -40,
+        marginBottom: 50,
+        borderRadius: 300 / 2,
+        minWidth: 300,
+        minHeight: 300,
+    },
     uploadButton: {
         display: 'flex',
         alignSelf: 'center',
@@ -159,10 +178,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: '10px',
     },
-    content: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: '10px',
+    button: {
+        minWidth: '80%'
     }
 })

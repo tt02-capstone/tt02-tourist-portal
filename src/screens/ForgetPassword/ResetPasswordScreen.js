@@ -43,6 +43,7 @@ export const ResetPasswordScreen = ({route, navigation}) => {
             }
         } catch (error) {
             console.error("Axios Error : ", error)
+            setLoading(false);
         }
     }
 

@@ -66,7 +66,6 @@ const nric = (nric) => {
     if (!nric) {
         return "NRIC can't be empty!";
     }
-
     return nric.length !== 9 ? 'NRIC should be 9 characters!' : '';
 }
 

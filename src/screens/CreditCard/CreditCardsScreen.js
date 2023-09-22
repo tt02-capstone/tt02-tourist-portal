@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Background from '../../components/Background';
 import Header from '../../components/Header'
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { CardForm, useStripe } from '@stripe/stripe-react-native';
 //import { getPaymentMethods } from '../../redux/creditCard'
 import {getEmail, getUserType, getUser} from "../../helpers/LocalStorage";
@@ -11,10 +11,13 @@ import Toast from "react-native-toast-message";
 import { useIsFocused } from '@react-navigation/native';
 
 
+
 export const CreditCardsScreen = ({ navigation }) => {
   const [cards, setCards] = useState([]); 
   const [tourist_email, setTouristEmail] = useState('');
   const [user_type, setUserType] = useState('');
+  const [deletion, setDeletion] = useState(null);
+  const [addition, setAddition] = useState(null);
   const isFocused = useIsFocused();
 
 
@@ -25,12 +28,13 @@ export const CreditCardsScreen = ({ navigation }) => {
     async function onLoad() {
       try {
         const userData = await getUser();
+        const tourist_email = userData.email;
         setTouristEmail(userData.email);
 
         console.log(tourist_email)
         const user_type = await getUserType();
         console.log(user_type)
-        setTouristEmail(await getEmail());
+
         setUserType(await getUserType()); 
         const response = await paymentsApi.get(`/getPaymentMethods/${user_type}/${tourist_email}`)
           if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
@@ -63,9 +67,9 @@ export const CreditCardsScreen = ({ navigation }) => {
     }
     
     onLoad();
-  }, [isFocused]);
+  }, [deletion, isFocused]);
   
-  const cardHeight = 150 + cards.length * 50;
+  const cardHeight =  cards.length * 80;
 
   const handleDeleteCard = async (payment_method_id) => {
 
@@ -77,12 +81,15 @@ export const CreditCardsScreen = ({ navigation }) => {
 
   } else {
     console.log('success', response.data)
+    
     if (response.data) {
+      setDeletion(true);
+      console.log(deletion)
       Toast.show({
         type: 'success',
         text1: 'Successfully deleted card'
     });
-      navigation.navigate('CreditCardsScreen');
+      
     } else {
       Toast.show({
         type: 'error',
@@ -94,12 +101,13 @@ export const CreditCardsScreen = ({ navigation }) => {
 };
   
   return (
-    <Background>
-        <View >
-        <Card containerStyle={{ height: cardHeight, marginTop: 0 ,alignSelf: 'flex-start'}}>
-        <Card.Title >
-          <Text style={{ fontSize: 20 }}>My Credit Cards</Text>
-        </Card.Title>
+
+         <ScrollView>
+  
+        {/* <Card containerStyle={{ height: cardHeight, marginTop: 0 ,marginBottom: 0, alignSelf: 'center'}}> */}
+        {/* <Card.Title >
+          <Text style={{ fontSize: 20 }}>Credit Card Details</Text>
+        </Card.Title> */}
         {
           cards.map((card) => (
             
@@ -108,21 +116,7 @@ export const CreditCardsScreen = ({ navigation }) => {
   rightWidth={90}
   minSlideWidth={40}
   shouldCancelWhenOutside={false} 
-  leftContent={(action) => (
-    <Button
-      containerStyle={{
-        flex: 1,
-        justifyContent: "center",
-        backgroundColor: "#f4f4f4",
-      }}
-      type="clear"
-      icon={{
-        name: "credit-card-edit-outline",
-        type: "material-community",
-      }}
-      onPress={action}
-    />
-  )}
+  
   rightContent={(action) => (
     <Button
       containerStyle={{
@@ -138,51 +132,63 @@ export const CreditCardsScreen = ({ navigation }) => {
       }}
     />
   )}
+
+
 >
 
+{/* onPress={() => {
+    navigation.navigate('CreditCardScreen', {
+      id: card.id,
+      brand: card.brand,
+      last4: card.last4,
+      expMonth: card.expMonth,
+      expYear: card.expYear,
+    });
+  }} */}
+
+{/* leftContent={(action) => (
+    <Button
+      containerStyle={{
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: "#f4f4f4",
+      }}
+      type="clear"
+      icon={{
+        name: "credit-card-edit-outline",
+        type: "material-community",
+      }}
+      onPress={action}
+    />
+  )} */}
   <Icon name={`${card.brand.toLowerCase()}`} type="fontisto" />
   <ListItem.Content>
-  <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('CreditCardScreen', {
-                  id: card.id,
-                  brand: card.brand,
-                  last4: card.last4,
-                  expMonth: card.expMonth,
-                  expYear: card.expYear,
-                });
-              }}
-            >
+  
     <ListItem.Title>**** **** **** {card.last4}</ListItem.Title>
     <ListItem.Subtitle>Expires {card.expMonth.toString().padStart(2, '0')}/{card.expYear} </ListItem.Subtitle>
-    </TouchableOpacity>
+    
   </ListItem.Content>
-  
   <ListItem.Chevron />
 </ListItem.Swipeable>
 
         ))}
+
+
        
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('AddCreditCardScreen', {
-              previousScreen: 'CreditCardsScreen',
-            })
-          }
-        >
+      
           <View style={{ width: 400, height: 150 }}>
-        <Card>
-          <Text>+ Add a Credit/ Debit Card</Text>
-        </Card>
+          <Button title="+ Add a Credit/ Debit Card" onPress={() => navigation.navigate('AddCreditCardScreen', {
+              previousScreen: 'CreditCardsScreen',
+            })} />
        
 
       </View>
-        </TouchableOpacity>
+
         
 
-        </Card>
-      </View>
-    </Background>
+       {/*  </Card> */}
+      </ScrollView>
+
     
 
   );

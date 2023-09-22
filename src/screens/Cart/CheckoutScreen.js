@@ -54,7 +54,7 @@ export const CheckoutScreen = ({navigation}) => {
   } else {
     console.log('success', response.data)
     if (response.data) {
-        navigation.navigate('CartScreen'); // Should navigate to Bookings Screen?
+        navigation.reset('BookingHistoryScreen'); // Should navigate to Bookings Screen?
         setDeletion(!deletion);
       Toast.show({
         type: 'success',
@@ -146,13 +146,13 @@ export const CheckoutScreen = ({navigation}) => {
 
 
     
-     <TouchableOpacity style={{ flexDirection: "row" }}
+     {/* <TouchableOpacity style={{ flexDirection: "row" }}
               onPress={() => {
                 navigation.navigate('AttractionDetailsScreen', {
                     attractionId: cartItem.attraction_id,
                 });
               }}
-            >
+            > */}
             
     <Image
                                     
@@ -181,7 +181,7 @@ export const CheckoutScreen = ({navigation}) => {
               </View>
               </View>       
             </ListItem.Content>
-            </TouchableOpacity>
+            {/* </TouchableOpacity> */}
             
             
           </ListItem.Swipeable>
@@ -247,13 +247,7 @@ export const CheckoutScreen = ({navigation}) => {
                 selectedCartItems: selectedCartItems,
                 totalPrice: totalPrice,
     })}
-    buttonStyle={{
-      borderColor: 'blue', // Set the color of the border
-      borderWidth: 1, // Set the width of the border
-    }}
-    titleStyle={{
-      color: 'blue' // Set the color of the text
-    }}
+  
   />
 </View>
        

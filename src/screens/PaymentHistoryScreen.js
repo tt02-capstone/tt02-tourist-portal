@@ -67,14 +67,14 @@ const PaymentHistoryScreen = ({ navigation }) => {
                             <Card>
                                 <Card.Title style={styles.header}>
                                     Payment ID: {item.payment_id}
-                                    <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.is_paid) }]}>{getPaidStatus(item.is_paid)}</Text>
-                                    </View>
                                 </Card.Title>
                                 <Text style={styles.description}>
-                                    Payment Amount: S${item.payment_amount}<br /><br />
+                                    Payment Amount: S${item.payment_amount} {'\n'} {'\n'}
                                     Booking ID: {item.booking.booking_id}
                                 </Text>
+                                <View style={{ display: 'inline-block' }}>
+                                    <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.is_paid) }]}>{getPaidStatus(item.is_paid)}</Text>
+                                </View>
                                 <Button style={styles.button} text="View Booking" mode="contained" onPress={() => viewBooking(item.booking.booking_id)} />
                             </Card>
                         ))
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 110,
+        width: 60,
         fontSize: 11,
         fontWeight: 'bold'
     },
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'gray',
         textAlign: 'center'
-    }, 
+    },
     button: {
         width: '100%'
     }

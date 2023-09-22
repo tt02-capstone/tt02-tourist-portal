@@ -80,7 +80,7 @@ const BookingHistoryScreen = ({ navigation }) => {
 
     const getImage = (item) => {
         if (item.attraction != null) {
-            return item.attraction.attraction_image_list[0]; 
+            return item.attraction.attraction_image_list[0];
         } else if (item.room != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
@@ -102,9 +102,6 @@ const BookingHistoryScreen = ({ navigation }) => {
                                 <Card>
                                     <Card.Title style={styles.header}>
                                         {getNameForBooking(item)}
-                                        <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                                            <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
-                                        </View>
                                     </Card.Title>
                                     <View style={{
                                         flexDirection: 'row',
@@ -113,9 +110,9 @@ const BookingHistoryScreen = ({ navigation }) => {
                                     }}>
                                         {/* Text on the left */}
                                         <Text style={styles.description}>
-                                            Booking ID: {item.booking_id}<br /><br />
-                                            Total Paid: S${item.payment.payment_amount}<br /><br />
-                                            Type: {formatType(item.type)}<br /><br />
+                                            Booking ID: {item.booking_id} {'\n'} {'\n'}
+                                            Total Paid: S${item.payment.payment_amount} {'\n'} {'\n'}
+                                            Type: {formatType(item.type)} {'\n'} {'\n'}
                                             Date: {formatDate(item.start_datetime)}
                                         </Text>
                                         {/* Image on the right */}
@@ -129,6 +126,9 @@ const BookingHistoryScreen = ({ navigation }) => {
                                                 uri: getImage(item) // KIV for image 
                                             }}
                                         />
+                                    </View>
+                                    <View style={{ display: 'inline-block', marginLeft: 20 }}>
+                                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
                                     </View>
                                     <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewBooking(item.booking_id)} />
                                 </Card>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 110,
+        width: 90,
         fontSize: 11,
         fontWeight: 'bold'
     },
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'gray',
         textAlign: 'center'
-    }, 
+    },
     button: {
         width: '100%'
     }

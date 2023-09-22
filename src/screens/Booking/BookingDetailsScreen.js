@@ -68,7 +68,7 @@ const BookingDetailsScreen = ({ navigation }) => {
 
     const getImage = (item) => {
         if (item.attraction != null) {
-            return item.attraction.attraction_image_list[0]; 
+            return item.attraction.attraction_image_list[0];
         } else if (item.room != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
@@ -121,7 +121,7 @@ const BookingDetailsScreen = ({ navigation }) => {
             });
             const timer = setTimeout(() => {
                 navigation.navigate('BookingHistoryScreen');
-              }, 2000);
+            }, 2000);
         } else {
             Toast.show({
                 type: 'error',
@@ -136,9 +136,6 @@ const BookingDetailsScreen = ({ navigation }) => {
                 <Card>
                     <Card.Title style={styles.header}>
                         {getNameForBooking(booking)}
-                        <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{booking.status}</Text>
-                    </View>
                     </Card.Title>
                     <Card.Image
                         style={{ padding: 0 }}
@@ -152,13 +149,16 @@ const BookingDetailsScreen = ({ navigation }) => {
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
                     <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>
                     <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>
+                    <View style={{ display: 'inline-block' }}>
+                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{booking.status}</Text>
+                    </View>
                 </Card>
                 <Card>
                     <Card.Title style={styles.header}>
                         Cancellation Policy
                     </Card.Title>
                     <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking.start_datetime)}.</Text>
-                    {booking.status != 'CANCELLED' && <Button text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
+                    {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
                 </Card>
             </ScrollView>
         </Background>

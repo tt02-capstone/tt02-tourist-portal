@@ -94,7 +94,6 @@ export const EditProfileScreen = ({route, navigation}) => {
                         )
                         await storeUser(response.data.user)
                         authContext.setAuthState({
-                            accessToken: response.data.token,
                             authenticated: true
                         });
 

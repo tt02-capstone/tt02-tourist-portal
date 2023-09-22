@@ -1,8 +1,6 @@
 import {createContext, useEffect, useState} from "react";
 import * as SecureStore from 'expo-secure-store';
 import axios from "axios";
-import {updateApiInstances} from "./api";
-
 
 const TOKEN_KEY= 'token'
 const AuthContext = createContext(null);
@@ -33,7 +31,7 @@ const AuthProvider = ({children}) => {
 
     const logout = async () => {
         await SecureStore.deleteItemAsync(TOKEN_KEY);
-        updateApiInstances('')
+        axios.defaults.headers.common['Authorization'] =  ``;
         setAuthState({
             accessToken: null,
             authenticated: false,

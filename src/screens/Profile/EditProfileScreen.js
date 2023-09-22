@@ -13,7 +13,6 @@ import { editTouristProfile } from '../../redux/touristRedux';
 import { storeUser } from '../../helpers/LocalStorage';
 import {AuthContext, TOKEN_KEY} from "../../helpers/AuthContext";
 import * as SecureStore from 'expo-secure-store';
-import { updateApiInstances } from "../../helpers/api"
 
 export const EditProfileScreen = ({route, navigation}) => {
 
@@ -31,7 +30,6 @@ export const EditProfileScreen = ({route, navigation}) => {
 
     useEffect(() => {
         async function fetchData() {
-            updateApiInstances(authContext.getAccessToken())
             const userData = await getUser()
             setUser(userData);
             setInputDate(new Date(userData.date_of_birth));

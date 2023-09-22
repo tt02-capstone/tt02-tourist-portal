@@ -5,7 +5,7 @@ import { View, ScrollView, StyleSheet, Image } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
 import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
 import {Paragraph} from "react-native-paper";
-import {localApi, loggedUserApi, touristApi, updateApiInstances} from "../helpers/api";
+import {localApi, loggedUserApi, touristApi} from "../helpers/api";
 import {AuthContext} from "../helpers/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
@@ -19,7 +19,6 @@ export const HomeScreen = ({navigation}) => {
   }, []);
 
   async function fetchUser() {
-      updateApiInstances(authContext.getAccessToken())
       const userData = await getUser()
       setUserData(userData)
       const usertype =  await getUserType()

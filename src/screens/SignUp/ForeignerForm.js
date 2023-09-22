@@ -1,4 +1,4 @@
-import {Pressable, Text, View} from "react-native";
+import {KeyboardAvoidingView, Pressable, Text, View} from "react-native";
 import TextInput from "../../components/TextInput";
 import InputValidator from "../../helpers/InputValidator";
 import {DatePickerInput} from "react-native-paper-dates";
@@ -55,6 +55,7 @@ export const ForeignerForm = ({formData, setFormData}) => {
                         let countryCode = country.callingCode.replace('+', '')
                         setFormData({...formData, countryCode})
                     }}
+                    returnKeyType='done'
                 />
             </View>
         </View>

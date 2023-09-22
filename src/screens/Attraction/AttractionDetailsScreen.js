@@ -56,7 +56,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const addToCart = async () => {
         const cartItems = [];
         const selectedTickets = [];
-        const user_type = user.userTypeEnum;
+        console.log(user)
+        const user_type = user.user_type;
         const tourist_email = user.email;
         const activity_name = attraction.name;
         
@@ -111,7 +112,10 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
                     console.log(response.data.httpStatusCode)
                     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-                        console.log('error',response.data)
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Unable to add items to cart'
+                        });
                     } else {
                         console.log('success', response.data)
                         setSelectedDate(null); // must have = use this to reset date selection 
@@ -176,8 +180,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
             
-            //let reccoms = await getAttractionRecommendation(attractionId);
-            //setRecommendation(reccoms)
+            let reccoms = await getAttractionRecommendation(attractionId);
+            setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();
@@ -301,7 +305,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <ScrollView horizontal>
                         <View style={{ flexDirection: 'row', height: 350}}>
                             {
-                                recommendation.map((item, index) => (
+                                recommendation.length > 0 && recommendation.map((item, index) => (
                                     <TouchableOpacity key={index} onPress={() => viewRecommendedAttraction(item.attraction_id)}>
                                         <View style={styles.rCard}>
                                             <Card style={styles.reccom}>

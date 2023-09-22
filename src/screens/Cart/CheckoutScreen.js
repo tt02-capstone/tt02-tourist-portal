@@ -47,7 +47,10 @@ export const CheckoutScreen = ({navigation}) => {
     const user_type = await getUserType();
     const payment_method_id = cards[getSelectedCard].id;
     console.log(booking_ids)
-    const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
+
+    try {
+
+      const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error',response.data)
 
@@ -68,6 +71,14 @@ export const CheckoutScreen = ({navigation}) => {
     });
     }
     }
+
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating a booking'
+    });
+    }
+    
     
     
 

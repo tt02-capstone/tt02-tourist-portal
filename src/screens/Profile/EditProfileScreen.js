@@ -1,19 +1,23 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import Background from '../../components/Background'
 import Header from '../../components/Header'
 import TextInput from '../../components/TextInput'
 import Button from '../../components/Button'
 import InputValidator from '../../helpers/InputValidator'
 import Toast from "react-native-toast-message";
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { getUser } from '../../helpers/LocalStorage'
 import { DatePickerInput } from 'react-native-paper-dates';
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { editLocalProfile } from '../../redux/localRedux';
 import { editTouristProfile } from '../../redux/touristRedux';
 import { storeUser } from '../../helpers/LocalStorage';
+import {AuthContext, TOKEN_KEY} from "../../helpers/AuthContext";
+import * as SecureStore from 'expo-secure-store';
+import { updateApiInstances } from "../../helpers/api"
 
 export const EditProfileScreen = ({route, navigation}) => {
+
+    const authContext = useContext(AuthContext);
 
     const [user, setUser] = useState();
     const [inputDate, setInputDate] = React.useState();
@@ -22,10 +26,12 @@ export const EditProfileScreen = ({route, navigation}) => {
         email: "",
         countryCode: "",
         mobileNum: "",
+        password: "",
     })
 
     useEffect(() => {
         async function fetchData() {
+            updateApiInstances(authContext.getAccessToken())
             const userData = await getUser()
             setUser(userData);
             setInputDate(new Date(userData.date_of_birth));
@@ -34,6 +40,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                 email: userData.email,
                 countryCode: userData.country_code,
                 mobileNum: userData.mobile_num,
+                password: "",
             })
         }
 
@@ -44,7 +51,8 @@ export const EditProfileScreen = ({route, navigation}) => {
         if (InputValidator.name(formData.name) === '' &&
             InputValidator.email(formData.email) === '' &&
             InputValidator.countryCode(formData.countryCode) === '' &&
-            InputValidator.mobileNo(formData.mobileNum) === '') {
+            InputValidator.mobileNo(formData.mobileNum) === '' &&
+            InputValidator.password(formData.password) === '') {
 
             // console.log(inputDate)
             let newDate = inputDate;
@@ -60,6 +68,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                     user_id: user.user_id,
                     name: formData.name,
                     email: formData.email,
+                    password: formData.password,
                     date_of_birth: newDate,
                     country_code: formData.countryCode,
                     mobile_num: formData.mobileNum,
@@ -72,6 +81,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                     } else if (user.user_type === 'TOURIST') {
                         response = await editTouristProfile(obj);
                     }
+                    console.log(response.data);
         
                     if (response && response.status) {
                         console.log('edit profile success!');
@@ -79,7 +89,17 @@ export const EditProfileScreen = ({route, navigation}) => {
                             type: 'success',
                             text1: 'Edit Profile Successful!'
                         })
-                        await storeUser(response.data);
+
+                        await SecureStore.setItemAsync(
+                            TOKEN_KEY,
+                            response.data.token
+                        )
+                        await storeUser(response.data.user)
+                        authContext.setAuthState({
+                            accessToken: response.data.token,
+                            authenticated: true
+                        });
+
                         navigation.navigate('ViewProfileScreen')
                     } else {
                         console.log('edit profile failed!');
@@ -107,7 +127,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                 Edit Profile
             </Header>
             
-            <View>
+            <ScrollView automaticallyAdjustKeyboardInsets={true}>
                 <TextInput
                     label="Name"
                     returnKeyType="next"
@@ -153,6 +173,16 @@ export const EditProfileScreen = ({route, navigation}) => {
                     errorText={InputValidator.mobileNo(formData.mobileNum)}
                 />
 
+                <TextInput
+                    label="Password (Validation)"
+                    returnKeyType="next"
+                    style={{minWidth: '100%'}}
+                    value={formData.password}
+                    secureTextEntry={true}
+                    onChangeText={(password) => setFormData({...formData, password})}
+                    errorText={InputValidator.password(formData.password)}
+                />
+
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Button
                         mode="contained"
@@ -160,7 +190,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                         onPress={onEditProfilePressed}
                     />
                 </View>
-            </View>
+            </ScrollView>
         </Background>
     ) : (<Background></Background>)
 }

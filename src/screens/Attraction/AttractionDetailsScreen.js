@@ -103,7 +103,20 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
             } else {  // when both ticket date + ticket types are selected 
                 let checkInventory = await checkTicketInventory(attraction.attraction_id,formattedDate,selectedTickets);
-                if (checkInventory.status) {
+                // current date check 
+                const currentDate = new Date();
+
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                const dateNow = `${year}-${month}-${day}`;
+                
+                if (dateNow > formattedDate) { // check for date selected since UI cant block dates before tdy
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Date selected should be today or after!'
+                    })
+                } else if (checkInventory.status) {
                     Toast.show({
                         type: 'error',
                         text1: checkInventory.error

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Background from '../components/CardBackground'
 import Button from '../components/Button'
 import { View, ScrollView, StyleSheet, } from 'react-native';
@@ -19,23 +19,23 @@ const PaymentHistoryScreen = ({ navigation }) => {
         const usertype = await getUserType()
     }
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                    let listOfPayments = await getPaymentHistoryList(user.user_id);
-                    setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
-                    console.log(listOfPayments);
-                    setLoading(false);
-                } catch (error) {
-                    alert('An error occur! Failed to retrieve payment list!');
-                    setLoading(false);
-                }
-            };
-            fetchUser();
-            fetchData();
-        }, [])
-    );
+    useEffect(() => {
+        async function onLoad() {
+            try {
+                const userData = await getUser();
+                setUser(userData);
+                const userId = userData.user_id;
+
+                let listOfPayments = await getPaymentHistoryList(userId);
+                setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
+                setLoading(false);
+            } catch (error) {
+                alert('An error occur! Failed to retrieve payment list!');
+                setLoading(false);
+            }
+        }
+        onLoad();
+    }, []);
 
     const getColorForStatus = (label) => {
         const labelColorMap = {

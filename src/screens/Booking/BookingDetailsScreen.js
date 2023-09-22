@@ -120,8 +120,8 @@ const BookingDetailsScreen = ({ navigation }) => {
                 text1: 'Booking has been cancelled!'
             });
             const timer = setTimeout(() => {
-                navigation.navigate('BookingHistoryScreen');
-            }, 2000);
+                fetchBooking();
+            }, 1000);
         } else {
             Toast.show({
                 type: 'error',

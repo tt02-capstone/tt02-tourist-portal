@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
@@ -6,36 +6,35 @@ import { Text, Card } from '@rneui/themed';
 import { getBookingHistoryList } from '../../redux/reduxBooking';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 const BookingHistoryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const isFocused = useIsFocused();
 
-    async function fetchUser() {
-        const userData = await getUser()
-        setUser(userData)
+    useEffect(() => {
+        async function onLoad() {
+            try {
+                const userData = await getUser();
+                setUser(userData);
+                const userId = userData.user_id;
 
-        const usertype = await getUserType()
-    }
+                let listOfBookings = await getBookingHistoryList(userId);
+                setData(listOfBookings.sort((a, b) => b.booking_id - a.booking_id));
+                setLoading(false);
+            } catch (error) {
+                alert('An error occur! Failed to retrieve booking list!');
+                setLoading(false);
+            }
+        }
+        onLoad();
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                    let listOfBookings = await getBookingHistoryList(user.user_id);
-                    setData(listOfBookings.sort((a, b) => b.booking_id - a.booking_id));
-                    console.log(listOfBookings);
-                    setLoading(false);
-                } catch (error) {
-                    alert('An error occur! Failed to retrieve booking list!');
-                    setLoading(false);
-                }
-            };
-            fetchUser();
-            fetchData();
-        }, [])
-    );
+        if (isFocused) {
+            onLoad();   
+        }
+    }, [isFocused]);
 
     const getColorForStatus = (label) => {
         const labelColorMap = {

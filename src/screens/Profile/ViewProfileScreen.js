@@ -147,8 +147,6 @@ export const ViewProfileScreen = ({route, navigation}) => {
                 <Button text="Enter Photo Gallery" style={styles.button} onPress={onImagePicker} />
                 <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
                 <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
-           
-                {/* <CustomFileUpload style={styles.uploadButton} handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
             </View>
         </Background>
     ) : 
@@ -157,7 +155,7 @@ export const ViewProfileScreen = ({route, navigation}) => {
 
 const styles = StyleSheet.create({
     image: {
-        marginTop: -40,
+        marginTop: 30,
         marginBottom: 50,
         borderRadius: 300 / 2,
         minWidth: 300,

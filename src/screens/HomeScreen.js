@@ -117,6 +117,13 @@ export const HomeScreen = ({navigation}) => {
               </Text>
               <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
             </Card>
+
+            <Button
+                style={styles.button}
+                text="Profile"
+                mode="contained"
+                onPress={() => navigation.navigate('ViewProfileScreen')}
+            />
             
             <Button
                 style={styles.button}
@@ -125,7 +132,7 @@ export const HomeScreen = ({navigation}) => {
                 onPress={onLogoutPressed}
             />
 
-<Button
+              <Button
                 style={styles.button}
                 text="CC Test"
                 mode="contained"

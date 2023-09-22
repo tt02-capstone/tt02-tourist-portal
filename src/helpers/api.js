@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST = 'localhost'
+const HOST = '192.168.86.130'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -47,6 +47,7 @@ export const updateApiInstances = (token) => {
     console.log('Bearer Token',bearerToken)
     userApi.defaults.headers.common['Authorization'] = bearerToken
     localApi.defaults.headers.common['Authorization'] = bearerToken
+    touristApi.defaults.headers.common['Authorization'] = bearerToken
     attractionApi.defaults.headers.common['Authorization'] = bearerToken
     bookingApi.defaults.headers.common['Authorization'] = bearerToken
     paymentsApi.defaults.headers.common['Authorization'] = bearerToken

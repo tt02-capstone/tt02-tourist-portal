@@ -49,41 +49,49 @@ export const EditProfileScreen = ({route, navigation}) => {
             // console.log(inputDate)
             let newDate = inputDate;
             newDate.setHours(inputDate.getHours() + 16)
-            let obj = {
-                user_id: user.user_id,
-                name: formData.name,
-                email: formData.email,
-                date_of_birth: newDate,
-                country_code: formData.countryCode,
-                mobile_num: formData.mobileNum,
-            }
-    
-            try {
-                let response;
-                if (user.user_type === 'LOCAL') {
-                    response = await editLocalProfile(obj);
-                } else if (user.user_type === 'TOURIST') {
-                    response = await editTouristProfile(obj);
+
+            if (newDate > new Date()) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Date of birth cannot be in the future!'
+                })
+            } else {
+                let obj = {
+                    user_id: user.user_id,
+                    name: formData.name,
+                    email: formData.email,
+                    date_of_birth: newDate,
+                    country_code: formData.countryCode,
+                    mobile_num: formData.mobileNum,
                 }
-    
-                if (response && response.status) {
-                    console.log('edit profile success!');
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Edit Profile Successful!'
-                    })
-                    await storeUser(response.data);
-                    navigation.navigate('ViewProfileScreen')
-                } else {
-                    console.log('edit profile failed!');
-                    Toast.show({
-                        type: 'error',
-                        text1: response.data.errorMessage
-                    })
+        
+                try {
+                    let response;
+                    if (user.user_type === 'LOCAL') {
+                        response = await editLocalProfile(obj);
+                    } else if (user.user_type === 'TOURIST') {
+                        response = await editTouristProfile(obj);
+                    }
+        
+                    if (response && response.status) {
+                        console.log('edit profile success!');
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Edit Profile Successful!'
+                        })
+                        await storeUser(response.data);
+                        navigation.navigate('ViewProfileScreen')
+                    } else {
+                        console.log('edit profile failed!');
+                        Toast.show({
+                            type: 'error',
+                            text1: response.data.errorMessage
+                        })
+                    }
+                } catch (error) {
+                    console.log(error)
+                    alert('An error hass occurred' + error);
                 }
-            } catch (error) {
-                console.log(error)
-                alert('An error hass occurred' + error);
             }
         } else if (InputValidator.dob(inputDate) !== '') {
             Toast.show({
@@ -117,17 +125,15 @@ export const EditProfileScreen = ({route, navigation}) => {
                     errorText={InputValidator.email(formData.email)}
                 />
 
-                <SafeAreaProvider style={{maxHeight: '20%'}}>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center'}}>
-                        <DatePickerInput
+                <View style={{marginTop: 30, marginBottom: 30}}>
+                    <DatePickerInput
                         locale="en"
                         label="Date of Birth"
                         value={inputDate}
                         onChange={(d) => setInputDate(d)}
                         inputMode="start"
-                        />
-                    </View>
-                </SafeAreaProvider>
+                    />
+                </View>
 
                 <TextInput
                     label="Country Code"

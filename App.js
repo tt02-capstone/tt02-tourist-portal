@@ -52,7 +52,7 @@ export const Layout = () => {
     const {getAccessToken, authState} = useContext(AuthContext);
 
     useEffect(() => {
-        console.log(authState)
+        console.log("auth-state:", authState)
         console.log('authenticated', authState.authenticated)
     }, [authState]);
 

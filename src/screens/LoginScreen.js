@@ -29,6 +29,7 @@ export const LoginScreen = ({navigation}) => {
 
         try {
             const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)
+            console.log("here")
             if (
                 response.data.httpStatusCode === 400 ||
                 response.data.httpStatusCode === 404 ||

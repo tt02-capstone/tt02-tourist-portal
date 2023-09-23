@@ -147,6 +147,7 @@ export const ViewProfileScreen = ({route, navigation}) => {
                 <Button text="Enter Photo Gallery" style={styles.button} onPress={onImagePicker} />
                 <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
                 <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
+                <Button text="View Payment Methods" style={styles.button} onPress={() => navigation.navigate('CreditCardsScreen')} />
             </View>
         </Background>
     ) : 

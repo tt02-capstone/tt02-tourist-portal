@@ -84,8 +84,9 @@ export const CartScreen = ({navigation}) => {
   } else {
     console.log('success', response.data)
     if (response.data) {
+      setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
 
-        setDeletion(!deletion);
+      setDeletion(!deletion);
       Toast.show({
         type: 'success',
         text1: 'Successfully deleted cart item(s)'

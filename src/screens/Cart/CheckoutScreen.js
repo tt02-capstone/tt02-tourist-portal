@@ -184,11 +184,7 @@ export const CheckoutScreen = ({navigation}) => {
               <View style={{ flexDirection: "column" }}>
               {
           cartItem.items.map((item, index) => (
-<<<<<<< HEAD
             <Text key={index} style={{fontSize: 13}} >{item.activity_selection} Qty: {item.quantity}</Text> 
-=======
-            <Text key={index}>{item.activity_selection} Qty: {item.quantity}</Text> 
->>>>>>> bd2026bb199f60670d2ee4757bdccba71c83b0a4
           ))
 
           }

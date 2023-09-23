@@ -27,7 +27,7 @@ export const Cart = () => {
             <Icon
               color="#000000"
               name="shopping-cart"
-              size={40}
+              size={20}
               type="font-awesome"
             />
           </TouchableOpacity>

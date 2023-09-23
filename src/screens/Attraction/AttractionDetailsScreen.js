@@ -56,7 +56,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const addToCart = async () => {
         const cartItems = [];
         const selectedTickets = [];
-        console.log(user)
         const user_type = user.user_type;
         const tourist_email = user.email;
         const activity_name = attraction.name;
@@ -283,7 +282,9 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <View>
                         {formattedPriceList.map(item => (
                             <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
-                                <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', width:135 }}>
+                                    <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
+                                </View>
                                 
                                 <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 40}} onPress={() => handleDecrease(item.ticket_type)}>
                                     -

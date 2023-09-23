@@ -139,6 +139,13 @@ export const HomeScreen = ({navigation}) => {
             
             <Button
                 style={styles.button}
+                text="Payments"
+                mode="contained"
+                onPress={() => navigation.navigate('PaymentHistoryScreen')}
+            />
+
+            <Button
+                style={styles.button}
                 text="Logout"
                 mode="contained"
                 onPress={onLogoutPressed}

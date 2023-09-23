@@ -157,6 +157,7 @@ export const EditProfileScreen = ({route, navigation}) => {
                     returnKeyType="next"
                     value={formData.countryCode}
                     style={{minWidth: '100%'}}
+                    editable={user.user_type === 'LOCAL' ? false : true}
                     onChangeText={(countryCode) => setFormData({...formData, countryCode})}
                     errorText={InputValidator.countryCode(formData.countryCode)}
                 />

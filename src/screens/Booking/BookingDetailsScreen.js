@@ -140,11 +140,9 @@ const BookingDetailsScreen = ({ navigation }) => {
                     <Card.Image
                         style={{ padding: 0 }}
                         source={{
-                            uri: getImage(booking) // KIV for image 
+                            uri: getImage(booking) 
                         }}
                     />
-                    <Text style={[styles.description]}>Booking ID: {booking.booking_id}</Text>
-                    <Text style={styles.description}>Payment ID: {booking.payment.payment_id}</Text>
                     <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount}</Text>
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
                     <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>

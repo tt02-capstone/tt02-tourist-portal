@@ -109,7 +109,6 @@ const BookingHistoryScreen = ({ navigation }) => {
                                     }}>
                                         {/* Text on the left */}
                                         <Text style={styles.description}>
-                                            Booking ID: {item.booking_id} {'\n'} {'\n'}
                                             Total Paid: S${item.payment.payment_amount} {'\n'} {'\n'}
                                             Type: {formatType(item.type)} {'\n'} {'\n'}
                                             Date: {formatDate(item.start_datetime)}
@@ -122,7 +121,7 @@ const BookingHistoryScreen = ({ navigation }) => {
                                                 marginLeft: 40,
                                             }}
                                             source={{
-                                                uri: getImage(item) // KIV for image 
+                                                uri: getImage(item) 
                                             }}
                                         />
                                     </View>

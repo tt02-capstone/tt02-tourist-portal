@@ -268,7 +268,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         Tickets
                     </Card.Title>
 
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 360, height: 100 , marginTop: -15}}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 , marginTop: -15}}>
                         <DatePickerInput
                             locale='en-GB'
                             format
@@ -282,7 +282,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <View>
                         {formattedPriceList.map(item => (
                             <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', width:135 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', width:120 }}>
                                     <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
                                 </View>
                                 
@@ -415,7 +415,10 @@ const styles = StyleSheet.create({
     },
     cartButton:{
         marginTop: -5,
-        width: '110%'
+        width: '100%',
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
     }
     
 });

@@ -122,6 +122,20 @@ export const HomeScreen = ({navigation}) => {
                 mode="contained"
                 onPress={() => navigation.navigate('ViewProfileScreen')}
             />
+
+            <Button
+                style={styles.button}
+                text="Saved Listing"
+                mode="contained"
+                onPress={() => navigation.navigate('SavedListingScreen')}
+            />
+
+            <Button
+                style={styles.button}
+                text="Bookings"
+                mode="contained"
+                onPress={() => navigation.navigate('BookingHistoryScreen')}
+            />  
             
             <Button
                 style={styles.button}

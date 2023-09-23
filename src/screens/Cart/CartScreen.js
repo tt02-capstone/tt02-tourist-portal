@@ -177,20 +177,20 @@ const handleCheckBoxToggle = (index) => {
     }
 
     const tourist_email = user.email
-      const cart_item_id = cartItems[cartItemIndex].items[itemIndex].cart_item_id;
-      const quantity = cartItems[cartItemIndex].items[itemIndex].quantity;
-      const cart_booking_id = cartItems[cartItemIndex].id
+    const cart_item_id = cartItems[cartItemIndex].items[itemIndex].cart_item_id;
+    const quantity = cartItems[cartItemIndex].items[itemIndex].quantity;
+    const cart_booking_id = cartItems[cartItemIndex].id
 
-      if (currentQuantity + delta === 0) { // Delete cart item if quantity is 0
-        cartItems[cartItemIndex].items.splice(itemIndex, 1);
+    if (currentQuantity + delta === 0) { // Delete cart item if quantity is 0
+      cartItems[cartItemIndex].items.splice(itemIndex, 1);
 
-      }
+    }
 
-      if (cartItems[cartItemIndex].items.length === 0) { // Delete cart booking if no cart items
-        cartItems.splice(cartItemIndex, 1);
-      }
+    if (cartItems[cartItemIndex].items.length === 0) { // Delete cart booking if no cart items
+      cartItems.splice(cartItemIndex, 1);
+    }
 
-      setCartItems([...cartItems]);
+    setCartItems([...cartItems]);
 
     const newTimer = setTimeout(async () => {
       
@@ -302,16 +302,16 @@ const handleCheckBoxToggle = (index) => {
                       source={{
                         uri: cartItem.image// KIV for image 
                       }} 
-                      style={{ width: 75, height: 75, borderRadius: 10, marginLeft:5, marginRight: 0}} />
+                      style={{ width: 65, height: 65, borderRadius: 10, marginLeft:5, marginRight: 0}} />
                 </TouchableOpacity>
                     
                     
                 <ListItem.Content style={{padding: 0, marginLeft: -10, height:80}}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "column" , width:180}}>
-                      <ListItem.Title style={{ fontSize: 14, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
-                      <ListItem.Subtitle style={{ fontSize: 12 , color: 'grey', fontWeight: 'bold'}} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
-                      <ListItem.Subtitle style={{ fontSize: 12 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
+                    <View style={{ flexDirection: "column" , width:130}}>
+                      <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
+                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
+                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
                       {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                       {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                     </View>
@@ -320,21 +320,21 @@ const handleCheckBoxToggle = (index) => {
                     {
                       cartItem.items.map((item, itemIndex) => (
                       <View style={{ flexDirection: "row" }} key={itemIndex}>
-                        <Text key={itemIndex} style={{marginLeft:8, marginBottom:10 , fontSize:13, fontWeight: 'bold'}}>{item.activity_selection} </Text> 
+                        <Text key={itemIndex} style={{marginLeft:8, marginBottom:10 , fontSize:10, fontWeight: 'bold'}}>{item.activity_selection} </Text> 
                           <TouchableOpacity 
-                              style={{ backgroundColor: '#044537', height: 18, width: 18,justifyContent: 'center',alignItems: 'center',borderRadius: 9, marginLeft:5, marginBottom: 8 }} 
+                              style={{ backgroundColor: '#044537', height: 16, width: 16,justifyContent: 'center',alignItems: 'center',borderRadius: 9, marginLeft:5, marginBottom: 8 }} 
                               onPress={() => updateQuantity(cartItemIndex,itemIndex, -1)}
                           >
                           
-                            <Text style={{color: 'white', fontSize: 15, fontWeight:'bold'}}> - </Text>
+                            <Text style={{color: 'white', fontSize: 12, fontWeight:'bold'}}> - </Text>
                           </TouchableOpacity>
 
-                          <Text style={{ marginLeft: 5, marginTop: 2 ,fontSize:13}}>{item.quantity} </Text>
+                          <Text style={{ marginLeft: 5, marginTop: 2 ,fontSize:10}}>{item.quantity} </Text>
 
-                          <TouchableOpacity style={{ backgroundColor: '#044537',  height: 18, width: 18 ,justifyContent: 'center',alignItems: 'center',borderRadius: 10 , marginLeft:5, marginBottom: 8}} 
+                          <TouchableOpacity style={{ backgroundColor: '#044537',  height: 16, width: 16 ,justifyContent: 'center',alignItems: 'center',borderRadius: 10 , marginLeft:5, marginBottom: 8}} 
                             onPress={() => updateQuantity(cartItemIndex,itemIndex, 1)}>
                           
-                            <Text style={{color: 'white', fontSize: 15, fontWeight:'bold' }}> + </Text>
+                            <Text style={{color: 'white', fontSize: 12, fontWeight:'bold' }}> + </Text>
 
                           </TouchableOpacity>
                       </View>

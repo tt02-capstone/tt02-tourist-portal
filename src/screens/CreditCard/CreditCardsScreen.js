@@ -116,7 +116,7 @@ export const CreditCardsScreen = ({ navigation }) => {
   rightWidth={90}
   minSlideWidth={40}
   shouldCancelWhenOutside={false} 
-  
+  key={index}
   rightContent={(action) => (
     <Button
       containerStyle={{

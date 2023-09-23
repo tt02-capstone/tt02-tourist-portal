@@ -57,7 +57,7 @@ export const CheckoutScreen = ({navigation}) => {
   } else {
     console.log('success', response.data)
     if (response.data) {
-        navigation.reset('BookingHistoryScreen'); // Should navigate to Bookings Screen?
+        navigation.navigate('BookingHistoryScreen'); // Should navigate to Bookings Screen?
         setDeletion(!deletion);
       Toast.show({
         type: 'success',
@@ -212,7 +212,7 @@ export const CheckoutScreen = ({navigation}) => {
   rightWidth={90}
   minSlideWidth={40}
   shouldCancelWhenOutside={false} 
-  
+  key={index}
 >
 <CheckBox
       left

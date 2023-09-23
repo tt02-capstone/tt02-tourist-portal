@@ -175,11 +175,24 @@ const handleCheckBoxToggle = (index) => {
       clearTimeout(apiCallTimer);
     }
 
-    const newTimer = setTimeout(async () => {
-      const tourist_email = user.email
+    const tourist_email = user.email
       const cart_item_id = cartItems[cartItemIndex].items[itemIndex].cart_item_id;
       const quantity = cartItems[cartItemIndex].items[itemIndex].quantity;
       const cart_booking_id = cartItems[cartItemIndex].id
+
+      if (currentQuantity + delta === 0) { // Delete cart item if quantity is 0
+        cartItems[cartItemIndex].items.splice(itemIndex, 1);
+
+      }
+
+      if (cartItems[cartItemIndex].items.length === 0) { // Delete cart booking if no cart items
+        cartItems.splice(cartItemIndex, 1);
+      }
+
+      setCartItems([...cartItems]);
+
+    const newTimer = setTimeout(async () => {
+      
 
       if (quantity >= 0 ){ // dbl check agn
         const response = await cartApi.put(`/updateCartItem/${user_type}/${tourist_email}/${cart_item_id}/${cart_booking_id}/${quantity}`)

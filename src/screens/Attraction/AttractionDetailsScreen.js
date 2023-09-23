@@ -56,7 +56,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const addToCart = async () => {
         const cartItems = [];
         const selectedTickets = [];
-        const user_type = user.userTypeEnum;
+        const user_type = user.user_type;
         const tourist_email = user.email;
         const activity_name = attraction.name;
         
@@ -102,7 +102,20 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
             } else {  // when both ticket date + ticket types are selected 
                 let checkInventory = await checkTicketInventory(attraction.attraction_id,formattedDate,selectedTickets);
-                if (checkInventory.status) {
+                // current date check 
+                const currentDate = new Date();
+
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                const dateNow = `${year}-${month}-${day}`;
+                
+                if (dateNow > formattedDate) { // check for date selected since UI cant block dates before tdy
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Date selected should be today or after!'
+                    })
+                } else if (checkInventory.status) {
                     Toast.show({
                         type: 'error',
                         text1: checkInventory.error
@@ -111,7 +124,10 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
                     console.log(response.data.httpStatusCode)
                     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-                        console.log('error',response.data)
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Unable to add items to cart'
+                        });
                     } else {
                         console.log('success', response.data)
                         setSelectedDate(null); // must have = use this to reset date selection 
@@ -176,8 +192,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
             
-            //let reccoms = await getAttractionRecommendation(attractionId);
-            //setRecommendation(reccoms)
+            let reccoms = await getAttractionRecommendation(attractionId);
+            setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();
@@ -266,7 +282,9 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <View>
                         {formattedPriceList.map(item => (
                             <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
-                                <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', width:135 }}>
+                                    <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
+                                </View>
                                 
                                 <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 40}} onPress={() => handleDecrease(item.ticket_type)}>
                                     -
@@ -301,7 +319,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <ScrollView horizontal>
                         <View style={{ flexDirection: 'row', height: 350}}>
                             {
-                                recommendation.map((item, index) => (
+                                recommendation.length > 0 && recommendation.map((item, index) => (
                                     <TouchableOpacity key={index} onPress={() => viewRecommendedAttraction(item.attraction_id)}>
                                         <View style={styles.rCard}>
                                             <Card style={styles.reccom}>

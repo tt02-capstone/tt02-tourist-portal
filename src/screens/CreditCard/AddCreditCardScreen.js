@@ -42,13 +42,22 @@ export const AddCreditCardScreen = ({ navigation }) => {
         paymentMethodType: 'Card',
       })
     if (error) {
-      console.log(error) // To use Toast
+      Toast.show({
+        type: 'error',
+        text1: error.message
+    });
     } else if (paymentMethod) {
-      const payment_method_id = paymentMethod.id;
+      try {
+
+        const payment_method_id = paymentMethod.id;
       const response = await paymentsApi.post(`/addPaymentMethod/${user_type}/${tourist_email}/${payment_method_id}`)
       console.log(response.data.httpStatusCode)
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-          console.log('error',response.data)
+      console.log(response)
+      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
+        Toast.show({
+          type: 'error',
+          text1: response.data.errorMessage
+      });
 
       } else {
           console.log('success', response.data)
@@ -58,21 +67,7 @@ export const AddCreditCardScreen = ({ navigation }) => {
               text1: 'Successfully added card'
           });
           navigation.goBack();
-          /* if (previousScreen === "CheckoutScreen") {
-            navigation.navigate(
-             'CheckoutScreen', {
-              booking_ids: booking_ids,
-              selectedCartItems: selectedCartItems,
-              totalPrice: totalPrice,
-              addedCard: response.data,
-              payment_method_id: payment_method_id
-             } 
-            )
-          } else if (previousScreen === "CreditCardsScreen") {
-            navigation.reset(
-              'CreditCardsScreen' 
-             )
-          }  */
+
         } else {
             Toast.show({
               type: 'error',
@@ -82,6 +77,16 @@ export const AddCreditCardScreen = ({ navigation }) => {
           
               
       };
+
+      } catch (error) {
+
+        Toast.show({
+          type: 'error',
+          text1: error.message
+      });
+
+      }
+      
  
 
     

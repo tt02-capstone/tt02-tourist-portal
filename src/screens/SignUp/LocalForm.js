@@ -31,8 +31,6 @@ export const LocalForm = ({formData, setFormData}) => {
                 // error={!!email.error}
                 errorText={InputValidator.nric(formData.nric)}
                 autoCapitalize="none"
-                autoCompleteType="nric"
-                textContentType="nric"
             />
             <View style={{marginTop: 30, marginBottom: 30}}>
                 <DatePickerInput
@@ -54,6 +52,7 @@ export const LocalForm = ({formData, setFormData}) => {
                     selectedCountry={selectedCountry}
                     modalDisabled={true}
                     onChangeSelectedCountry={(selectedDate) => setSelectedCountry(selectedDate)}
+                    returnKeyType='done'
                 />
             </View>
         </View>

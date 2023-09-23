@@ -174,17 +174,17 @@ export const CheckoutScreen = ({navigation}) => {
                                 />
             <ListItem.Content style={{padding: 0, margin: 0}}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <View style={{ flexDirection: "column" }}>
-              <ListItem.Title>{cartItem.item_name}</ListItem.Title>
-              <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
-              <ListItem.Subtitle>${cartItem.price}</ListItem.Subtitle>
+            <View style={{ flexDirection: "column", }}>
+              <ListItem.Title style={{fontSize: 16}}>{cartItem.item_name}</ListItem.Title>
+              <ListItem.Subtitle style={{fontSize: 14}}>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
+              <ListItem.Subtitle style={{fontSize: 14}}>${cartItem.price}</ListItem.Subtitle>
 
               
               </View>
               <View style={{ flexDirection: "column" }}>
               {
-          cartItem.items.map((item) => (
-            <Text>{item.activity_selection} Qty: {item.quantity}</Text> 
+          cartItem.items.map((item, index) => (
+            <Text key={index} style={{fontSize: 13}} >{item.activity_selection} Qty: {item.quantity}</Text> 
           ))
 
           }

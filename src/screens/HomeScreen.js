@@ -129,13 +129,6 @@ export const HomeScreen = ({navigation}) => {
                 mode="contained"
                 onPress={onLogoutPressed}
             />
-
-              <Button
-                style={styles.button}
-                text="CC Test"
-                mode="contained"
-                onPress={() => navigation.navigate('CreditCardsScreen')}
-            />
           </View>
         </ScrollView>
     </Background>

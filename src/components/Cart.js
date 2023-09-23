@@ -11,7 +11,21 @@ export const Cart = () => {
     const isCheckoutScreen = route.name === 'CheckoutScreen';
     const isSignUpScreen = route.name === 'SignUpScreen';
 
-    if (isLoginScreen || isCartScreen || isCheckoutScreen || isSignUpScreen) {
+/*     <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen}
+    options={{title: 'Verify Code'}}/>
+<Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}
+    options={{title: 'Reset Password'}}/>
+<Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen}
+    options={{title: 'Forgot Password'}}/>
+<Stack.Screen name="EmailVerificationScreen" component={EmailVerificationScreen}
+    options={{title: 'Verify Email'}}/> */
+    const isCodeVerificationScreen = route.name === 'CodeVerificationScreen';
+    const isResetPasswordScreen = route.name === 'ResetPasswordScreen';
+    const isForgotPasswordScreen = route.name === 'ForgotPasswordScreen';
+    const isEmailVerificationScreen = route.name === 'EmailVerificationScreen';
+
+    if (isLoginScreen || isCartScreen || isCheckoutScreen || isSignUpScreen || isCodeVerificationScreen 
+      || isResetPasswordScreen || isForgotPasswordScreen || isEmailVerificationScreen) {
         return null;
       }
 

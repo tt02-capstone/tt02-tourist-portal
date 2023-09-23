@@ -84,8 +84,9 @@ export const CartScreen = ({navigation}) => {
   } else {
     console.log('success', response.data)
     if (response.data) {
+      setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
 
-        setDeletion(!deletion);
+      setDeletion(!deletion);
       Toast.show({
         type: 'success',
         text1: 'Successfully deleted cart item(s)'
@@ -136,7 +137,6 @@ const handleCheckBoxToggle = (index) => {
   };
 
   const isAllChecked = () => {
-
     return itemChecked.every((isChecked) => isChecked);
   };
 
@@ -157,28 +157,52 @@ const handleCheckBoxToggle = (index) => {
   const updateQuantity = (cartItemIndex,itemIndex, delta) => {
 
     // Update the cart items with new quantity for the specified ticket type
-    cartItems[cartItemIndex].items[itemIndex].quantity += delta;
+    const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
 
-    setCartItems(cartItems);
+    if (currentQuantity + delta >= 0) { // quantity can never go  below 0
+      cartItems[cartItemIndex].items[itemIndex].quantity += delta ;
+      
+      // deal w the pricing change 
+      const price = parseFloat(cartItems[cartItemIndex].items[itemIndex].price)
+      const difference = price  * delta; // get the change either +ve or - ve
+      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference; // new total price for the list item 
+      cartItems[cartItemIndex].price = newTotalPrice.toFixed(2).toString(); // set it back to 2 dp and set as string 
+
+      setCartItems([...cartItems]);
+    }
 
     // Clear any pending API call
     if (apiCallTimer) {
       clearTimeout(apiCallTimer);
     }
 
-    const newTimer = setTimeout(async () => {
+    const tourist_email = user.email
+    const cart_item_id = cartItems[cartItemIndex].items[itemIndex].cart_item_id;
+    const quantity = cartItems[cartItemIndex].items[itemIndex].quantity;
+    const cart_booking_id = cartItems[cartItemIndex].id
 
-      const tourist_email = user.email
-      const cart_item_id = cartItems[cartItemIndex].items[itemIndex].cart_item_id;
-      const quantity = cartItems[cartItemIndex].items[itemIndex].quantity;
-      const cart_booking_id = cartItems[cartItemIndex].id
-      const response = await cartApi.put(`/updateCartItem/${user_type}/${tourist_email}/${cart_item_id}/${cart_booking_id}/${quantity}`)
+    if (currentQuantity + delta === 0) { // Delete cart item if quantity is 0
+      cartItems[cartItemIndex].items.splice(itemIndex, 1);
+
+    }
+
+    if (cartItems[cartItemIndex].items.length === 0) { // Delete cart booking if no cart items
+      cartItems.splice(cartItemIndex, 1);
+    }
+
+    setCartItems([...cartItems]);
+
+    const newTimer = setTimeout(async () => {
+      
+
+      if (quantity >= 0 ){ // dbl check agn
+        const response = await cartApi.put(`/updateCartItem/${user_type}/${tourist_email}/${cart_item_id}/${cart_booking_id}/${quantity}`)
           if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
               console.log('error',response.data)
-
           } else {
               console.log('success',response.data)
           }
+      }
     }, 1000);
 
     setApiCallTimer(newTimer);
@@ -194,13 +218,12 @@ const handleCheckBoxToggle = (index) => {
         setUserType(user_type)
         const tourist_email = userData.email
         
-        
         const response = await cartApi.get(`/viewCart/${user_type}/${tourist_email}`)
           if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
               console.log('error',response.data)
 
           } else {
-              console.log(response.data)
+              // console.log(response.data)
               const cartDetails = response.data;
               const extractedDetails = cartDetails.map((detail) => {
                 console.log(detail)
@@ -228,10 +251,7 @@ const handleCheckBoxToggle = (index) => {
               if (extractedDetails.length > 0) {
                 setItemChecked(Array(extractedDetails.length).fill(false));
               } 
-              
-              
           }
-
 
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -242,160 +262,112 @@ const handleCheckBoxToggle = (index) => {
   }, [deletion,isFocused]);
 
   
-
   return (
-    <View>
-
-    
+  <View>
     <ScrollView>
-    <View>
-      {
-          cartItems.map((cartItem, cartItemIndex) => (
-            
-          <ListItem.Swipeable
-            shouldCancelWhenOutside={false} 
-            rightWidth={90}
-            minSlideWidth={40}
-            key={cartItemIndex}
-            rightContent={
-                <Button
-                containerStyle={{
-                  flex: 1,
-                  justifyContent: "center",
-                  backgroundColor: "#DC143C",
-                }}
-                type="clear"
-                icon={{ name: "delete-outline" }}
-                onPress={() => {
-                  handleDeleteCartItem(cartItem.id);
-     
-                }}
-              />
-            }
-          >
-
-<CheckBox
-      left
-      iconType="material-community"
-           checkedIcon="checkbox-outline"
-           uncheckedIcon={'checkbox-blank-outline'}
-      containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
-      checked={itemChecked[cartItemIndex]}
-      onPress={() => handleCheckBoxToggle(cartItemIndex)}
-      
-    />
-    
-     <TouchableOpacity style={{ flexDirection: "row" }}
-              onPress={() => {
-                navigation.navigate('AttractionDetailsScreen', {
-                    attractionId: cartItem.attraction_id,
-                });
-              }}
-            >
-            
-    <Image
-                                    
-                                    source={{
-                                    uri: cartItem.image// KIV for image 
-                                    }}
-                                    style={{ width: 75, height: 75, borderRadius: 10, marginLeft: 0, marginRight: 0}}
-                                />
-            <ListItem.Content style={{padding: 0, margin: 0}}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <View style={{ flexDirection: "column" }}>
-              <ListItem.Title>{cartItem.item_name}</ListItem.Title>
-              <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
-              <ListItem.Subtitle>${cartItem.price}</ListItem.Subtitle>
-              {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
+      <View>
+        {
+            cartItems.map((cartItem, cartItemIndex) => (
               
-              </View>
-              <View style={{ flexDirection: "column" }}>
-              {
-          cartItem.items.map((item, itemIndex) => (
-            <View style={{ flexDirection: "row" }}>
+              <ListItem.Swipeable
+                  shouldCancelWhenOutside={false} 
+                  rightWidth={90}
+                  minSlideWidth={40}
+                  key={cartItemIndex}
+                  rightContent={
+                      <Button
+                        containerStyle={{
+                          flex: 1,
+                          justifyContent: "center",
+                          backgroundColor: "#DC143C",
+                        }}
+                        type="clear"
+                        icon={{ name: "delete-outline" }}
+                        onPress={ () => { handleDeleteCartItem(cartItem.id);}}
+                    />
+                  }
+                >
 
-<Text key={itemIndex} style={{marginLeft: 10, }}>{item.activity_selection} </Text> 
-
-<TouchableOpacity 
-    style={{
-        backgroundColor: '#044537', 
-        height: 15, 
-        width: 15,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }} 
-    onPress={() => updateQuantity(cartItemIndex,itemIndex, -1)}
->
-    <Text style={{color: 'white', fontSize: 10}}> - </Text>
-</TouchableOpacity>
-
-<Text>{item.quantity} </Text>
-
-<TouchableOpacity 
-    style={{
-        backgroundColor: '#044537', 
-
-        height: 15, 
-        width: 15,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }} 
-    onPress={() => updateQuantity(cartItemIndex,itemIndex, 1)}
->
-    <Text style={{color: 'white', fontSize: 10}}> + </Text>
-</TouchableOpacity>
-                                
-                
-
-            
-
-            </View>
-          ))
-
-          }
-              
-              </View>
-              </View>       
-            </ListItem.Content>
-            </TouchableOpacity>
-            
-            
-          </ListItem.Swipeable>
-        ))}
-
-        
-    
+                <CheckBox left
+                    iconType="material-community"
+                    checkedIcon="checkbox-outline"
+                    uncheckedIcon={'checkbox-blank-outline'}
+                    containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
+                    checked={itemChecked[cartItemIndex]}
+                    onPress={() => handleCheckBoxToggle(cartItemIndex)}
+                />
       
-        
+                <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AttractionDetailsScreen', {attractionId: cartItem.attraction_id});}}>
+                    <Image
+                      source={{
+                        uri: cartItem.image// KIV for image 
+                      }} 
+                      style={{ width: 65, height: 65, borderRadius: 10, marginLeft:5, marginRight: 0}} />
+                </TouchableOpacity>
+                    
+                    
+                <ListItem.Content style={{padding: 0, marginLeft: -10, height:80}}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "column" , width:130}}>
+                      <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
+                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
+                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
+                      {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
+                      {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
+                    </View>
+                    
+                    <View style={{ flexDirection: "column" }}>
+                    {
+                      cartItem.items.map((item, itemIndex) => (
+                      <View style={{ flexDirection: "row" }} key={itemIndex}>
+                        <Text key={itemIndex} style={{marginLeft:8, marginBottom:10 , fontSize:10, fontWeight: 'bold'}}>{item.activity_selection} </Text> 
+                          <TouchableOpacity 
+                              style={{ backgroundColor: '#044537', height: 16, width: 16,justifyContent: 'center',alignItems: 'center',borderRadius: 9, marginLeft:5, marginBottom: 8 }} 
+                              onPress={() => updateQuantity(cartItemIndex,itemIndex, -1)}
+                          >
+                          
+                            <Text style={{color: 'white', fontSize: 12, fontWeight:'bold'}}> - </Text>
+                          </TouchableOpacity>
+
+                          <Text style={{ marginLeft: 5, marginTop: 2 ,fontSize:10}}>{item.quantity} </Text>
+
+                          <TouchableOpacity style={{ backgroundColor: '#044537',  height: 16, width: 16 ,justifyContent: 'center',alignItems: 'center',borderRadius: 10 , marginLeft:5, marginBottom: 8}} 
+                            onPress={() => updateQuantity(cartItemIndex,itemIndex, 1)}>
+                          
+                            <Text style={{color: 'white', fontSize: 12, fontWeight:'bold' }}> + </Text>
+
+                          </TouchableOpacity>
+                      </View>
+                    ))} 
+                  </View>
+                </View>       
+              </ListItem.Content>
+            </ListItem.Swipeable>
+          ))}
+
     </View>
-    </ScrollView>
+  </ScrollView>
 
 
     
-       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10 }}>
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(4, 69, 55, 0.2)', padding: 10 , height: 70 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <CheckBox
-      left
-      iconType="material-community"
-           checkedIcon="checkbox-outline"
-           uncheckedIcon={'checkbox-blank-outline'}
-      title="All"
-      style={{ borderWidth: 0, margin: 0, padding: 0 }}
-      containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent' }}
-      checked={isAllChecked()} // Check if all items are checked
-     onPress={handleCheckAllToggle}
-      
-    />
-        <Text>Total Price: ${totalPrice.toFixed(2)}</Text>
+          <CheckBox
+          left
+          iconType="material-community"
+              checkedIcon="checkbox-outline"
+              uncheckedIcon={'checkbox-blank-outline'}
+          title="All"
+          style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight:'bold', color:'black'}}
+          containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color:'black' }}
+          checked={isAllChecked()} // Check if all items are checked
+          onPress={handleCheckAllToggle}/>
+            <Text style = {{fontWeight:'bold', color:'black'}}>Total Price: ${totalPrice.toFixed(2)}</Text>
       </View>
-      <Button title="Checkout" onPress={() => {
-        checkout();
-      }} />
-    </View>
 
-      </View>
+      <Button style={{borderRadius: 10, backgroundColor:'#044537'}} title="Checkout" onPress={() => { checkout();}} />
+  </View>
+
+</View>
   );
-
- 
-  
 };

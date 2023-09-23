@@ -1,6 +1,8 @@
 import axios from "axios";
+import {TOKEN_KEY} from "./AuthContext";
+import * as SecureStore from "expo-secure-store";
 
-const HOST = '192.168.86.130'
+const HOST = 'localhost'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -42,13 +44,46 @@ export const cartApi = axios.create({
 })
 
 
-export const updateApiInstances = (token) => {
-    const bearerToken = token?  `Bearer ${token}`: ``;
-    console.log('Bearer Token',bearerToken)
-    userApi.defaults.headers.common['Authorization'] = bearerToken
-    localApi.defaults.headers.common['Authorization'] = bearerToken
-    attractionApi.defaults.headers.common['Authorization'] = bearerToken
-    bookingApi.defaults.headers.common['Authorization'] = bearerToken
-    paymentsApi.defaults.headers.common['Authorization'] = bearerToken
-    cartApi.defaults.headers.common['Authorization'] = bearerToken
-}
+const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi]
+
+instanceList.map((api) => {
+    api.interceptors.request.use( async (config) => {
+        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        config.headers.Authorization = token ? `Bearer ${token}` : '';
+        return config;
+    });
+})
+
+const refreshToken = async () => {
+    try {
+        const resp = await userApi.get("/refreshToken");
+        console.log("refresh token", resp.data);
+        return resp.data;
+    } catch (e) {
+        console.log("Error",e);
+    }
+};
+
+instanceList.map((api) => {
+    api.interceptors.response.use(
+        (response) => {
+            return response;
+        },
+        async function (error) {
+            const originalRequest = error.config;
+            console.log(error.response.status === 403 && !originalRequest._retry)
+            if (error.response.status === 403 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                const resp = await refreshToken();
+                const newToken = resp.refreshToken;
+                console.log("Refresh token", newToken)
+
+                await SecureStore.setItemAsync(TOKEN_KEY, newToken);
+                axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                return api(originalRequest);
+            }
+            return Promise.reject(error);
+        }
+    );
+})

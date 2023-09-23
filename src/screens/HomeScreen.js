@@ -5,7 +5,7 @@ import { View, ScrollView, StyleSheet, Image } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
 import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
 import {Paragraph} from "react-native-paper";
-import {localApi, loggedUserApi, touristApi, updateApiInstances} from "../helpers/api";
+import {localApi, loggedUserApi, touristApi} from "../helpers/api";
 import {AuthContext} from "../helpers/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
@@ -19,11 +19,9 @@ export const HomeScreen = ({navigation}) => {
   }, []);
 
   async function fetchUser() {
-      updateApiInstances(authContext.getAccessToken())
       const userData = await getUser()
       setUserData(userData)
       const usertype =  await getUserType()
-      console.log(authContext.getAccessToken())
   }
 
   const viewAttractions = () => {
@@ -117,19 +115,33 @@ export const HomeScreen = ({navigation}) => {
               </Text>
               <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={viewAttractions}/>
             </Card>
+
+            <Button
+                style={styles.button}
+                text="Profile"
+                mode="contained"
+                onPress={() => navigation.navigate('ViewProfileScreen')}
+            />
+
+            <Button
+                style={styles.button}
+                text="Saved Listing"
+                mode="contained"
+                onPress={() => navigation.navigate('SavedListingScreen')}
+            />
+
+            <Button
+                style={styles.button}
+                text="Bookings"
+                mode="contained"
+                onPress={() => navigation.navigate('BookingHistoryScreen')}
+            />  
             
             <Button
                 style={styles.button}
                 text="Logout"
                 mode="contained"
                 onPress={onLogoutPressed}
-            />
-
-<Button
-                style={styles.button}
-                text="CC Test"
-                mode="contained"
-                onPress={() => navigation.navigate('CreditCardsScreen')}
             />
           </View>
         </ScrollView>

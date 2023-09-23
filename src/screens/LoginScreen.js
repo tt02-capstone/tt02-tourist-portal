@@ -9,7 +9,7 @@ import TextInput from '../components/TextInput'
 import {theme} from '../core/theme'
 import Toast from "react-native-toast-message";
 import InputValidator from "../helpers/InputValidator";
-import {localApi, touristApi, updateApiInstances, userApi} from "../helpers/api";
+import {localApi, touristApi, userApi} from "../helpers/api";
 import CustomButton from "../components/CustomButton";
 import {storeUser} from "../helpers/LocalStorage";
 import {AuthContext, TOKEN_KEY} from "../helpers/AuthContext";
@@ -29,6 +29,7 @@ export const LoginScreen = ({navigation}) => {
 
         try {
             const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)
+            console.log("here")
             if (
                 response.data.httpStatusCode === 400 ||
                 response.data.httpStatusCode === 404 ||
@@ -47,7 +48,7 @@ export const LoginScreen = ({navigation}) => {
 
 
                 console.log('success', response.data)
-                console.log('response.data.toke', response.data.token)
+                console.log('response.data.token', response.data.token)
 
                 await SecureStore.setItemAsync(
                     TOKEN_KEY,
@@ -57,7 +58,6 @@ export const LoginScreen = ({navigation}) => {
                 await storeUser(response.data.user)
 
                 authContext.setAuthState({
-                    accessToken: response.data.token,
                     authenticated: true
                 });
             }

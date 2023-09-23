@@ -1,8 +1,6 @@
 import {createContext, useEffect, useState} from "react";
 import * as SecureStore from 'expo-secure-store';
 import axios from "axios";
-import {updateApiInstances} from "./api";
-
 
 const TOKEN_KEY= 'token'
 const AuthContext = createContext(null);
@@ -10,7 +8,6 @@ const {Provider} = AuthContext;
 
 const AuthProvider = ({children}) => {
     const [authState, setAuthState] = useState({
-        accessToken: null,
         authenticated: null,
     });
 
@@ -21,7 +18,6 @@ const AuthProvider = ({children}) => {
             if (token) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
                 setAuthState({
-                    accessToken: token,
                     authenticated: true
                 });
             }
@@ -29,20 +25,19 @@ const AuthProvider = ({children}) => {
 
         loadToken()
     }, []);
-    
 
     const logout = async () => {
         await SecureStore.deleteItemAsync(TOKEN_KEY);
-        updateApiInstances('')
+        axios.defaults.headers.common['Authorization'] =  ``;
         setAuthState({
-            accessToken: null,
             authenticated: false,
         });
     };
 
 
-    const getAccessToken = () => {
-        return authState.accessToken;
+    const getAccessToken = async () => {
+        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        return token
     };
 
     return (

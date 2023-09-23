@@ -109,14 +109,14 @@ export const CreditCardsScreen = ({ navigation }) => {
           <Text style={{ fontSize: 20 }}>Credit Card Details</Text>
         </Card.Title> */}
         {
-          cards.map((card) => (
+          cards.map((card, index) => (
             
             <ListItem.Swipeable
   leftWidth={80}
   rightWidth={90}
   minSlideWidth={40}
   shouldCancelWhenOutside={false} 
-  
+  key={index}
   rightContent={(action) => (
     <Button
       containerStyle={{

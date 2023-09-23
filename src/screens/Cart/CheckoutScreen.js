@@ -47,14 +47,17 @@ export const CheckoutScreen = ({navigation}) => {
     const user_type = await getUserType();
     const payment_method_id = cards[getSelectedCard].id;
     console.log(booking_ids)
-    const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
+
+    try {
+
+      const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error',response.data)
 
   } else {
     console.log('success', response.data)
     if (response.data) {
-        navigation.reset('BookingHistoryScreen'); // Should navigate to Bookings Screen?
+        navigation.navigate('BookingHistoryScreen'); // Should navigate to Bookings Screen?
         setDeletion(!deletion);
       Toast.show({
         type: 'success',
@@ -68,6 +71,14 @@ export const CheckoutScreen = ({navigation}) => {
     });
     }
     }
+
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating a booking'
+    });
+    }
+    
     
     
 
@@ -201,7 +212,7 @@ export const CheckoutScreen = ({navigation}) => {
   rightWidth={90}
   minSlideWidth={40}
   shouldCancelWhenOutside={false} 
-  
+  key={index}
 >
 <CheckBox
       left

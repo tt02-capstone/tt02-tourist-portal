@@ -80,7 +80,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
                 <View style={styles.container}>
                     {
                         data.map((item, index) => (
-                            <Card>
+                            <Card key={index}>
                                 <Card.Title style={styles.header}>
                                     {item.booking.attraction.name}
                                 </Card.Title>

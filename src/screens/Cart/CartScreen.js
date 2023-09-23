@@ -350,7 +350,7 @@ const handleCheckBoxToggle = (index) => {
 
 
     
-  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(4, 69, 55, 0.2)', padding: 10 , height: 70 }}>
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10 , height: 70 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CheckBox
           left

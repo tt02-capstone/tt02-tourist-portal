@@ -283,10 +283,10 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         {formattedPriceList.map(item => (
                             <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', width:120 }}>
-                                    <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
+                                    <Text style={{fontSize: 11, fontWeight:'bold'}}>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
                                 </View>
                                 
-                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 40}} onPress={() => handleDecrease(item.ticket_type)}>
+                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleDecrease(item.ticket_type)}>
                                     -
                                 </Button>
                                 
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     },
     header:{
         textAlign: 'left',
-        fontSize: 15,
+        fontSize: 13,
         color: '#044537',
         flexDirection: 'row'
     },
@@ -377,13 +377,13 @@ const styles = StyleSheet.create({
         fontSize: 16,marginTop: 5,
     },
     subtitle: {
-        marginBottom: 5, fontSize: 13, color: 'grey'
+        marginBottom: 5, fontSize: 12, color: 'grey'
     },
     description: {
-        marginBottom: 10, fontSize: 13, marginTop : 10 
+        marginBottom: 10, fontSize: 12, marginTop : 10 
     },
     pricing: {
-        marginBottom: 0, fontSize: 13, marginTop : 0
+        marginBottom: 0, fontSize: 12, marginTop : 0
     },
     recommendation:{
         marginBottom: 10, textAlign: 'center', marginTop : 10 
@@ -417,8 +417,6 @@ const styles = StyleSheet.create({
         marginTop: -5,
         width: '100%',
         alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
     }
     
 });

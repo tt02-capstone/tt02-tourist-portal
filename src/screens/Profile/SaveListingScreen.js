@@ -170,7 +170,7 @@ const SavedListingScreen = ({ navigation }) => {
                   {...props}
                   indicatorStyle={{ backgroundColor: 'white' }} // the line below the tab
                   style={{ backgroundColor: 'rgba(4, 69, 55, 0.85)', height: 50  }} 
-                  labelStyle={{ fontSize: 9, fontWeight:'bold' }}
+                  labelStyle={{ fontSize: 5, fontWeight:'bold' }}
                 />
             )}
         />

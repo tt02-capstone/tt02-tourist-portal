@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, LogBox } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Toast from 'react-native-toast-message';
@@ -29,6 +29,8 @@ import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
 import { enGB,en, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
+
+LogBox.ignoreAllLogs(true)
 
 initStripe({
   // API Key is test key, will be masked via GitHub Actions for deployment

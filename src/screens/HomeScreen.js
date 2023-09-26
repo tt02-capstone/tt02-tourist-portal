@@ -27,6 +27,10 @@ export const HomeScreen = ({ navigation }) => {
   const viewAttractions = () => {
     navigation.navigate('AttractionScreen')
   }
+  
+  const viewAccommodations = () => {
+    navigation.navigate('AccommodationScreen')
+  }
 
   const onLogoutPressed = async () => {
     await clearStorage();
@@ -68,7 +72,7 @@ export const HomeScreen = ({ navigation }) => {
               Discover a wide range of accommodation options in Singapore, tailored to suit every traveler's preferences.
               Start exploring your options now!
             </Text>
-            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAccommodations} />
           </Card>
 
           <Card>

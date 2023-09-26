@@ -21,6 +21,8 @@ import BookingHistoryScreen from "./src/screens/Booking/BookingHistoryScreen";
 import BookingDetailsScreen from "./src/screens/Booking/BookingDetailsScreen";
 import PaymentHistoryScreen from "./src/screens/PaymentHistoryScreen";
 import SavedListingScreen from "./src/screens/Profile/SaveListingScreen";
+import AccommodationScreen from "./src/screens/Accommodation/AccommodationScreen";
+import AccommodationDetailsScreen from "./src/screens/Accommodation/AccommodationDetailsScreen";
 import {CreditCardsScreen} from "./src/screens/CreditCard/CreditCardsScreen";
 import {AddCreditCardScreen} from "./src/screens/CreditCard/AddCreditCardScreen";
 import {CreditCardScreen} from "./src/screens/CreditCard/CreditCardScreen";
@@ -75,6 +77,8 @@ export const Layout = () => {
 
                         <Stack.Screen name="AttractionScreen" component={AttractionScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
+                        <Stack.Screen name="AccommodationScreen" component={AccommodationScreen} options={{ title : 'Attractions' }} />
+                        <Stack.Screen name="AccommodationDetailsScreen" component={ AccommodationDetailsScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />

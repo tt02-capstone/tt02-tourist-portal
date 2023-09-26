@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
 import { getBookingByBookingId, cancelBookingByBookingId } from '../../redux/reduxBooking';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
+import { theme } from '../../core/theme'
 
 const BookingDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -140,11 +141,9 @@ const BookingDetailsScreen = ({ navigation }) => {
                     <Card.Image
                         style={{ padding: 0 }}
                         source={{
-                            uri: getImage(booking) // KIV for image 
+                            uri: getImage(booking)
                         }}
                     />
-                    <Text style={[styles.description]}>Booking ID: {booking.booking_id}</Text>
-                    <Text style={styles.description}>Payment ID: {booking.payment.payment_id}</Text>
                     <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount}</Text>
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
                     <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>
@@ -160,6 +159,59 @@ const BookingDetailsScreen = ({ navigation }) => {
                     <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking.start_datetime)}.</Text>
                     {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
                 </Card>
+                {booking.status != 'CANCELLED' && booking.qr_code_list.length > 1 && <Card>
+                    <Card.Title style={styles.header}>
+                        Ticket Vouchers
+                    </Card.Title>
+                    <ScrollView horizontal>
+                        <View style={{ flexDirection: 'row', height: 350 }}>
+                            {
+                                booking.qr_code_list.map((item, index) => (
+                                    <View key={index} style={styles.rCard}>
+                                        <Card style={styles.reccom}>
+                                            <Card.Title style={styles.header}>
+                                                Voucher Code: {booking.qr_code_list[index].voucher_code}
+                                            </Card.Title>
+                                            <Card.Image
+                                                style={{ padding: 0, width: 200, height: 200 }}
+                                                source={{
+                                                    uri: booking.qr_code_list[0].qr_code_link
+                                                }}
+                                            />
+                                        </Card>
+
+                                        <Text style={{ marginBottom: 15 }}></Text>
+                                    </View>
+                                ))
+                            }
+                        </View>
+                    </ScrollView>
+                </Card>}
+                {booking.status != 'CANCELLED' && booking.qr_code_list.length == 1 && <Card>
+                    <Card.Title style={styles.header}>
+                        Ticket Voucher
+                    </Card.Title>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        {
+                            booking.qr_code_list.map((item, index) => (
+                                <View key={index} style={styles.rCard}>
+                                    <Card style={styles.reccom}>
+                                        <Card.Title style={styles.header}>
+                                            Voucher Code: {booking.qr_code_list[index].voucher_code}
+                                        </Card.Title>
+                                        <Card.Image
+                                            style={{ padding: 0, width: 200, height: 200 }}
+                                            source={{
+                                                uri: booking.qr_code_list[index].qr_code_link
+                                            }}
+                                        />
+                                    </Card>
+                                    <Text style={{ marginBottom: 15 }}></Text>
+                                </View>
+                            ))
+                        }
+                    </View>
+                </Card>}
             </ScrollView>
         </Background>
     ) : ''
@@ -167,7 +219,7 @@ const BookingDetailsScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     header: {
-        textAlign: 'left',
+        textAlign: 'center',
         fontSize: 15,
         color: '#044537'
     },
@@ -189,7 +241,16 @@ const styles = StyleSheet.create({
         width: 90,
         fontSize: 10,
         fontWeight: 'bold'
-    }
+    },
+    dropBorder: {
+        borderWidth: 0,
+        shadowColor: 'rgba(0,0,0, 0.0)',
+        shadowOffset: { height: 0, width: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+        backgroundColor: theme.colors.surface,
+    },
 });
 
 export default BookingDetailsScreen

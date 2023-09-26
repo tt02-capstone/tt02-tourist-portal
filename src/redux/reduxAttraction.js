@@ -92,3 +92,17 @@ export async function deleteSavedAttraction(user_id,attraction_id) {
     }
 }
 
+export async function getSeasonalActivity(attraction_id) {
+    try {
+        const response = await attractionApi.get(`/getSeasonalActivity/${attraction_id}`);
+        if (response.data != [] && response.data.httpStatusCode != 404) { // not going to catch error here since errors means thr is no seasonal activity now 
+            // console.log('seasonal');
+            // console.log(response.data);
+            return response.data;
+        }    
+    } catch (error) {
+        console.error("Retrieve recommendation error!");
+        return {status: false, data: error.message};
+    }
+}
+

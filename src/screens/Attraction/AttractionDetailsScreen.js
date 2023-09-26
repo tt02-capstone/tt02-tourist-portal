@@ -8,7 +8,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
-import { getAttraction, getAttractionRecommendation, saveAttraction , checkTicketInventory} from '../../redux/reduxAttraction'; 
+import { getAttraction, getAttractionRecommendation, saveAttraction , checkTicketInventory , getSeasonalActivity} from '../../redux/reduxAttraction'; 
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
@@ -23,6 +23,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const [selectedDate, setSelectedDate] = useState();
     const [formattedPriceList, setFormattedPriceList] = useState([]);
     const [quantityByTicketType, setQuantityByTicketType] = useState({});
+    const [seasonalActivity, setSeasonalActivity] = useState([]);
     const route = useRoute();
     const { attractionId } = route.params;
 
@@ -191,6 +192,11 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttraction(attraction);
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
+
+            let activity = await getSeasonalActivity(attractionId);
+            if (activity != []) {
+                setSeasonalActivity(activity); // get seasonal
+            }
             
             let reccoms = await getAttractionRecommendation(attractionId);
             setRecommendation(reccoms)
@@ -261,6 +267,13 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <Text style={styles.subtitle}>Operating Hours: {attraction.opening_hours}</Text>
                     <Text style={styles.description}>{attraction.description}</Text>
                     <Text style={styles.description}>{attraction.age_group}</Text>
+
+                    { seasonalActivity && <View style={{ backgroundColor: '#EBFAF2', padding: 8, borderRadius: 10}}>
+                        <Text style={styles.activityHeader} >Special Event !!</Text>
+                        <Text style={styles.activity}>{seasonalActivity.name} from {seasonalActivity.start_date} to {seasonalActivity.end_date}</Text>
+                        <Text style={styles.activity}>{seasonalActivity.description}</Text>
+                    </View> }
+
                 </Card>
                 
                 <Card containerStyle={styles.dropBorder}>
@@ -268,7 +281,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         Tickets
                     </Card.Title>
 
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 360, height: 100 , marginTop: -15}}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 , marginTop: -15}}>
                         <DatePickerInput
                             locale='en-GB'
                             format
@@ -282,11 +295,11 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     <View>
                         {formattedPriceList.map(item => (
                             <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', width:135 }}>
-                                    <Text>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', width:120 }}>
+                                    <Text style={{fontSize: 11, fontWeight:'bold'}}>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
                                 </View>
                                 
-                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 40}} onPress={() => handleDecrease(item.ticket_type)}>
+                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleDecrease(item.ticket_type)}>
                                     -
                                 </Button>
                                 
@@ -366,7 +379,7 @@ const styles = StyleSheet.create({
     },
     header:{
         textAlign: 'left',
-        fontSize: 15,
+        fontSize: 13,
         color: '#044537',
         flexDirection: 'row'
     },
@@ -377,13 +390,19 @@ const styles = StyleSheet.create({
         fontSize: 16,marginTop: 5,
     },
     subtitle: {
-        marginBottom: 5, fontSize: 13, color: 'grey'
+        marginBottom: 5, fontSize: 12, color: 'grey'
     },
     description: {
-        marginBottom: 10, fontSize: 13, marginTop : 10 
+        marginBottom: 10, fontSize: 12, marginTop : 10 
+    },
+    activityHeader: {
+        marginBottom: 5, fontSize: 12,  fontWeight: "bold"
+    },
+    activity: {
+        marginBottom: 5, fontSize: 11
     },
     pricing: {
-        marginBottom: 0, fontSize: 13, marginTop : 0
+        marginBottom: 0, fontSize: 12, marginTop : 0
     },
     recommendation:{
         marginBottom: 10, textAlign: 'center', marginTop : 10 
@@ -415,7 +434,8 @@ const styles = StyleSheet.create({
     },
     cartButton:{
         marginTop: -5,
-        width: '110%'
+        width: '100%',
+        alignSelf: 'center',
     }
     
 });

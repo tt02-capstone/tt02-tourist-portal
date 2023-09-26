@@ -6,11 +6,13 @@ import { Text, Card } from '@rneui/themed';
 import { getPaymentHistoryList } from '../redux/reduxBooking';
 import { getUser, getUserType } from '../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 const PaymentHistoryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const isFocused = useIsFocused();
 
     async function fetchUser() {
         const userData = await getUser()
@@ -27,6 +29,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
                 const userId = userData.user_id;
 
                 let listOfPayments = await getPaymentHistoryList(userId);
+                console.log(listOfPayments);
                 setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
                 setLoading(false);
             } catch (error) {
@@ -35,22 +38,35 @@ const PaymentHistoryScreen = ({ navigation }) => {
             }
         }
         onLoad();
-    }, []);
 
-    const getColorForStatus = (label) => {
+        if (isFocused) {
+            onLoad();   
+        }
+    }, [isFocused]);
+
+    const getColorForStatus = (bookingStatus) => {
         const labelColorMap = {
-            'true': 'lightgreen',
-            'false': 'lightpink'
+            'UPCOMING': 'lightgreen',
+            'ONGOING': 'lightgreen',
+            'COMPLETED': 'lightgreen',
+            'CANCELLED': 'lightpink'
         };
-
-        return labelColorMap[label] || 'gray';
+        console.log(bookingStatus);
+        return labelColorMap[bookingStatus] || 'gray';
     };
 
-    const getPaidStatus = (status) => {
-        if (status) {
+    const getPaidStatus = (status, startDate, lastUpdatedDate, bookingStatus) => {
+        let formattedStartDate = new Date(startDate);
+        let formattedUpdatedDate = new Date(lastUpdatedDate);
+        let timeDifference = formattedStartDate - formattedUpdatedDate;
+        let daysDifference = timeDifference / (24 * 60 * 60 * 1000);
+
+        if (bookingStatus != 'CANCELLED') {
             return 'Paid';
+        } else if (bookingStatus == 'CANCELLED' && daysDifference >= 3) {
+            return 'Refunded';
         } else {
-            return 'Unpaid';
+            return 'Not Eligible for Refund';
         }
     }
 
@@ -64,16 +80,16 @@ const PaymentHistoryScreen = ({ navigation }) => {
                 <View style={styles.container}>
                     {
                         data.map((item, index) => (
-                            <Card>
+                            <Card key={index}>
                                 <Card.Title style={styles.header}>
-                                    Payment ID: {item.payment_id}
+                                    {item.booking.attraction.name}
                                 </Card.Title>
                                 <Text style={styles.description}>
-                                    Payment Amount: S${item.payment_amount} {'\n'} {'\n'}
-                                    Booking ID: {item.booking.booking_id}
+                                    Payment Amount: S${item.payment_amount}
                                 </Text>
                                 <View style={{ display: 'inline-block' }}>
-                                    <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.is_paid) }]}>{getPaidStatus(item.is_paid)}</Text>
+                                    <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.booking.status) }]}>{
+                                        getPaidStatus(item.is_paid, item.booking.start_datetime, item.booking.last_update, item.booking.status)}</Text>
                                 </View>
                                 <Button style={styles.button} text="View Booking" mode="contained" onPress={() => viewBooking(item.booking.booking_id)} />
                             </Card>
@@ -118,7 +134,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 60,
+        width: 80,
         fontSize: 11,
         fontWeight: 'bold'
     },

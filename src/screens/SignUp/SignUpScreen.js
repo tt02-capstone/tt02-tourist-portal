@@ -141,7 +141,8 @@ export const SignUpScreen = ({navigation}) => {
             const response = isLocal? await localApi.post(`/create`,user ): await touristApi.post(`/create`,user )
             if (
                 response.data.httpStatusCode === 400 ||
-                response.data.httpStatusCode === 404
+                response.data.httpStatusCode === 404 ||
+                response.data.httpStatusCode === 422
             ) {
                 console.log('error')
                 Toast.show({

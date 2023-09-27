@@ -1,11 +1,11 @@
-import React , { useState, useEffect } from 'react'
-import Background from '../components/CardBackground'
-import Header from '../components/Header'
-import Button from '../components/Button'
+import React , { useState, useEffect } from 'react';
+import Background from '../../components/CardBackground';
+import Header from '../../components/Header';
+import Button from '../../components/Button';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, Card, Icon } from '@rneui/themed';
-import { getAttractionList  } from '../redux/reduxAttraction';
-import { clearStorage, getUser, getUserType } from '../helpers/LocalStorage';
+import { getAttractionList  } from '../../redux/reduxAttraction';
+import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
 
 const AttractionScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -24,10 +24,6 @@ const AttractionScreen = ({ navigation }) => {
             try {
                 let listOfAttractions = await getAttractionList();
                 setData(listOfAttractions);
-                console.log(listOfAttractions);
-                // for (const item of listOfAttractions) {
-                //     console.log(item.attraction_image_list[1]);
-                // }
                 setLoading(false);
             } catch (error) {
                 alert ('An error occur! Failed to retrieve attraction list!');
@@ -74,7 +70,7 @@ const AttractionScreen = ({ navigation }) => {
                                 />
 
                                 <Text style={styles.description}>{item.description}</Text>
-                                <View style={{ display: 'inline-block'}}>
+                                <View style={{ flexDirection: 'row' }}>
                                     <Text style={[styles.tag, {backgroundColor:getColorForType(item.attraction_category)}]}>{item.attraction_category}</Text>
                                     <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
                                 </View>

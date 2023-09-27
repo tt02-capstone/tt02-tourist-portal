@@ -3,7 +3,8 @@ import { CardForm, useStripe } from '@stripe/stripe-react-native';
 import { View,  FlatList, StyleSheet } from 'react-native';
 import Toast from "react-native-toast-message";
 import { Text, Card, Button, Icon, ListItem } from '@rneui/themed';
-import {getEmail, getUserType} from "../../helpers/LocalStorage";
+import {getEmail, getUserType, getUser} from "../../helpers/LocalStorage";
+import { useRoute } from '@react-navigation/native';
 import {paymentsApi} from "../../helpers/api";
 
 
@@ -13,7 +14,8 @@ export const AddCreditCardScreen = ({ navigation }) => {
   const [user_type, setUserType] = useState('');
   const { confirmPayment, createPaymentMethod } = useStripe();
   const [cardDetails, setCardDetails] = useState(null);
-
+  const route = useRoute();
+  const { previousScreen, booking_ids, selectedCartItems, totalPrice } = route.params;
 
   useEffect(() => {
     
@@ -21,7 +23,8 @@ export const AddCreditCardScreen = ({ navigation }) => {
     
     async function onLoad() {
       try {
-        setTouristEmail(await getEmail());
+        const userData = await getUser();
+        setTouristEmail(userData.email);
         setUserType(await getUserType());        
         
       } catch (error) {
@@ -32,18 +35,29 @@ export const AddCreditCardScreen = ({ navigation }) => {
     onLoad();
   }, []);
 
+  
+
   const handleSaveCard = async () => {
     const { paymentMethod, error } = await createPaymentMethod({
         paymentMethodType: 'Card',
       })
     if (error) {
-      console.log(error) // To use Toast
+      Toast.show({
+        type: 'error',
+        text1: error.message
+    });
     } else if (paymentMethod) {
-      const payment_method_id = paymentMethod.id;
+      try {
+
+        const payment_method_id = paymentMethod.id;
       const response = await paymentsApi.post(`/addPaymentMethod/${user_type}/${tourist_email}/${payment_method_id}`)
       console.log(response.data.httpStatusCode)
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-          console.log('error',response.data)
+      console.log(response)
+      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
+        Toast.show({
+          type: 'error',
+          text1: response.data.errorMessage
+      });
 
       } else {
           console.log('success', response.data)
@@ -52,8 +66,9 @@ export const AddCreditCardScreen = ({ navigation }) => {
               type: 'success',
               text1: 'Successfully added card'
           });
-            navigation.navigate('CreditCardsScreen');
-          } else {
+          navigation.goBack();
+
+        } else {
             Toast.show({
               type: 'error',
               text1: 'Unable to add card'
@@ -62,6 +77,16 @@ export const AddCreditCardScreen = ({ navigation }) => {
           
               
       };
+
+      } catch (error) {
+
+        Toast.show({
+          type: 'error',
+          text1: error.message
+      });
+
+      }
+      
  
 
     

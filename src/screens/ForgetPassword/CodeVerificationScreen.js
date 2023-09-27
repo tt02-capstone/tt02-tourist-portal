@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import Background from '../components/Background'
-import Header from '../components/Header'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import InputValidator from '../helpers/InputValidator'
-import CustomButton from "../components/CustomButton";
-import {localApi, userApi} from "../helpers/api";
+import Background from '../../components/Background'
+import Header from '../../components/Header'
+import TextInput from '../../components/TextInput'
+import Button from '../../components/Button'
+import InputValidator from '../../helpers/InputValidator'
+import CustomButton from "../../components/CustomButton";
+import {localApi, userApi} from "../../helpers/api";
 import Toast from "react-native-toast-message";
 import {ActivityIndicator, Paragraph} from "react-native-paper";
 
@@ -38,6 +38,7 @@ export const CodeVerificationScreen = ({navigation}) => {
             }
         } catch (error) {
             console.error("Axios Error : ", error)
+            setLoading(false);
         }
     }
 

@@ -1,44 +1,48 @@
 import React, {useContext, useState} from 'react'
-import {Pressable, StyleSheet, TextComponent, View} from 'react-native'
-import {List, Paragraph, RadioButton, Text} from 'react-native-paper'
+import {Pressable, StyleSheet, Switch, TextComponent, View} from 'react-native'
+import {List, Paragraph, RadioButton, Text, ToggleButton} from 'react-native-paper'
 import axios from 'axios'
-import Background from '../components/Background'
-import Header from '../components/Header'
-import Button from '../components/Button'
-import TextInput from '../components/TextInput'
-import {theme} from '../core/theme'
+import Background from '../../components/Background'
+import Header from '../../components/Header'
+import Button from '../../components/Button'
+import TextInput from '../../components/TextInput'
+import {theme} from '../../core/theme'
 import Toast from "react-native-toast-message";
-import InputValidator from "../helpers/InputValidator";
-import {localApi, touristApi} from "../helpers/api";
-import CustomButton from "../components/CustomButton";
+import InputValidator from "../../helpers/InputValidator";
+import {localApi, touristApi} from "../../helpers/api";
+import CustomButton from "../../components/CustomButton";
 import {ProgressBar, MD3Colors} from 'react-native-paper';
-import {LocalForm} from "../helpers/LocalForm";
-import {ForeignerForm} from "../helpers/ForeignerForm";
+import {LocalForm} from "./LocalForm";
+import {ForeignerForm} from "./ForeignerForm";
 
 export const SignUpScreen = ({navigation}) => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         password: "",
-        dob: new Date(),
+        dob: "",
         mobile: "",
         nric: "",
         passport: "",
-        countryCode: ""
+        countryCode: "65"
     })
 
-    const [isLocal, setIsLocal] = useState('');
+    const [isLocal, setIsLocal] = useState(false);
     const [progress, setProgress] = React.useState(0.5);
     const [page, setPage] = React.useState(1);
-    const [show, setShow] = useState(false);
 
     const onPage1Pressed = () => {
         const nameError = InputValidator.name(formData.name)
         const emailError = InputValidator.email(formData.email)
         const passwordError = InputValidator.password(formData.password)
-        if (emailError || passwordError || nameError || !isLocal) {
+        if (emailError || passwordError || nameError) {
+            Toast.show({
+                type: 'error',
+                text1: 'All inputs are required!'
+            })
             return
         }
+        console.log(isLocal)
         setPage(page + 1);
         setProgress(0.5)
     }
@@ -52,8 +56,7 @@ export const SignUpScreen = ({navigation}) => {
                         returnKeyType="next"
                         value={formData.name}
                         onChangeText={(name) => setFormData({...formData, name})}
-                        // error={!!name.error}
-                        errorText={InputValidator.name(formData.name)}
+                        errorText={formData.name ? InputValidator.name(formData.name) : ''}
                     />
                     <TextInput
                         label="Email"
@@ -61,7 +64,7 @@ export const SignUpScreen = ({navigation}) => {
                         value={formData.email}
                         onChangeText={(email) => setFormData({...formData, email})}
                         // error={!!email.error}
-                        errorText={InputValidator.email(formData.email)}
+                        errorText={formData.email? InputValidator.email(formData.email) : ''}
                         autoCapitalize="none"
                         autoCompleteType="email"
                         textContentType="emailAddress"
@@ -73,23 +76,16 @@ export const SignUpScreen = ({navigation}) => {
                         value={formData.password}
                         onChangeText={(password) => setFormData({...formData, password})}
                         // error={!!password.error}
-                        errorText={InputValidator.password(formData.password)}
+                        errorText={formData.password? InputValidator.password(formData.password): ''}
                         secureTextEntry
                     />
-                    <Text>Are you a Singapore Citizen, PR or Long Term Pass Holder </Text>
-                    <View style={{flexDirection: 'row', width: '100%'}}>
-                        <RadioButton.Group
-                            value={isLocal}
-                            onValueChange={(value) => setIsLocal(value)}
-                            style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}
-                        >
-                            <RadioButton.Item label="Yes" value="Yes"/>
-                            <RadioButton.Item label="No" value="No"/>
-                        </RadioButton.Group>
+                    <View style= {{ flexDirection: 'row', marginTop: 5, marginBottom:10}}>
+                        <Text style={{flexShrink: 1, maxWidth: '80%', marginRight: 10 }} >Are you a Singapore Citizen, PR or Long Term Pass Holder ?</Text>
+                        <Switch value={isLocal} onValueChange={() => setIsLocal(!isLocal)} />
                     </View>
                 </View>)
-        } else if (page == 2) {
-            if (isLocal === 'Yes') {
+        } else if (page === 2) {
+            if (isLocal) {
                 return <LocalForm formData={formData} setFormData={setFormData}/>
             } else {
                 return <ForeignerForm formData={formData} setFormData={setFormData}/>
@@ -99,16 +95,35 @@ export const SignUpScreen = ({navigation}) => {
 
     }
     const onSignUpPressed = async () => {
-        setProgress(1)
 
-        let user = isLocal === "Yes"? {
+        const nricError = InputValidator.nric(formData.nric)
+        const passportError = InputValidator.passport(formData.passport)
+        const mobileError = InputValidator.mobileNo(formData.mobile)
+        const dobError = InputValidator.dob(formData.dob)
+        if (isLocal && (nricError  || mobileError ||dobError)) {
+            Toast.show({
+                type: 'error',
+                text1: 'All inputs are required!'
+            })
+            return
+        } else if (!isLocal && (passportError|| mobileError ||dobError)) {
+            Toast.show({
+                type: 'error',
+                text1: 'All inputs are required!'
+            })
+            return
+        }
+
+        setProgress(1)
+        console.log(formData)
+        let user = isLocal? {
             name: formData.name,
             email: formData.email,
             password: formData.password,
             is_blocked: false,
-            country_code: "65",
+            country_code: formData.countryCode,
             nric_num: formData.nric,
-            date_of_birth: "2001-03-08",
+            date_of_birth: formData.dob,
             mobile_num: formData.mobile,
             wallet_balance: 0
         }: {
@@ -116,17 +131,18 @@ export const SignUpScreen = ({navigation}) => {
             email: formData.email,
             password: formData.password,
             is_blocked: false,
-            country_code: "65",
+            country_code: formData.countryCode,
             passport_num: formData.passport,
-            date_of_birth: "2001-03-08",
+            date_of_birth: formData.dob,
             mobile_num: formData.mobile
         };
         console.log(user, isLocal)
         try {
-            const response = isLocal === "Yes"? await localApi.post(`/create`,user ): await touristApi.post(`/create`,user )
+            const response = isLocal? await localApi.post(`/create`,user ): await touristApi.post(`/create`,user )
             if (
                 response.data.httpStatusCode === 400 ||
-                response.data.httpStatusCode === 404
+                response.data.httpStatusCode === 404 ||
+                response.data.httpStatusCode === 422
             ) {
                 console.log('error')
                 Toast.show({
@@ -137,46 +153,50 @@ export const SignUpScreen = ({navigation}) => {
                 console.log('success')
                 Toast.show({
                     type: 'success',
-                    text1: 'Sign Up Successful'
+                    text1: 'Sign Up Successful! Please check your email for verification code!'
                 })
 
                 console.log('success', response.data)
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'LoginScreen'}],
-                })
+                setTimeout(() => {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'EmailVerificationScreen'}],
+                    })
+                }, 700);
+
             }
         } catch (error) {
             console.log(error)
-            alert('An error hass occurred' + error)
+            alert('An error has occurred' + error)
         }
-
-        // navigation.reset({
-        //   index: 0,
-        //   routes: [{ name: 'HomeScreen' }],
-        // })
     }
 
     return (
         <Background>
             <View>
-                <Paragraph> Progress - Part {page}</Paragraph>
+                <Paragraph> Part {page}</Paragraph>
                 <ProgressBar progress={progress} visible={true}/>
             </View>
             <View>{PageDisplay()}</View>
-            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+            <View style={{ flexDirection: 'row', maxWidth: '60%' }}>
                 {page === 2 &&<Button
                     mode="contained"
                     text={"Prev"}
                     onPress={() => {
                         setPage(page - 1);
                     }}
+                    style={{margin: 5}}
                 />}
-                {page === 1 && <Button
+
+                {page === 1 && <View style={{width: 400}}>
+                    <Button
                     mode="contained"
                     text={"Next"}
                     onPress={onPage1Pressed}
-                />}
+                />
+                </View>
+                }
+
                 {page===2 && <Button
                     mode="contained"
                     text={"Submit"}

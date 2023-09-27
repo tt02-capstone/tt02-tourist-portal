@@ -1,43 +1,40 @@
-import React, { useState } from 'react'
-import Background from '../components/CardBackground'
-import Button from '../components/Button'
+import React, { useState, useEffect } from 'react'
+import Background from '../../components/CardBackground'
+import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getBookingHistoryList } from '../redux/reduxBooking';
-import { getUser, getUserType } from '../helpers/LocalStorage';
+import { getBookingHistoryList } from '../../redux/reduxBooking';
+import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 const BookingHistoryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const isFocused = useIsFocused();
 
-    async function fetchUser() {
-        const userData = await getUser()
-        setUser(userData)
+    useEffect(() => {
+        async function onLoad() {
+            try {
+                const userData = await getUser();
+                setUser(userData);
+                const userId = userData.user_id;
 
-        const usertype = await getUserType()
-    }
+                let listOfBookings = await getBookingHistoryList(userId);
+                setData(listOfBookings.sort((a, b) => b.booking_id - a.booking_id));
+                setLoading(false);
+            } catch (error) {
+                alert('An error occur! Failed to retrieve booking list!');
+                setLoading(false);
+            }
+        }
+        onLoad();
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                    // To update when nav bar is up
-                    let listOfBookings = await getBookingHistoryList(3);
-                    // let listOfBookings = await getBookingHistoryList(user.user_id);
-                    setData(listOfBookings.sort((a, b) => b.booking_id - a.booking_id));
-                    console.log(listOfBookings);
-                    setLoading(false);
-                } catch (error) {
-                    alert('An error occur! Failed to retrieve booking list!');
-                    setLoading(false);
-                }
-            };
-            fetchUser();
-            fetchData();
-        }, [])
-    );
+        if (isFocused) {
+            onLoad();   
+        }
+    }, [isFocused]);
 
     const getColorForStatus = (label) => {
         const labelColorMap = {
@@ -82,7 +79,7 @@ const BookingHistoryScreen = ({ navigation }) => {
 
     const getImage = (item) => {
         if (item.attraction != null) {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
+            return item.attraction.attraction_image_list[0];
         } else if (item.room != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
@@ -104,9 +101,6 @@ const BookingHistoryScreen = ({ navigation }) => {
                                 <Card>
                                     <Card.Title style={styles.header}>
                                         {getNameForBooking(item)}
-                                        <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                                            <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
-                                        </View>
                                     </Card.Title>
                                     <View style={{
                                         flexDirection: 'row',
@@ -115,9 +109,8 @@ const BookingHistoryScreen = ({ navigation }) => {
                                     }}>
                                         {/* Text on the left */}
                                         <Text style={styles.description}>
-                                            Booking ID: {item.booking_id}<br /><br />
-                                            Total Paid: S${item.payment.payment_amount}<br /><br />
-                                            Type: {formatType(item.type)}<br /><br />
+                                            Total Paid: S${item.payment.payment_amount} {'\n'} {'\n'}
+                                            Type: {formatType(item.type)} {'\n'} {'\n'}
                                             Date: {formatDate(item.start_datetime)}
                                         </Text>
                                         {/* Image on the right */}
@@ -128,9 +121,12 @@ const BookingHistoryScreen = ({ navigation }) => {
                                                 marginLeft: 40,
                                             }}
                                             source={{
-                                                uri: getImage(item) // KIV for image 
+                                                uri: getImage(item) 
                                             }}
                                         />
+                                    </View>
+                                    <View style={{ display: 'inline-block', marginLeft: 20 }}>
+                                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
                                     </View>
                                     <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewBooking(item.booking_id)} />
                                 </Card>
@@ -176,7 +172,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 110,
+        width: 90,
         fontSize: 11,
         fontWeight: 'bold'
     },
@@ -194,7 +190,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'gray',
         textAlign: 'center'
-    }, 
+    },
     button: {
         width: '100%'
     }

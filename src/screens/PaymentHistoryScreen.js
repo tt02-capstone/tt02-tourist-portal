@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Background from '../components/CardBackground'
 import Button from '../components/Button'
 import { View, ScrollView, StyleSheet, } from 'react-native';
@@ -6,11 +6,13 @@ import { Text, Card } from '@rneui/themed';
 import { getPaymentHistoryList } from '../redux/reduxBooking';
 import { getUser, getUserType } from '../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 const PaymentHistoryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const isFocused = useIsFocused();
 
     async function fetchUser() {
         const userData = await getUser()
@@ -19,40 +21,52 @@ const PaymentHistoryScreen = ({ navigation }) => {
         const usertype = await getUserType()
     }
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                    // To update when nav bar is up
-                    let listOfPayments = await getPaymentHistoryList(1);
-                    // let listOfPayments = await getPaymentHistoryList(user.user_id);
-                    setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
-                    console.log(listOfPayments);
-                    setLoading(false);
-                } catch (error) {
-                    alert('An error occur! Failed to retrieve payment list!');
-                    setLoading(false);
-                }
-            };
-            fetchUser();
-            fetchData();
-        }, [])
-    );
+    useEffect(() => {
+        async function onLoad() {
+            try {
+                const userData = await getUser();
+                setUser(userData);
+                const userId = userData.user_id;
 
-    const getColorForStatus = (label) => {
+                let listOfPayments = await getPaymentHistoryList(userId);
+                console.log(listOfPayments);
+                setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
+                setLoading(false);
+            } catch (error) {
+                alert('An error occur! Failed to retrieve payment list!');
+                setLoading(false);
+            }
+        }
+        onLoad();
+
+        if (isFocused) {
+            onLoad();   
+        }
+    }, [isFocused]);
+
+    const getColorForStatus = (bookingStatus) => {
         const labelColorMap = {
-            'true': 'lightgreen',
-            'false': 'lightpink'
+            'UPCOMING': 'lightgreen',
+            'ONGOING': 'lightgreen',
+            'COMPLETED': 'lightgreen',
+            'CANCELLED': 'lightpink'
         };
-
-        return labelColorMap[label] || 'gray';
+        console.log(bookingStatus);
+        return labelColorMap[bookingStatus] || 'gray';
     };
 
-    const getPaidStatus = (status) => {
-        if (status) {
+    const getPaidStatus = (status, startDate, lastUpdatedDate, bookingStatus) => {
+        let formattedStartDate = new Date(startDate);
+        let formattedUpdatedDate = new Date(lastUpdatedDate);
+        let timeDifference = formattedStartDate - formattedUpdatedDate;
+        let daysDifference = timeDifference / (24 * 60 * 60 * 1000);
+
+        if (bookingStatus != 'CANCELLED') {
             return 'Paid';
+        } else if (bookingStatus == 'CANCELLED' && daysDifference >= 3) {
+            return 'Refunded';
         } else {
-            return 'Unpaid';
+            return 'Not Eligible for Refund';
         }
     }
 
@@ -60,27 +74,35 @@ const PaymentHistoryScreen = ({ navigation }) => {
         navigation.navigate('BookingDetailsScreen', { bookingId: booking_id });
     }
 
-    return (
+    return data.length !== 0 ? (
         <Background>
             <ScrollView>
                 <View style={styles.container}>
                     {
                         data.map((item, index) => (
-                            <Card>
+                            <Card key={index}>
                                 <Card.Title style={styles.header}>
-                                    Payment ID: {item.payment_id}
-                                    <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.is_paid) }]}>{getPaidStatus(item.is_paid)}</Text>
-                                    </View>
+                                    {item.booking.attraction.name}
                                 </Card.Title>
                                 <Text style={styles.description}>
-                                    Payment Amount: S${item.payment_amount}<br /><br />
-                                    Booking ID: {item.booking.booking_id}
+                                    Payment Amount: S${item.payment_amount}
                                 </Text>
-                                <Button text="View Booking" mode="contained" onPress={() => viewBooking(item.booking.booking_id)} />
+                                <View style={{ display: 'inline-block' }}>
+                                    <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.booking.status) }]}>{
+                                        getPaidStatus(item.is_paid, item.booking.start_datetime, item.booking.last_update, item.booking.status)}</Text>
+                                </View>
+                                <Button style={styles.button} text="View Booking" mode="contained" onPress={() => viewBooking(item.booking.booking_id)} />
                             </Card>
                         ))
                     }
+                </View>
+            </ScrollView>
+        </Background>
+    ) : (
+        <Background>
+            <ScrollView>
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyMessage}>No payments made</Text>
                 </View>
             </ScrollView>
         </Background>
@@ -112,13 +134,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 110,
+        width: 80,
         fontSize: 11,
         fontWeight: 'bold'
     },
     header: {
         color: '#044537',
         fontSize: 15
+    },
+    emptyContainer: {
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 8
+    },
+    emptyMessage: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'gray',
+        textAlign: 'center'
+    },
+    button: {
+        width: '100%'
     }
 });
 

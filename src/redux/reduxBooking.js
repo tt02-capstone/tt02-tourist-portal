@@ -9,6 +9,7 @@ export async function getBookingHistoryList(userId) {
         }    
     } catch (error) {
         console.error("Retrieve booking history list error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -20,19 +21,21 @@ export async function getBookingByBookingId(bookingId) {
         }    
     } catch (error) {
         console.error("Retrieve booking details error!");
+        return {status: false, data: error.message};
     }
 }
 
 export async function cancelBookingByBookingId(bookingId) {
     try {
         const response = await bookingApi.put(`/cancelBooking/${bookingId}`);
-        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404) {
+        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404 || response.data.httpStatusCode == 422) {
             return {status:true, info:response.data.errorMessage};
         } else {
             return {status:false, info:response.data};
         }    
     } catch (error) {
         console.error("Cancel booking error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -44,5 +47,6 @@ export async function getPaymentHistoryList(userId) {
         }    
     } catch (error) {
         console.error("Retrieve payment history list error!");
+        return {status: false, data: error.message};
     }
 }

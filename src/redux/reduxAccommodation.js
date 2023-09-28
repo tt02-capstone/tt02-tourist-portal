@@ -37,3 +37,16 @@ export async function getNumOfBookingsOnDate(accommodation_id, roomType, date) {
         return {status: false, data: error.message};
     }
 }
+
+export async function getMinAvailableRoomsOnDateRange(accommodation_id, roomType, checkInDate, checkOutDate) {
+    try {
+        const response = await accommodationApi.get(`/getMinAvailableRoomsOnDateRange/${accommodation_id}/${roomType}/${checkInDate}/${checkOutDate}`);
+        console.log("response", response.data);
+        if (response.data != []) {
+            return response.data;
+        }    
+    } catch (error) {
+        console.error("getMinAvailableRoomsOnDateRange error!");
+        return {status: false, data: error.message};
+    }
+}

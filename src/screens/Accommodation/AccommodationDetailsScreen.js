@@ -17,12 +17,10 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [accommodation, setAccommodation] = useState([]);
     const [roomList, setRoomList] = useState([]);
-    // const [attrTicketList, setAttrTicketList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
-    // const [formattedPriceList, setFormattedPriceList] = useState([]);
-    // const [quantityByRoomType, setQuantityByRoomType] = useState({});
-    // const [seasonalActivity, setSeasonalActivity] = useState([]);
+    const [formattedRoomList, setFormattedRoomList] = useState([]);
+    const [quantityByRoomType, setQuantityByRoomType] = useState({});
     const route = useRoute();
     const { accommodationId } = route.params;
 
@@ -33,25 +31,25 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         const usertype = await getUserType()
     }
 
-    // const handleIncrease = (roomType) => {
-    //     setQuantityByRoomType((prevQuantity) => {
-    //       const updatedQuantity = {
-    //         ...prevQuantity,
-    //         [roomType]: (prevQuantity[roomType] || 0) + 1,
-    //       };
-    //       return updatedQuantity;
-    //     });
-    // };
+    const handleIncrease = (roomType) => {
+        setQuantityByRoomType((prevQuantity) => {
+            const updatedQuantity = {
+                ...prevQuantity,
+                [roomType]: (prevQuantity[roomType] || 0) + 1,
+            };
+            return updatedQuantity;
+        });
+    };
 
-    // const handleDecrease = (roomType) => {
-    //     setQuantityByRoomType((prevQuantity) => {
-    //       const updatedQuantity = {
-    //         ...prevQuantity,
-    //         [roomType]: Math.max((prevQuantity[roomType] || 0) - 1, 0),
-    //       };
-    //       return updatedQuantity;
-    //     });
-    // };
+    const handleDecrease = (roomType) => {
+        setQuantityByRoomType((prevQuantity) => {
+            const updatedQuantity = {
+                ...prevQuantity,
+                [roomType]: Math.max((prevQuantity[roomType] || 0) - 1, 0),
+            };
+            return updatedQuantity;
+        });
+    };
 
     // const addToCart = async () => {
     //     const cartItems = [];
@@ -164,16 +162,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             let accommodation = await getAccommodation(accommodationId);
             setAccommodation(accommodation);
             setRoomList(accommodation.room_list);
-            console.log("accommodation", accommodation);
-            // setAttrTicketList(accommodation.ticket_per_day_list);
-
-            // let activity = await getSeasonalActivity(accommodationId);
-            // if (activity != []) {
-            //     setSeasonalActivity(activity); // get seasonal
-            // }
-
-            // let reccoms = await getAccommodationRecommendation(accommodationId);
-            // setRecommendation(reccoms)
+            console.log("roomList", accommodation.room_list);
 
             setLoading(false);
             fetchUser();
@@ -184,13 +173,19 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         }
     }
 
-    // const fetchPrice = () => {
-    //     const formattedPriceList = priceList.map(item => {
-    //         const userType = user.user_type; 
-    //         const amount = userType === 'TOURIST' ? item.tourist_amount : item.local_amount;
-    //         const ticket_type = item.ticket_type;
+    // const fetchRoom = () => {
+    //     const formattedRoomList = roomList.map(item => {
 
-    //         let ticket_count = 0; // default value 
+    //         // need to count number of rooms by type
+    //         // 
+
+
+    //         const room_type = item.room_type;
+    //         const amenities_description = item.amenities_description;
+    //         const num_of_pax = item.num_of_pax;
+    //         const price = item.price;
+
+    //         let ticket_count = 0; // default value  => this is basically number of tickets avail on that day
     //         let ticket_type_id = null;
 
     //         if (selectedDate) {
@@ -199,32 +194,117 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     //             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     //             const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
     //             const formattedDate = `${year}-${month}-${day}`;
-    //             const matchingTicket = attrTicketList.find(ticket => 
-    //                 ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
-    //             );
+    //             console.log("formattedDate", formattedDate);
 
-    //             if (matchingTicket) {
-    //                 ticket_count = matchingTicket.ticket_count;
-    //                 ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
-    //             }
+    //             // const matchingRoom = roomList.find(ticket => 
+    //             //     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
+    //             // );
+
+    //             // if (matchingTicket) {
+    //             //     ticket_count = matchingTicket.ticket_count;
+    //             //     ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
+    //             // }
     //         }
 
+    // //         return {
+    // //             ...item, 
+    // //             userType,
+    // //             amount,
+    // //             ticket_type,
+    // //             ticket_type_id,
+    // //             ticket_count
+    // //         };
+    // //     });
+
+    //     setFormattedRoomList(formattedRoomList)
+    // }
+
+    // const fetchRoom = () => {
+    //     // Initialize an object to store room counts by type
+    //     const roomCounts = {};
+
+    //     // Iterate through the roomList to count rooms by type
+    //     roomList.forEach((room) => {
+    //         const roomType = room.room_type;
+    //         console.log("roomType", roomType);
+    //         if (roomCounts[roomType]) {
+    //             roomCounts[roomType]++;
+    //         } else {
+    //             roomCounts[roomType] = 1;
+    //         }
+    //     });
+
+    //     console.log("roomCounts", roomCounts);
+
+    //     // Now roomCounts object contains the counts for each room type
+
+    //     // Map the roomList to include room counts in the formattedRoomList
+    //     const formattedRoomList = roomList.map((item) => {
+    //         const room_type = item.room_type;
+    //         const amenities_description = item.amenities_description;
+    //         const num_of_pax = item.num_of_pax;
+    //         const price = item.price;
+
+    //         // Add the room count for the current room type
+    //         const roomCount = roomCounts[room_type] || 0;
+
     //         return {
-    //             ...item, 
-    //             userType,
-    //             amount,
-    //             ticket_type,
-    //             ticket_type_id,
-    //             ticket_count
+    //             ...item,
+    //             roomCount, // Add room count to the item
+    //             room_type,
+    //             amenities_description,
+    //             num_of_pax,
+    //             price,
     //         };
     //     });
 
-    //     setFormattedPriceList(formattedPriceList)
-    // }
+    //     console.log("formattedRoomList", formattedRoomList);
+    //     setFormattedRoomList(formattedRoomList);
+    // };
+
+    const fetchRoom = () => {
+        // Initialize an object to store room counts by type
+        const roomCounts = {};
+
+        // Group rooms by room type using reduce
+        const roomGroups = roomList.reduce((groups, room) => {
+            const roomType = room.room_type;
+
+            if (!groups[roomType]) {
+                groups[roomType] = [];
+            }
+
+            groups[roomType].push(room);
+
+            return groups;
+        }, {});
+
+        // Now roomGroups object contains rooms grouped by room type
+
+        // Map the grouped rooms to create the formattedRoomList
+        const formattedRoomList = Object.keys(roomGroups).map((roomType) => {
+            const rooms = roomGroups[roomType];
+            const amenities_description = rooms[0].amenities_description;
+            const num_of_pax = rooms[0].num_of_pax;
+            const price = rooms[0].price;
+            const roomCount = rooms.length; // Count of rooms for the current room type
+
+            return {
+                room_type: roomType,
+                amenities_description,
+                num_of_pax,
+                price,
+                roomCount,
+            };
+        });
+
+        console.log("formattedRoomList", formattedRoomList);
+        setFormattedRoomList(formattedRoomList);
+    };
 
     useEffect(() => {
         fetchAccommodation(); // when the page load the first time
-        // fetchPrice();
+        fetchRoom();
     }, [selectedDate]);
 
     function formatLocalDateTime(localDateTimeString) {
@@ -236,7 +316,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     function toTitleCase(str) {
         return str ? str
             .toLowerCase()
-            .split('_') 
+            .split('_')
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ')
             : ''
@@ -276,12 +356,12 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                 </Card>
 
-                {/* <Card containerStyle={styles.dropBorder}>
+                <Card containerStyle={styles.dropBorder}>
                     <Card.Title style={styles.header}>
                         Rooms
                     </Card.Title>
 
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 , marginTop: -15}}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
                         <DatePickerInput
                             locale='en-GB'
                             format
@@ -290,77 +370,39 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                             onChange={(d) => setSelectedDate(d)}
                             inputMode="start"
                         />
-                    </View> */}
+                    </View>
 
-                {/* <View>
-                        {formattedPriceList.map(item => (
-                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', width:120 }}>
-                                    <Text style={{fontSize: 11, fontWeight:'bold'}}>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Rooms Available: ${item.ticket_count}`}  </Text>
+                    <View>
+                        {formattedRoomList.map((item) => (
+                            <View key={item.room_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', width: 120 }}>
+                                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{`${item.room_type} ROOM @ $${item.price}`}{'\n'}{`Rooms Available: ${item.roomCount}`}  </Text>
                                 </View>
-                                
-                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleDecrease(item.ticket_type)}>
+
+                                <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleDecrease(item.room_type)}>
                                     -
                                 </Button>
-                                
-                                <Text style={{ marginLeft: 20 }}>{quantityByRoomType[item.ticket_type] || 0}</Text>
-                                
-                                <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleIncrease(item.ticket_type)}>
+
+                                <Text style={{ marginLeft: 20 }}>{quantityByRoomType[item.room_type] || 0}</Text>
+
+                                <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleIncrease(item.room_type)}>
                                     +
                                 </Button>
-
                             </View>
                         ))}
-                        
                     </View>
-                </Card> */}
+
+                </Card>
 
                 {/* <View style={styles.cartOut}> 
-                    <CartButton 
-                        style = {styles.cartButton}
-                        text = "Add to Cart" 
-                        mode="contained" 
-                        onPress={addToCart}
-                    />
-                </View> */}
+                        <CartButton 
+                            style = {styles.cartButton}
+                            text = "Add to Cart" 
+                            mode="contained" 
+                            onPress={addToCart}
+                        />
+                    </View> */}
 
-                {/* <Card containerStyle={styles.dropBorder}>
-                    <Card.Title style={styles.header}>
-                        Nearby Recommendation
-                    </Card.Title>
-
-                    <ScrollView horizontal>
-                        <View style={{ flexDirection: 'row', height: 350}}>
-                            {
-                                recommendation.length > 0 && recommendation.map((item, index) => (
-                                    <TouchableOpacity key={index} onPress={() => viewRecommendedAccommodation(item.accommodation_id)}>
-                                        <View style={styles.rCard}>
-                                            <Card style={styles.reccom}>
-                                                <Card.Title style={styles.header}>
-                                                    {item.name} 
-                                                </Card.Title>
-                                                <Card.Image
-                                                    style={{ padding: 0, width: 260, height: 100}}
-                                                    source={{
-                                                        uri: item.accommodation_image_list[0] // KIV for image 
-                                                    }}
-                                                />
-                                                <Text style={{marginBottom: 15 }}></Text> 
-                                                
-                                                <View style={{ flexDirection : 'row' }}>
-                                                    <Text style={[styles.tag, {backgroundColor:getColorForType(item.accommodation_category)}]}>{item.accommodation_category}</Text>
-                                                    <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
-                                                </View>
-                                            </Card>
-
-                                            <Text style={{marginBottom: 15 }}></Text> 
-                                        </View>
-                                    </TouchableOpacity>
-                                )) 
-                            }
-                        </View>
-                    </ScrollView>
-                </Card> */}
             </ScrollView>
         </Background>
     )

@@ -224,6 +224,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
                 const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
                 const formattedDate = `${year}-${month}-${day}`;
+                console.log('formattedDate', formattedDate);
                 const matchingTicket = attrTicketList.find(ticket => 
                     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
                 );

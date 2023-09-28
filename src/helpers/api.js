@@ -2,8 +2,8 @@ import axios from "axios";
 import {TOKEN_KEY} from "./AuthContext";
 import * as SecureStore from "expo-secure-store";
 
-//const HOST = '10.100.101.190'
-const HOST = '172.20.10.2'
+const HOST = '10.100.101.190'
+// const HOST = '172.20.10.2'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({

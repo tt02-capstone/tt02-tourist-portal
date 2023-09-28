@@ -2,7 +2,7 @@ import axios from "axios";
 import {TOKEN_KEY} from "./AuthContext";
 import * as SecureStore from "expo-secure-store";
 
-const HOST = '192.168.86.136'
+const HOST = '192.168.86.137'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -36,7 +36,6 @@ export const bookingApi = axios.create({
 
 export const paymentsApi = axios.create({
     baseURL: HOST_WITH_PORT + '/payment'
-
 })
 
 export const cartApi = axios.create({

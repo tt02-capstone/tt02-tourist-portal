@@ -13,6 +13,7 @@ import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { getTelecomById, toggleSaveTelecom } from '../../redux/telecomRedux';
+import { addTelecomToCart } from '../../redux/cartRedux';
 
 const TelecomDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -127,6 +128,66 @@ const TelecomDetailsScreen = ({ navigation }) => {
     };
 
     const addToCart = async () => {
+
+        if (ticketQuantity < 1) {
+            Toast.show({
+                type: 'error',
+                text1: "Please purchase at least 1!"
+            })
+        } else if (!selectedDate) {
+            Toast.show({
+                type: 'error',
+                text1: "Please select a date!"
+            })
+        } else if (selectedDate.getYear() == new Date().getYear() && selectedDate.getMonth() == new Date().getMonth() && selectedDate.getDate() < new Date().getDate() ) {
+            Toast.show({
+                type: 'error',
+                text1: "Please select a future date!"
+            })
+        } else if (!telecom) {
+            Toast.show({
+                type: 'error',
+                text1: "Telecom not selected!"
+            })
+
+        } else {
+            let endDate = new Date(selectedDate);
+            endDate.setDate(endDate.getDate() + telecom.num_of_days_valid-1);
+
+            let cartBooking = {
+                activity_name: telecom.name,
+                start_datetime: selectedDate,
+                end_datetime: endDate,
+                type: 'TELECOM',
+                cart_item_list: [ // cart item
+                    {
+                        start_datetime: selectedDate,
+                        end_datetime: endDate,
+                        quantity: ticketQuantity,
+                        price: telecom.price,
+                        activity_selection: telecom.name,
+                        type: 'TELECOM'
+                    }
+                ],
+            };
+
+            let response = await addTelecomToCart(user.user_id, telecom.telecom_id, cartBooking);
+            if (response.status) {
+                setTicketQuantity(0);
+                setSelectedDate(null);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Telecom has been added to cart!'
+                });
+            } else {
+                console.log("Item was not added to cart!");
+                console.log(response.data);
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage,
+                });
+            }
+        }
     }
 
     return (

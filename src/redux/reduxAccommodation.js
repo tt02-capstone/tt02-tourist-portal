@@ -25,3 +25,15 @@ export async function getAccommodation(accommodation_id) {
     }
 }
 
+export async function getNumOfBookingsOnDate(accommodation_id, roomType, date) {
+    try {
+        const response = await accommodationApi.get(`/getNumOfBookingsOnDate/${accommodation_id}/${roomType}/${date}`);
+        console.log("response", response.data);
+        if (response.data != []) {
+            return response.data;
+        }    
+    } catch (error) {
+        console.error("getNumOfBookingsOnDate error!");
+        return {status: false, data: error.message};
+    }
+}

@@ -8,7 +8,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
-import { getAccommodation } from '../../redux/reduxAccommodation';
+import { getAccommodation, getNumOfBookingsOnDate } from '../../redux/reduxAccommodation';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
@@ -173,98 +173,10 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         }
     }
 
-    // const fetchRoom = () => {
-    //     const formattedRoomList = roomList.map(item => {
-
-    //         // need to count number of rooms by type
-    //         // 
-
-
-    //         const room_type = item.room_type;
-    //         const amenities_description = item.amenities_description;
-    //         const num_of_pax = item.num_of_pax;
-    //         const price = item.price;
-
-    //         let ticket_count = 0; // default value  => this is basically number of tickets avail on that day
-    //         let ticket_type_id = null;
-
-    //         if (selectedDate) {
-    //             // format date 
-    //             const year = selectedDate.getFullYear();
-    //             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    //             const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
-    //             const formattedDate = `${year}-${month}-${day}`;
-    //             console.log("formattedDate", formattedDate);
-
-    //             // const matchingRoom = roomList.find(ticket => 
-    //             //     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
-    //             // );
-
-    //             // if (matchingTicket) {
-    //             //     ticket_count = matchingTicket.ticket_count;
-    //             //     ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;
-    //             // }
-    //         }
-
-    // //         return {
-    // //             ...item, 
-    // //             userType,
-    // //             amount,
-    // //             ticket_type,
-    // //             ticket_type_id,
-    // //             ticket_count
-    // //         };
-    // //     });
-
-    //     setFormattedRoomList(formattedRoomList)
-    // }
-
-    // const fetchRoom = () => {
-    //     // Initialize an object to store room counts by type
-    //     const roomCounts = {};
-
-    //     // Iterate through the roomList to count rooms by type
-    //     roomList.forEach((room) => {
-    //         const roomType = room.room_type;
-    //         console.log("roomType", roomType);
-    //         if (roomCounts[roomType]) {
-    //             roomCounts[roomType]++;
-    //         } else {
-    //             roomCounts[roomType] = 1;
-    //         }
-    //     });
-
-    //     console.log("roomCounts", roomCounts);
-
-    //     // Now roomCounts object contains the counts for each room type
-
-    //     // Map the roomList to include room counts in the formattedRoomList
-    //     const formattedRoomList = roomList.map((item) => {
-    //         const room_type = item.room_type;
-    //         const amenities_description = item.amenities_description;
-    //         const num_of_pax = item.num_of_pax;
-    //         const price = item.price;
-
-    //         // Add the room count for the current room type
-    //         const roomCount = roomCounts[room_type] || 0;
-
-    //         return {
-    //             ...item,
-    //             roomCount, // Add room count to the item
-    //             room_type,
-    //             amenities_description,
-    //             num_of_pax,
-    //             price,
-    //         };
-    //     });
-
-    //     console.log("formattedRoomList", formattedRoomList);
-    //     setFormattedRoomList(formattedRoomList);
-    // };
-
     const fetchRoom = () => {
         // Initialize an object to store room counts by type
         const roomCounts = {};
+        const existingBookingsForRoomTypeCount = 0;
 
         // Group rooms by room type using reduce
         const roomGroups = roomList.reduce((groups, room) => {
@@ -279,6 +191,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             return groups;
         }, {});
 
+        console.log("roomGroups", roomGroups);
+
         // Now roomGroups object contains rooms grouped by room type
 
         // Map the grouped rooms to create the formattedRoomList
@@ -289,12 +203,42 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             const price = rooms[0].price;
             const roomCount = rooms.length; // Count of rooms for the current room type
 
+            let room_type_id = null;
+
+            if (selectedDate) {
+                (async () => {
+                    const date = new Date(selectedDate);
+                    const selectedDateInLocalDateTime = date.toISOString();
+
+                    try {
+                        const response = await getNumOfBookingsOnDate(accommodation.accommodation_id, roomType, selectedDateInLocalDateTime);
+                        room_booking_count = response;
+                        console.log("room_booking_count", room_booking_count);
+
+                        //     // // Replace 'attrTicketList' with the appropriate list that contains ticket data
+                        //     // const matchingTicket = attrTicketList.find((ticket) =>
+                        //     //     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
+                        //     // );
+
+                        //     // if (matchingTicket) {
+                        //     //     room_booking_count = matchingTicket.ticket_count;
+                        //     //     room_type_id = matchingTicket ? matchingTicket.room_type_id : null;
+                        //     // }
+
+                    } catch (error) {
+                        console.error("Error fetching room_booking_count:", error);
+                    }
+                })();
+            }
+
             return {
                 room_type: roomType,
                 amenities_description,
                 num_of_pax,
                 price,
                 roomCount,
+                room_booking_count,
+                // room_type_id, 
             };
         });
 
@@ -376,7 +320,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         {formattedRoomList.map((item) => (
                             <View key={item.room_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', width: 120 }}>
-                                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{`${item.room_type} ROOM @ $${item.price}`}{'\n'}{`Rooms Available: ${item.roomCount}`}  </Text>
+                                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{`${item.room_type} ROOM @ $${item.price}`}{'\n'}{`Rooms Available: ${item.roomCount - item.room_booking_count}`}  </Text>
                                 </View>
 
                                 <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleDecrease(item.room_type)}>

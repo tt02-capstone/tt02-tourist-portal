@@ -7,13 +7,13 @@ import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { getAccommodation, getMinAvailableRoomsOnDateRange } from '../../redux/reduxAccommodation';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { addRoomToCart } from '../../redux/cartRedux';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -26,6 +26,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     const [quantityByRoomType, setQuantityByRoomType] = useState({});
     const route = useRoute();
     const { accommodationId } = route.params;
+    const [activeSlide, setActiveSlide] = useState(0);
 
     async function fetchUser() {
         const userData = await getUser()
@@ -361,37 +362,53 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                 </Card>
 
-                {roomList.map((item) => (
-                    <Card key={item.room_type} containerStyle={styles.roomCard}>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Image
-                                source={{ uri: item.room_image }}
-                                style={styles.roomImage}
-                            />
-                            <View style={{ flex: 1, marginLeft: 10 }}>
-                                <Card.Title style={styles.header}>{item.room_type}</Card.Title>
-                                <Text style={styles.details}>
-                                    <Text style={styles.boldText}>Amenities:</Text>{' '}
-                                    {item.amenities_description}
-                                </Text>
-                                <Text style={styles.details}>
-                                    <Text style={styles.boldText}>Capacity:</Text>{' '}
-                                    {item.num_of_pax}
-                                </Text>
-                                <Text style={styles.details}>
-                                    <Text style={styles.boldText}>Price per Night:</Text>{' '}
-                                    ${item.price}
-                                </Text>
-                                <Text style={styles.details}>
-                                    <Text style={styles.boldText}>Available Rooms:</Text>{' '}
-                                    {item.available_rooms || 0}
-                                </Text>
+                <Carousel
+                    data={roomList}
+                    renderItem={({ item }) => (
+                        <Card containerStyle={styles.roomCard}>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Image
+                                    source={{ uri: item.room_image }}
+                                    style={styles.roomImage}
+                                />
+                                <View style={{ flex: 1, marginLeft: 10 }}>
+                                    <Card.Title style={styles.header}>{item.room_type}</Card.Title>
+                                    <Text style={styles.details}>
+                                        <Text style={styles.boldText}>Amenities:</Text>{' '}
+                                        {item.amenities_description}
+                                    </Text>
+                                    <Text style={styles.details}>
+                                        <Text style={styles.boldText}>Pax Capacity:</Text>{' '}
+                                        {item.num_of_pax}
+                                    </Text>
+                                    <Text style={styles.details}>
+                                        <Text style={styles.boldText}>Price per Night:</Text>{' '}
+                                        ${item.price}
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
-                    </Card>
-                ))}
+                        </Card>
+                    )}
+                    sliderWidth={400} 
+                    itemWidth={360}  
+                    layout={'default'}
+                    onSnapToItem={(index) => setActiveSlide(index)}
+                />
 
-
+                <Pagination
+                    dotsLength={roomList.length} // Total number of items
+                    activeDotIndex={activeSlide} // Current active slide index
+                    containerStyle={{ paddingVertical: 10 }}
+                    dotStyle={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
+                        marginHorizontal: 2,
+                        backgroundColor: 'rgba(0, 0, 0, 0.92)',
+                    }}
+                    inactiveDotOpacity={0.4}
+                    inactiveDotScale={0.6}
+                />
 
                 <Card containerStyle={styles.dropBorder}>
                     <Card.Title style={styles.header}>

@@ -1,29 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { ListItem, Button, CheckBox, Card, Avatar, Image, Text } from '@rneui/themed';
-import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
+import React , { useState, useEffect, } from 'react';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { ListItem, Button, CheckBox, Image, Text } from '@rneui/themed';
+import { getUser, getUserType } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
-import Background from '../../components/Background';
 import { useIsFocused } from '@react-navigation/native';
 
-
-export const CartScreen = ({ navigation }) => {
-  const [user, setUser] = useState('');
-  const [cartItems, setCartItems] = useState([]);
-  const [user_type, setUserType] = useState('');
-  const [deletion, setDeletion] = useState(false);
-  const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [apiCallTimer, setApiCallTimer] = useState(null);
-  const isFocused = useIsFocused();
+export const CartScreen = ({navigation}) => {
+    const [user, setUser] = useState('');
+    const [cartItems, setCartItems] = useState([]); 
+    const [user_type, setUserType] = useState('');
+    const [deletion, setDeletion] = useState(false);
+    const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [apiCallTimer, setApiCallTimer] = useState(null);
+    const isFocused = useIsFocused();
 
   function formatDateAndTime(date) {
     const options = {
       year: '2-digit',
       month: '2-digit',
       day: '2-digit',
-
     };
 
     const formattedDate = new Date(date).toLocaleString(undefined, options);
@@ -32,27 +29,21 @@ export const CartScreen = ({ navigation }) => {
 
   const checkout = async () => {
     const booking_ids = [];
-    const selectedCartItems = [];
-    itemChecked.forEach((isChecked, index) => {
-      if (isChecked) {
-        console.log("WATTT " + cartItems[index])
-        console.log(cartItems[index])
-        booking_ids.push(cartItems[index].id);
-        selectedCartItems.push(cartItems[index]);
-      }
+      const selectedCartItems = [];
+      itemChecked.forEach((isChecked, index) => {
+        if (isChecked) {
+            // console.log("WATTT " + cartItems[index])
+            // console.log(cartItems[index])
+            booking_ids.push(cartItems[index].id);
+            selectedCartItems.push(cartItems[index]);
+        }
     });
 
     if (selectedCartItems.length > 0) {
-
-      console.log(booking_ids)
-      navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
-    }
-
-    // Should give warning
-
-
+        navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
+    } 
+    // should give warning
   }
-
 
   useEffect(() => {
     navigation.setOptions({
@@ -66,8 +57,7 @@ export const CartScreen = ({ navigation }) => {
     });
   }, [navigation, user, itemChecked]);
 
-  const handleDeleteCartItem = async (user, itemChecked) => {
-    console.log(user) //There seems to be a bug with the useLayoutEffect, it would not retrieve the user object
+  const handleDeleteCartItem = async (user,itemChecked) => {
     const tourist_email = user.email;
     const booking_ids = [];
     itemChecked.forEach((isChecked, index) => {
@@ -76,31 +66,29 @@ export const CartScreen = ({ navigation }) => {
 
       }
     });
-    console.log(tourist_email, booking_ids)
-    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`, booking_ids)
+
+    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`,booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error', response.data)
 
+  } else {
+    // console.log('success', response.data)
+    if (response.data) {
+      setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
+      setDeletion(!deletion);
+      Toast.show({
+        type: 'success',
+        text1: 'Successfully deleted cart item(s)'
+    });
+    
     } else {
-      console.log('success', response.data)
-      if (response.data) {
-        setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
-
-        setDeletion(!deletion);
-        Toast.show({
-          type: 'success',
-          text1: 'Successfully deleted cart item(s)'
-        });
-
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Unable to delete cart item(s)'
-        });
-      }
+      Toast.show({
+        type: 'error',
+        text1: 'Unable to delete cart item(s)'
+      });
     }
-
-  };
+  }
+};
 
   const getFields = (cartItems) => {
     let subtotal = 0;
@@ -108,23 +96,22 @@ export const CartScreen = ({ navigation }) => {
     const quantities = [];
 
     cartItems.forEach((cartItem) => {
-
-      subtotal += (cartItem.price * cartItem.quantity);
-      selections.push(cartItem.activity_selection);
-      quantities.push(cartItem.quantity);
+        subtotal += (cartItem.price * cartItem.quantity);
+        selections.push(cartItem.activity_selection);
+        quantities.push(cartItem.quantity);
     });
-
 
     return { subtotal, selections, quantities };
   }
 
-
   const handleCheckBoxToggle = (index) => {
     const updatedChecked = [...itemChecked];
+    
     if (updatedChecked[index]) {
       const cartItem = cartItems[index];
       const newPrice = totalPrice - parseFloat(cartItem.price);
       setTotalPrice(newPrice);
+
     } else {
       const cartItem = cartItems[index];
       const newPrice = totalPrice + parseFloat(cartItem.price);
@@ -132,8 +119,7 @@ export const CartScreen = ({ navigation }) => {
     }
 
     updatedChecked[index] = !updatedChecked[index];
-    setItemChecked(updatedChecked);
-
+    setItemChecked(updatedChecked);    
   };
 
   const isAllChecked = () => {
@@ -142,15 +128,19 @@ export const CartScreen = ({ navigation }) => {
 
   const handleCheckAllToggle = () => {
     const updatedChecked = itemChecked.map(() => !isAllChecked());
+
     if (isAllChecked()) {
-      setTotalPrice(0);
+        setTotalPrice(0);
+
     } else {
-      let newPrice = 0;
-      cartItems.forEach((cartItem) => {
-        newPrice += parseFloat(cartItem.price);
-      });
-      setTotalPrice(newPrice);
+        let newPrice = 0;
+        cartItems.forEach((cartItem) => {
+            newPrice += parseFloat(cartItem.price);
+        });
+
+        setTotalPrice(newPrice);
     }
+
     setItemChecked(updatedChecked);
   };
 
@@ -183,7 +173,6 @@ export const CartScreen = ({ navigation }) => {
 
     if (currentQuantity + delta === 0) { // Delete cart item if quantity is 0
       cartItems[cartItemIndex].items.splice(itemIndex, 1);
-
     }
 
     if (cartItems[cartItemIndex].items.length === 0) { // Delete cart booking if no cart items
@@ -193,14 +182,12 @@ export const CartScreen = ({ navigation }) => {
     setCartItems([...cartItems]);
 
     const newTimer = setTimeout(async () => {
-
-
-      if (quantity >= 0) { // dbl check agn
+      if (quantity >= 0 ) {
         const response = await cartApi.put(`/updateCartItem/${user_type}/${tourist_email}/${cart_item_id}/${cart_booking_id}/${quantity}`)
         if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-          console.log('error', response.data)
+          console.log('error',response.data)
         } else {
-          console.log('success', response.data)
+          console.log('success',response.data)
         }
       }
     }, 1000);
@@ -211,7 +198,6 @@ export const CartScreen = ({ navigation }) => {
   useEffect(() => {
     async function onLoad() {
       try {
-
         const user_type = await getUserType();
         const userData = await getUser()
         setUser(userData)
@@ -219,41 +205,52 @@ export const CartScreen = ({ navigation }) => {
         const tourist_email = userData.email
 
         const response = await cartApi.get(`/viewCart/${user_type}/${tourist_email}`)
-        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-          console.log('error', response.data)
+          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
+            console.log('error',response.data)
 
-        } else {
-          // console.log(response.data)
-          const cartDetails = response.data;
-          console.log('cart details', cartDetails);
-          const extractedDetails = cartDetails.map((detail) => {
-            console.log(detail.cart_item_list)
-            //console.log(detail.attraction.attraction_id)
+          } else {
+            const cartDetails = response.data;
+            const extractedDetails = cartDetails.map((detail) => {
             const { subtotal, selections, quantities } = getFields(detail.cart_item_list);
 
-            return {
-              id: parseInt(detail.cart_booking_id),
-              type: detail.type,
-              attraction_id: detail.attraction.attraction_id,
-              image: detail.attraction.attraction_image_list[0],
-              item_name: detail.activity_name, // Needs to be conditional
-              activity_name: detail.attraction.name, // Needs to be conditional
-              startTime: formatDateAndTime(detail.start_datetime),
-              endTime: formatDateAndTime(detail.end_datetime),
-              items: detail.cart_item_list.filter(item => item.type === "ATTRACTION"), // get activity selection
-              tour: detail.cart_item_list.filter(item => item.type === "TOUR").length != 0
-                ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
-              price: subtotal.toFixed(2),
-              quantity: quantities,
-              selections: selections
-              //price: detail.price.toFixed(2),
-            };
-          })
-          setCartItems(extractedDetails);
-          if (extractedDetails.length > 0) {
-            setItemChecked(Array(extractedDetails.length).fill(false));
+            if (detail.type === 'ATTRACTION') {
+              return {
+                id: parseInt(detail.cart_booking_id),
+                type: detail.type,
+                attraction_id: detail.attraction.attraction_id,
+                image: detail.attraction.attraction_image_list[0],
+                item_name: detail.activity_name,
+                activity_name: detail.attraction.name,
+                startTime: formatDateAndTime(detail.start_datetime),
+                endTime: formatDateAndTime(detail.end_datetime),
+                items: detail.cart_item_list, // get activity selection
+                price: subtotal.toFixed(2),
+                quantity: quantities,
+                selections: selections
+              };
+
+            } else if (detail.type === 'TELECOM') {
+                return {
+                  id: parseInt(detail.cart_booking_id),
+                  type: detail.type,
+                  telecom_id: detail.telecom.telecom_id,
+                  image: detail.telecom.plan_duration_category,
+                  item_name: detail.activity_name,
+                  activity_name: detail.activity_name,
+                  startTime: formatDateAndTime(detail.start_datetime),
+                  endTime: formatDateAndTime(detail.end_datetime),
+                  items: detail.cart_item_list,
+                  price: subtotal.toFixed(2),
+                  quantity: quantities,
+                }
+              }
+            })
+
+            setCartItems(extractedDetails);
+            if (extractedDetails.length > 0) {
+              setItemChecked(Array(extractedDetails.length).fill(false));
+            }
           }
-        }
 
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -261,33 +258,44 @@ export const CartScreen = ({ navigation }) => {
     }
 
     onLoad();
-  }, [deletion, isFocused]);
+  }, [deletion,isFocused]);
 
+  // telecom images
+  function formatTelecomImage(text) {
+    if (text === 'ONE_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_1_day.JPG';
+    } else if (text === 'THREE_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_3_day.JPG';
+    } else if (text === 'SEVEN_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_7_day.JPG';
+    } else if (text === 'FOURTEEN_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_14_day.JPG';
+    } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_more_than_14_day.JPG';
+    } else {
+        return text;
+    }
+  }
+  
   return (
     <View>
       <ScrollView>
         <View>
-          {
-            cartItems.map((cartItem, cartItemIndex) => (
-
+          {cartItems.map((cartItem, cartItemIndex) => (   
               <ListItem.Swipeable
-                shouldCancelWhenOutside={false}
-                rightWidth={90}
-                minSlideWidth={40}
-                key={cartItemIndex}
-                rightContent={
-                  <Button
-                    containerStyle={{
-                      flex: 1,
-                      justifyContent: "center",
-                      backgroundColor: "#DC143C",
-                    }}
-                    type="clear"
-                    icon={{ name: "delete-outline" }}
-                    onPress={() => { handleDeleteCartItem(cartItem.id); }}
-                  />
-                }
-              >
+                  shouldCancelWhenOutside={false} 
+                  rightWidth={90}
+                  minSlideWidth={40}
+                  key={cartItemIndex}
+                  rightContent={
+                      <Button
+                        containerStyle={{flex: 1, justifyContent: "center", backgroundColor: "#DC143C" }}
+                        type="clear"
+                        icon={{ name: "delete-outline" }}
+                        onPress={ () => { handleDeleteCartItem(cartItem.id);}}
+                    />
+                  }
+                >
 
                 <CheckBox left
                   iconType="material-community"
@@ -297,81 +305,98 @@ export const CartScreen = ({ navigation }) => {
                   checked={itemChecked[cartItemIndex]}
                   onPress={() => handleCheckBoxToggle(cartItemIndex)}
                 />
+      
+                {/* attraction */}
+                {cartItem.type === 'ATTRACTION' &&
+                  <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AttractionDetailsScreen', {attractionId: cartItem.attraction_id});}}>
+                      <Image
+                        source={{uri: cartItem.image}} 
+                        style={{ width: 65, height: 65, borderRadius: 10, marginLeft:5, marginRight: 0}} />
+                  </TouchableOpacity>
+                }
 
-                <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AttractionDetailsScreen', { attractionId: cartItem.attraction_id }); }}>
-                  <Image
-                    source={{
-                      uri: cartItem.image// KIV for image 
-                    }}
-                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
-                </TouchableOpacity>
+                {/* Telecom */}
+                {cartItem.type === 'TELECOM' &&
+                  <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('TelecomDetailsScreen', {id: cartItem.telecom_id});}}>
+                      <Image
+                        source={{
+                          uri: formatTelecomImage(cartItem.image) 
+                        }}
+                        style={{ width: 65, height: 65, borderRadius: 10, marginLeft:5, marginRight: 0}} />
+                  </TouchableOpacity>
+                }
 
-
-                <ListItem.Content style={{ padding: 0, marginLeft: -10, height: 80 }}>
+                {/* Common */}
+                <ListItem.Content style={{padding: 0, marginLeft: -10, height:80}}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "column", width: 130 }}>
                       <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>S${cartItem.price}</ListItem.Subtitle>
-                      {cartItem.tour != null ? <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
-                        Tour: {cartItem.tour[0].activity_selection}
-                      </ListItem.Subtitle> : <Text></Text>}
+                      
+                      {cartItem.type === 'ATTRACTION' && 
+                        <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
+                      }
+                      {cartItem.type === 'TELECOM' && 
+                        <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}} >Start Date : {cartItem.startTime}</ListItem.Subtitle>
+                      }
+
+                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
                       {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                       {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                     </View>
 
                     <View style={{ flexDirection: "column" }}>
-                      {
-                        cartItem.items.map((item, itemIndex) => (
-                          <View style={{ flexDirection: "row" }} key={itemIndex}>
-                            <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
-                            <TouchableOpacity
-                              style={{ backgroundColor: '#044537', height: 16, width: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 9, marginLeft: 5, marginBottom: 8 }}
-                              onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
-                            >
+                    {cartItem.items.map((item, itemIndex) => (
+                      <View style={{ flexDirection: "row" }} key={itemIndex}>
 
-                              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}> - </Text>
-                            </TouchableOpacity>
+                        {cartItem.type === 'ATTRACTION' && 
+                          <Text key={itemIndex} style={{marginLeft:8, marginBottom:10 , fontSize:10, fontWeight: 'bold'}}>{item.activity_selection} </Text>
+                        }
 
-                            <Text style={{ marginLeft: 5, marginTop: 2, fontSize: 10 }}>{item.quantity} </Text>
+                        <TouchableOpacity 
+                            style={{ backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                                     borderRadius: 15, marginLeft:5, marginBottom: 8 }} 
+                            onPress={() => updateQuantity(cartItemIndex,itemIndex, -1)}
+                        >
+                          
+                        <Text style={{color: 'white', fontSize: 15, fontWeight:'bold'}}> - </Text>
+                        </TouchableOpacity>
 
-                            <TouchableOpacity style={{ backgroundColor: '#044537', height: 16, width: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginLeft: 5, marginBottom: 8 }}
-                              onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}>
+                        <Text style={{ marginLeft: 5, marginTop: 2 ,fontSize:10}}>{item.quantity} </Text>
 
-                              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}> + </Text>
-
-                            </TouchableOpacity>
-                          </View>
-                        ))}
-                    </View>
+                        <TouchableOpacity
+                          style={{ backgroundColor: '#044537',  height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                                   borderRadius: 15, marginLeft:5, marginBottom: 8}} 
+                          onPress={() => updateQuantity(cartItemIndex,itemIndex, 1)}
+                        >
+                          <Text style={{color: 'white', fontSize: 15, fontWeight:'bold' }}> + </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))} 
                   </View>
-                </ListItem.Content>
-              </ListItem.Swipeable>
-            ))}
-
-        </View>
-      </ScrollView>
-
-
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10, height: 70 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <CheckBox
-            left
-            iconType="material-community"
-            checkedIcon="checkbox-outline"
-            uncheckedIcon={'checkbox-blank-outline'}
-            title="All"
-            style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight: 'bold', color: 'black' }}
-            containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color: 'black' }}
-            checked={isAllChecked()} // Check if all items are checked
-            onPress={handleCheckAllToggle} />
-          <Text style={{ fontWeight: 'bold', color: 'black' }}>Total Price: ${totalPrice.toFixed(2)}</Text>
-        </View>
-
-        <Button style={{ borderRadius: 10, backgroundColor: '#044537' }} title="Checkout" onPress={() => { checkout(); }} />
+                </View>       
+              </ListItem.Content>
+            </ListItem.Swipeable>
+          ))}
+    </View>
+  </ScrollView>
+    
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10 , height: 70 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <CheckBox
+          left
+          iconType="material-community"
+          checkedIcon="checkbox-outline"
+          uncheckedIcon={'checkbox-blank-outline'}
+          title="All"
+          style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight:'bold', color:'black'}}
+          containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color:'black' }}
+          checked={isAllChecked()} // Check if all items are checked
+          onPress={handleCheckAllToggle}/>
+          <Text style = {{fontWeight:'bold', color:'black'}}>Total Price: ${totalPrice.toFixed(2)}</Text>
       </View>
 
+      <Button style={{borderRadius: 10, backgroundColor:'#044537'}} title="Checkout" onPress={() => { checkout();}} />
     </View>
+  </View>
   );
 };

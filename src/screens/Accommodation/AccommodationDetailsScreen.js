@@ -8,7 +8,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
-import { getAccommodation } from '../../redux/reduxAccommodation';
+import {getAccommodation, toggleSaveAccommodation} from '../../redux/reduxAccommodation';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
@@ -24,6 +24,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     // const [quantityByRoomType, setQuantityByRoomType] = useState({});
     // const [seasonalActivity, setSeasonalActivity] = useState([]);
     const route = useRoute();
+    const [isSaved, setIsSaved] = useState(false);
+
     const { accommodationId } = route.params;
 
     async function fetchUser() {
@@ -243,12 +245,69 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             ;
     }
 
+    useEffect(() => {
+        if (user) {
+            let saved = false;
+            for (var i = 0; i < user.accommodation_list.length; i++) {
+                if(user.accommodation_list[i].accommodation_id === accommodationId) {
+                    saved = true;
+                    break;
+                }
+            }
+            setIsSaved(saved);
+        }
+    }, [user])
+
+    // add to saved listing
+    const save = async () => {
+        let response = await toggleSaveAccommodation(user.user_id, accommodation.accommodation_id);
+        console.log('toggle res', response.data)
+        if (response.status) {
+            if (!isSaved) {
+                setIsSaved(true);
+                let obj = {
+                    ...user,
+                    accommodation_list: response.data
+                }
+                await storeUser(obj);
+                fetchUser();
+                Toast.show({
+                    type: 'success',
+                    text1: 'Accommodation has been saved!'
+                });
+            } else {
+                setIsSaved(false);
+                let obj = {
+                    ...user,
+                    accommodation_list: response.data
+                }
+
+                await storeUser(obj);
+                fetchUser();
+                Toast.show({
+                    type: 'success',
+                    text1: 'Accommodation has been unsaved!'
+                });
+            }
+
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: response.info
+            })
+        }
+    }
+
     return (
         <Background>
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
                         {accommodation.name}
+                        <Button mode="text" style={{ marginTop: -10}} onPress={save} >
+                            {isSaved && <Icon name="heart" size={20} color='red' />}
+                            {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                        </Button>
                     </Card.Title>
 
                     <View style={{ flexDirection: 'row' }}>

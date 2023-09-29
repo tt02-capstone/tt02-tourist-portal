@@ -77,8 +77,8 @@ export const Layout = () => {
 
                         <Stack.Screen name="AttractionScreen" component={AttractionScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
-                        <Stack.Screen name="AccommodationScreen" component={AccommodationScreen} options={{ title : 'Attractions' }} />
-                        <Stack.Screen name="AccommodationDetailsScreen" component={ AccommodationDetailsScreen} options={{ title : 'Attractions' }} />
+                        <Stack.Screen name="AccommodationScreen" component={AccommodationScreen} options={{ title : 'Accommodations' }} />
+                        <Stack.Screen name="AccommodationDetailsScreen" component={ AccommodationDetailsScreen} options={{ title : 'Accommodations' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />

@@ -31,6 +31,7 @@
     "react-dom": "18.2.0",
     "react-native": "^0.72.4",
     "react-native-common-date-picker": "^2.3.9",
+    "react-native-elements": "^3.4.3",
     "react-native-image-picker": "^7.0.0",
     "react-native-international-phone-number": "^0.5.2",
     "react-native-paper": "^5.10.3",

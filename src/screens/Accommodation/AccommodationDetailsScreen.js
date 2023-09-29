@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 import CartButton from '../../components/Button';
 import { theme } from '../../core/theme'
 import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
@@ -145,7 +145,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         text1: 'Please select a future date!'
                     })
                 } else {
-                    
+
                     for (const room of selectedRooms) {
                         let cartBooking = {
                             activity_name: accommodation.name,
@@ -361,28 +361,36 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                 </Card>
 
-                {formattedRoomList.map((item) => (
+                {roomList.map((item) => (
                     <Card key={item.room_type} containerStyle={styles.roomCard}>
-                        <Card.Title style={styles.header}>{item.room_type}</Card.Title>
-
-                        <Text style={styles.details}>
-                            <Text style={styles.boldText}>Amenities:</Text>{' '}
-                            {item.amenities_description}
-                        </Text>
-                        <Text style={styles.details}>
-                            <Text style={styles.boldText}>Capacity:</Text>{' '}
-                            {item.num_of_pax}
-                        </Text>
-                        <Text style={styles.details}>
-                            <Text style={styles.boldText}>Price per Night:</Text>{' '}
-                            ${item.price}
-                        </Text>
-                        <Text style={styles.details}>
-                            <Text style={styles.boldText}>Available Rooms:</Text>{' '}
-                            {item.available_rooms || 0}
-                        </Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Image
+                                source={{ uri: item.room_image }}
+                                style={styles.roomImage}
+                            />
+                            <View style={{ flex: 1, marginLeft: 10 }}>
+                                <Card.Title style={styles.header}>{item.room_type}</Card.Title>
+                                <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Amenities:</Text>{' '}
+                                    {item.amenities_description}
+                                </Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Capacity:</Text>{' '}
+                                    {item.num_of_pax}
+                                </Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Price per Night:</Text>{' '}
+                                    ${item.price}
+                                </Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Available Rooms:</Text>{' '}
+                                    {item.available_rooms || 0}
+                                </Text>
+                            </View>
+                        </View>
                     </Card>
                 ))}
+
 
 
                 <Card containerStyle={styles.dropBorder}>
@@ -472,6 +480,9 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 30, height: 30, marginRight: 10,
+    },
+    roomImage: {
+        width: 100, height: 100, marginRight: 10,
     },
     name: {
         fontSize: 16, marginTop: 5,

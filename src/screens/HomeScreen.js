@@ -28,6 +28,10 @@ export const HomeScreen = ({ navigation }) => {
     navigation.navigate('AttractionScreen')
   }
 
+  const viewRestaurant = () => {
+    navigation.navigate('RestaurantScreen')
+  }
+
   const viewTelecoms = () => {
     navigation.navigate('TelecomScreen')
   }
@@ -91,7 +95,7 @@ export const HomeScreen = ({ navigation }) => {
               Indulge your taste buds in Singapore's vibrant culinary scene, where a myriad of restaurants await to
               delight your palate. Come and savor the extraordinary culinary delights that await you!
             </Text>
-            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewRestaurant} />
           </Card>
 
           <Card>
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   description: {
-    marginBottom: 10, fontSize: 13, marginTop: 10
+    marginBottom: 10, fontSize: 12, marginTop: 10
   },
   button: {
     width: '92%',

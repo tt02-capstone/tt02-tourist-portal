@@ -33,6 +33,8 @@ import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
 import DealScreen from "./src/screens/Deal/DealScreen";
 import DealDetailsScreen from "./src/screens/Deal/DealDetailsScreen";
+import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
+import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -79,6 +81,8 @@ export const Layout = () => {
                         <Stack.Screen name="TelecomDetailsScreen" component={TelecomDetailsScreen} options={{ title : 'Telecoms' }} />
                         <Stack.Screen name="DealScreen" component={DealScreen} options={{ title : 'Deals' }} />
                         <Stack.Screen name="DealDetailsScreen" component={DealDetailsScreen} options={{ title : 'Deal' }} />
+                        <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
+                        <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />

@@ -31,6 +31,8 @@ import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
 import { enGB,en, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
+import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
+import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -75,6 +77,8 @@ export const Layout = () => {
                         <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="TelecomScreen" component={TelecomScreen} options={{ title : 'Telecoms' }} />
                         <Stack.Screen name="TelecomDetailsScreen" component={TelecomDetailsScreen} options={{ title : 'Telecoms' }} />
+                        <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
+                        <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />

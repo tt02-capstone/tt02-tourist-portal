@@ -6,6 +6,7 @@ import { View, ScrollView, StyleSheet, Image, TouchableOpacity, useWindowDimensi
 import { Text, Card, Icon } from '@rneui/themed';
 import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
 import { getSavedAttractionList, deleteSavedAttraction } from '../../redux/reduxAttraction';
+import { getAllSavedRestaurantForUser, removeSavedRestaurantForUser } from '../../redux/restaurantRedux';
 import { getUserSavedTelecom, toggleSaveTelecom } from '../../redux/telecomRedux';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
@@ -23,7 +24,7 @@ const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) 
                             <Card.Image
                                 style={{ padding: 0}}
                                 source={{
-                                uri: item.attraction_image_list[0] // KIV for image 
+                                uri: item.attraction_image_list[0] 
                                 }}
                             />
 
@@ -46,8 +47,40 @@ const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) 
     </Background>
 );
 
-const RestaurantRoute = () => (
-    <View style={{ flex: 1, backgroundColor: 'white' }} />
+const RestaurantRoute = ({data, removeListing, viewListing, getColorForType}) => (
+    <Background>
+        <ScrollView>
+            <View style={styles.container}>
+                { 
+                    data.map((item, index) => (
+                        <Card key={index}>
+                            <Card.Title style={styles.header}>
+                                {item.name} 
+                            </Card.Title>
+                            <Card.Image
+                                style={{ padding: 0}}
+                                source={{
+                                    uri: item.restaurant_image_list[0] 
+                                }}
+                            />
+
+                            <Text style={styles.description}>{item.description}</Text>
+                            <View style={{ flexDirection: 'row'}}>
+                                <Text style={[styles.tag, {backgroundColor:getColorForType(item.restaurant_type)}]}>{item.restaurant_type}</Text>
+                                <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'row'}}>
+                                <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeListing(item.restaurant_id)} />
+                                <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewListing(item.restaurant_id)}/>
+                            </View>
+
+                        </Card>
+                    )) 
+                }
+            </View>
+        </ScrollView>
+    </Background>
 );
 
 const AccomodationRoute = () => (
@@ -131,6 +164,9 @@ const SavedListingScreen = ({ navigation }) => {
     const [telecomData, setTelecomData] = useState([]);
     const [fetchData, setFetchData] = useState(true);
 
+    // restaurant 
+    const [restData, setRestData] = useState([]);
+
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
         { key: 'first', title: 'Attraction' },
@@ -148,6 +184,9 @@ const SavedListingScreen = ({ navigation }) => {
     async function updateData() {
         const savedAttractions = await getSavedAttractionList(user.user_id);
         setData(savedAttractions);
+
+        const savedRest = await getAllSavedRestaurantForUser(user.user_id);
+        setRestData(savedRest.data)
     }
 
     useEffect(() => {
@@ -164,18 +203,24 @@ const SavedListingScreen = ({ navigation }) => {
                     if (telecomResponse.status) {
                         setTelecomData(telecomResponse.data);
                     }
-                    
+
+                    let savedRest = await getAllSavedRestaurantForUser(userData.user_id);
+                    if (savedRest.status) {
+                        setRestData(savedRest.data);
+                    } 
+
                     setFetchData(false);
                 }
 
             } catch (error) {
-                alert ('An error occur! Failed to retrieve saved attraction listing!');
+                alert ('An error occur! Failed to retrieve saved listing!');
             }    
         };
         fetchUser();
         fetchData();
     }, [fetchData, isFocused]);
 
+    // attractions 
     const getColorForType = (label) => {
         const labelColorMap = {
           'HISTORICAL': 'lightblue',
@@ -212,6 +257,7 @@ const SavedListingScreen = ({ navigation }) => {
         }
     }
 
+    // telecom
     const viewTelecomListing = (id) => {
         navigation.navigate('TelecomDetailsScreen', {id: id});
     }
@@ -237,6 +283,42 @@ const SavedListingScreen = ({ navigation }) => {
         }
     }
 
+    // restaurant 
+    const getColorForTypeRest = (label) => {
+        const labelColorMap = {
+            'KOREAN': 'lightblue',
+            'MEXICAN': 'lightgreen',
+            'CHINESE': 'orange',
+            'WESTERN' : 'yellow',
+            'FAST_FOOD' : 'turquoise',
+            'JAPANESE' : 'lightpink'
+          };
+  
+        return labelColorMap[label] || 'gray';
+    };
+
+    const viewRestListing = (restId) => {
+        navigation.navigate('RestaurantDetailsScreen', {restId : restId}); // redirect to rest
+    }
+
+    const removeRestListing = async (restId) => {
+        let response = await removeSavedRestaurantForUser(user.user_id, restId)
+        if (response.status) {
+            fetchUser();
+            Toast.show({
+                type: 'success',
+                text1: 'Listing has been removed!'
+            });
+
+            updateData();
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: response.info
+            })
+        }
+    }
+
     return (
         <TabView
             navigationState={{ index, routes }}
@@ -245,7 +327,7 @@ const SavedListingScreen = ({ navigation }) => {
                     case 'first':
                         return <AttractionRoute data={data} removeListing={removeListing} viewListing={viewListing}  getColorForType={getColorForType}/>;
                     case 'second':
-                        return <RestaurantRoute />;
+                        return <RestaurantRoute data={restData} removeListing={removeRestListing} viewListing={viewRestListing} getColorForType={getColorForTypeRest} />;
                     case 'third':
                         return <AccomodationRoute />;
                     case 'fourth':
@@ -304,7 +386,8 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     button: {
-        width: "50%"
+        width: "50%",
+        
     }
 });
 

@@ -147,8 +147,13 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     cartItems.push({
                         type: "TOUR",
                         activity_selection: `${selectedTourType.name} (${formatTime(tour.start_time)} - ${formatTime(tour.end_time)})`,
-                        quantity: 1,
-                        price: (selectedTourType.price * noOfPax),
+                        // my logic is to just store the noofpax as the quantity then adjust it accordingly on the cart side anyways u will need tat no. later on as well
+                        // and this num is dependent on how many tickets they gonna buy 
+                        // then for the price just take the per pax price so it will be easier to muniplate on the cart side 
+                        // quantity: 1
+                        quantity: noOfPax,
+                        // price: (selectedTourType.price * noOfPax),
+                        price: (selectedTourType.price),
                         start_datetime: formattedDate,
                         end_datetime: formattedDate,
                     });
@@ -156,8 +161,10 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     tourCartItems.push({
                         type: "TOUR",
                         activity_selection: `${selectedTourType.name} (${formatTime(tour.start_time)} - ${formatTime(tour.end_time)})`,
-                        quantity: 1,
-                        price: (selectedTourType.price * noOfPax),
+                        // quantity: 1,
+                        quantity: noOfPax,
+                        // price: (selectedTourType.price * noOfPax),
+                        price: (selectedTourType.price),
                         start_datetime: formattedDate,
                         end_datetime: formattedDate,
                     });
@@ -291,12 +298,12 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttrTicketList(attraction.ticket_per_day_list);
 
             let activity = await getSeasonalActivity(attractionId);
-            if (activity != []) {
+            if (activity.length != 0) {
                 setSeasonalActivity(activity); // get seasonal
             }
 
-            let reccoms = await getAttractionRecommendation(attractionId);
-            setRecommendation(reccoms)
+            // let reccoms = await getAttractionRecommendation(attractionId);
+            // setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();
@@ -347,13 +354,16 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const fetchTours = async () => {
         try {
             if (selectedDate != undefined) {
+                console.log('in ttour')
                 setLoading(true);
                 let response = await getAllTourTypesByAttraction(attractionId, selectedDate);
                 setTours(response.data);
                 setLoading(false);
+
+                console.log(response)
             }
         } catch (error) {
-            alert('An error occurred! Failed to retrieve tours list!');
+            // alert('An error occurred! Failed to retrieve tours list!');
             setLoading(false);
         }
     }

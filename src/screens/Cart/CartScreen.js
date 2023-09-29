@@ -145,6 +145,13 @@ export const CartScreen = ({navigation}) => {
   };
 
   const updateQuantity = (cartItemIndex, itemIndex, delta) => {
+    let tourPrice = 0
+
+    if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
+      tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
+      let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
+      cartItems[cartItemIndex].tour[0].quantity = oldQ + delta; // update per pax for tours 
+    }
 
     // Update the cart items with new quantity for the specified ticket type
     const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
@@ -155,10 +162,12 @@ export const CartScreen = ({navigation}) => {
       // deal w the pricing change 
       const price = parseFloat(cartItems[cartItemIndex].items[itemIndex].price)
       const difference = price * delta; // get the change either +ve or - ve
-      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference; // new total price for the list item 
+      const tourDiff = tourPrice * delta 
+      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference + parseFloat(tourDiff); // new total price for the list item 
       cartItems[cartItemIndex].price = newTotalPrice.toFixed(2).toString(); // set it back to 2 dp and set as string 
 
       setCartItems([...cartItems]);
+
     }
 
     // Clear any pending API call

@@ -71,15 +71,33 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             })
         } else {
             // format date
+            // const checkInDate = new Date(range.startDate);
+            // checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
+            // const checkInDateInLocalDateTime = checkInDate.toISOString();
+
+            // const checkOutDate = new Date(range.endDate);
+            // checkOutDate.setDate(checkOutDate.getDate()); // as datepicker is giving 1 day before
+            // const checkOutDateInLocalDateTime = checkOutDate.toISOString();
+
+            // console.log("checkInDateInLocalDateTime", checkInDateInLocalDateTime);
+            // console.log("checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
+
+            const checkInTime = accommodation.check_in_time.split('T')[1];
+            const checkOutTime = accommodation.check_out_time.split('T')[1];
+
+            console.log("checkInTime", checkInTime);
+            console.log("checkOutTime", checkOutTime);
+
             const checkInDate = new Date(range.startDate);
             checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
-            const checkInDateInLocalDateTime = checkInDate.toISOString();
+            const checkInDateInLocalDateTime = `${checkInDate.toISOString().split('T')[0]}T${checkInTime}Z`;
 
             const checkOutDate = new Date(range.endDate);
-            checkOutDate.setDate(checkOutDate.getDate() + 1); // as datepicker is giving 1 day before
-            const checkOutDateInLocalDateTime = checkOutDate.toISOString();
+            checkOutDate.setDate(checkOutDate.getDate());
+            const checkOutDateInLocalDateTime = `${checkOutDate.toISOString().split('T')[0]}T${checkOutTime}Z`;
 
-            console.log("formattedRoomList", formattedRoomList);
+            console.log("ADDTOCART checkInDateInLocalDateTime", checkInDateInLocalDateTime);
+            console.log("ADDTOCART checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
 
             for (const roomType in quantityByRoomType) {
 
@@ -127,6 +145,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         text1: 'Please select a future date!'
                     })
                 } else {
+                    
                     for (const room of selectedRooms) {
                         let cartBooking = {
                             activity_name: accommodation.name,
@@ -203,7 +222,12 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             const price = room.price;
             const roomCount = room.quantity;
 
-            let available_rooms = 0;
+            console.log("accommodation.check_in_time", accommodation.check_in_time);
+            const checkInTime = accommodation.check_in_time.split('T')[1];
+            const checkOutTime = accommodation.check_out_time.split('T')[1];
+
+            console.log("checkInTime", checkInTime);
+            console.log("checkOutTime", checkOutTime);
 
             if (range.startDate && range.endDate) {
                 console.log("range.startDate", range.startDate);
@@ -211,15 +235,14 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                 const checkInDate = new Date(range.startDate);
                 checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
-                const checkInDateInLocalDateTime = checkInDate.toISOString();
+                const checkInDateInLocalDateTime = `${checkInDate.toISOString().split('T')[0]}T${checkInTime}Z`;
 
                 const checkOutDate = new Date(range.endDate);
-                checkOutDate.setDate(checkOutDate.getDate() + 1); // as datepicker is giving 1 day before
-                const checkOutDateInLocalDateTime = checkOutDate.toISOString();
+                checkOutDate.setDate(checkOutDate.getDate());
+                const checkOutDateInLocalDateTime = `${checkOutDate.toISOString().split('T')[0]}T${checkOutTime}Z`;
 
-                // console.log("selectedDateInLocalDateTime", selectedDateInLocalDateTime);
-                // console.log ("accommodation.accommodation_id", accommodation.accommodation_id);
-                // console.log ("room.room_type", room.room_type);
+                console.log("HERE checkInDateInLocalDateTime", checkInDateInLocalDateTime);
+                console.log("HERE checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
 
                 try {
                     const response = await getMinAvailableRoomsOnDateRange(accommodation.accommodation_id, room.room_type, checkInDateInLocalDateTime, checkOutDateInLocalDateTime);

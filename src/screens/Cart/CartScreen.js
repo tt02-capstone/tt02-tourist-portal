@@ -28,6 +28,28 @@ export const CartScreen = ({ navigation }) => {
     return formattedDate;
   }
 
+  function formatCheckInDateTime(accommodation, date) {
+    const checkInTime = accommodation.check_in_time.split('T')[1];
+
+    const checkInDate = new Date(date);
+    checkInDate.setDate(checkInDate.getDate()); 
+    const checkInDateInLocalDateTime = `${checkInDate.toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' })}`;
+
+    return checkInDateInLocalDateTime;
+  }
+
+  function formatCheckOutDateTime(accommodation, date) {
+    const checkOutTime = accommodation.check_out_time.split('T')[1];
+
+    const checkOutDate = new Date(date);
+    checkOutDate.setDate(checkOutDate.getDate());
+    
+    const options = { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' };
+    const checkOutDateInLocalDateTime = `${checkOutDate.toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' })}`;
+
+    return checkOutDateInLocalDateTime;
+}
+
   const checkout = async () => {
     const booking_ids = [];
     const selectedCartItems = [];
@@ -247,8 +269,12 @@ export const CartScreen = ({ navigation }) => {
             } else if (detail.type === 'ACCOMMODATION') {
               try {
                 const accommodation = await retrieveAccommodationByRoom(detail.room.room_id);
-                console.log("accommodation HERE", accommodation);
-                console.log("detail.room.room_image", detail.room.room_image);
+
+                console.log("startTime HERE", detail.start_datetime);
+                console.log("endTime HERE", detail.end_datetime);
+
+                console.log("formatCheckInDateTime HERE", formatCheckInDateTime(accommodation, detail.start_datetime));
+                console.log("formatCheckOutDateTime HERE", formatCheckOutDateTime(accommodation, detail.end_datetime));
 
                 return {
                   id: parseInt(detail.cart_booking_id),
@@ -257,8 +283,8 @@ export const CartScreen = ({ navigation }) => {
                   image: detail.room.room_image,
                   item_name: detail.activity_name,
                   activity_name: detail.activity_name,
-                  startTime: formatDateAndTime(detail.start_datetime),
-                  endTime: formatDateAndTime(detail.end_datetime),
+                  startTime: formatCheckInDateTime(accommodation, detail.start_datetime),
+                  endTime: formatCheckOutDateTime(accommodation, detail.end_datetime),
                   items: detail.cart_item_list,
                   price: subtotal.toFixed(2),
                   quantity: quantities,
@@ -423,15 +449,15 @@ export const CartScreen = ({ navigation }) => {
                         <Text style={{ marginLeft: 5, marginTop: 2, fontSize: 10 }}>{item.quantity} </Text>
 
                         {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
-                            borderRadius: 15, marginLeft: 5, marginBottom: 8
-                          }}
-                          onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
-                        >
-                          <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
-                        </TouchableOpacity>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                              borderRadius: 15, marginLeft: 5, marginBottom: 8
+                            }}
+                            onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
+                          >
+                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
+                          </TouchableOpacity>
                         )}
                       </View>
                     ))}

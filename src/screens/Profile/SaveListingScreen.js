@@ -10,6 +10,7 @@ import { getAllSavedRestaurantForUser, removeSavedRestaurantForUser } from '../.
 import { getUserSavedTelecom, toggleSaveTelecom } from '../../redux/telecomRedux';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import {getUserSavedDeal, toggleSaveDeal} from "../../redux/dealRedux";
 
 const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) => (
     <Background>
@@ -24,7 +25,7 @@ const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) 
                             <Card.Image
                                 style={{ padding: 0}}
                                 source={{
-                                uri: item.attraction_image_list[0] 
+                                uri: item.attraction_image_list[0]
                                 }}
                             />
 
@@ -51,16 +52,16 @@ const RestaurantRoute = ({data, removeListing, viewListing, getColorForType}) =>
     <Background>
         <ScrollView>
             <View style={styles.container}>
-                { 
+                {
                     data.map((item, index) => (
                         <Card key={index}>
                             <Card.Title style={styles.header}>
-                                {item.name} 
+                                {item.name}
                             </Card.Title>
                             <Card.Image
                                 style={{ padding: 0}}
                                 source={{
-                                    uri: item.restaurant_image_list[0] 
+                                    uri: item.restaurant_image_list[0]
                                 }}
                             />
 
@@ -76,7 +77,7 @@ const RestaurantRoute = ({data, removeListing, viewListing, getColorForType}) =>
                             </View>
 
                         </Card>
-                    )) 
+                    ))
                 }
             </View>
         </ScrollView>
@@ -140,8 +141,88 @@ const TelecomRoute = ({data, viewTelecomListing, removeTelecomListing}) => (
     </Background>
 );
 
-const DealRoute = () => (
-    <View style={{ flex: 1, backgroundColor: 'white' }} />
+function formatDealType(text) {
+    if (text === 'CHINESE_NEW_YEAR') {
+        return " CHINESE NEW YEAR"
+    } else if (text === 'NATIONAL_DAY') {
+        return "NATIONAL DAY"
+    } else if (text === 'DEEPAVALLI') {
+        return "DEEPAVALLI"
+    } else if (text === 'NUS_WELLBEING_DAY') {
+        return "NUS WELLBEING DAY"
+    } else if (text === 'SINGLES_DAY') {
+        return "SINGLES DAY"
+    } else if (text === 'VALENTINES') {
+        return "VALENTINES"
+    } else if (text === 'HARI_RAYA') {
+        return "HARI RAYA"
+    } else if (text === 'NEW_YEAR_DAY') {
+        return "NEW YEAR DAY"
+    } else if (text === 'BLACK_FRIDAY') {
+        return "BLACK FRIDAY"
+    } else if (text === 'CHRISTMAS') {
+        return "CHRISTMAS"
+    } else if (text === 'GOVERNMENT') {
+        return "GOVERNMENT"
+    } else {
+        return text
+    }
+}
+
+const formatDate = (date) => {
+    let inputDate = new Date(date);
+    let day = inputDate.getDate().toString().padStart(2, '0');
+    let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
+    let year = inputDate.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+const DealRoute = ({userType, data, removeDealListing}) => (
+    <Background>
+        <ScrollView>
+            <View style={styles.container}>
+                {data.map((item, index) => {
+                    if ((userType === 'TOURIST' && !item.is_govt_voucher) || userType === 'LOCAL') {
+                        return (
+                            <Card key={index}>
+                                <Card.Title style={styles.header}>
+                                    {item.promo_code ? item.promo_code : 'NO PROMO CODE REQUIRED'}
+                                </Card.Title>
+                                {item.deal_image_list.length > 0 ? (
+                                    <Card.Image
+                                        style={{ padding: 0, height: 200 }}
+                                        source={{
+                                            uri: item.deal_image_list[0] // KIV for image
+                                        }}
+                                    />
+                                ) : null}
+
+
+                                <Text style={styles.description}>
+                                    <Text style={{ fontWeight: 'bold' }}>Start Date:</Text>  {formatDate(item.start_datetime)} {'\n'} {'\n'}
+                                    <Text style={{ fontWeight: 'bold' }}>End Date:</Text> {formatDate(item.end_datetime)} {'\n'} {'\n'}
+                                    <Text style={{ fontWeight: 'bold' }}>Promo Code:</Text> {item.promo_code}
+                                </Text>
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', fontWeight: 'bold' }]}>
+                                        {item.discount_percent} % for GRABS
+                                    </Text>
+                                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>
+                                        {formatDealType(item.deal_type)}
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                                    <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeDealListing(item.deal_id)} />
+                                </View>
+                            </Card>
+                        );
+                    } else {
+                        return null;
+                    }
+                })}
+            </View>
+        </ScrollView>
+    </Background>
 );
 
 const renderScene = SceneMap({
@@ -159,12 +240,16 @@ const SavedListingScreen = ({ navigation }) => {
 
     // attraction
     const [data, setData] = useState([]);
-    
+
+    //deal
+    const [dealData, setDealData] = useState([]);
+
     // telecom
     const [telecomData, setTelecomData] = useState([]);
     const [fetchData, setFetchData] = useState(true);
+    const [userType, setUserType] = useState('');
 
-    // restaurant 
+    // restaurant
     const [restData, setRestData] = useState([]);
 
     const [index, setIndex] = React.useState(0);
@@ -179,6 +264,7 @@ const SavedListingScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
+        setUserType(await getUserType());
     }
 
     async function updateData() {
@@ -204,10 +290,16 @@ const SavedListingScreen = ({ navigation }) => {
                         setTelecomData(telecomResponse.data);
                     }
 
+                    let dealResponse = await getUserSavedDeal(userData.user_id);
+                    if (dealResponse.status) {
+                        setDealData(dealResponse.data);
+                    }
+
+
                     let savedRest = await getAllSavedRestaurantForUser(userData.user_id);
                     if (savedRest.status) {
                         setRestData(savedRest.data);
-                    } 
+                    }
 
                     setFetchData(false);
                 }
@@ -220,7 +312,7 @@ const SavedListingScreen = ({ navigation }) => {
         fetchData();
     }, [fetchData, isFocused]);
 
-    // attractions 
+    // attractions
     const getColorForType = (label) => {
         const labelColorMap = {
           'HISTORICAL': 'lightblue',
@@ -283,7 +375,7 @@ const SavedListingScreen = ({ navigation }) => {
         }
     }
 
-    // restaurant 
+    // restaurant
     const getColorForTypeRest = (label) => {
         const labelColorMap = {
             'KOREAN': 'lightblue',
@@ -293,7 +385,7 @@ const SavedListingScreen = ({ navigation }) => {
             'FAST_FOOD' : 'turquoise',
             'JAPANESE' : 'lightpink'
           };
-  
+
         return labelColorMap[label] || 'gray';
     };
 
@@ -319,6 +411,27 @@ const SavedListingScreen = ({ navigation }) => {
         }
     }
 
+    //deal
+    const removeDealListing = async (id) => {
+        let response = await toggleSaveDeal(user.user_id, id);
+        if (response.status) {
+            let obj = {
+                ...user,
+                deals_list: response.data
+            }
+            await storeUser(obj);
+            fetchUser();
+            setFetchData(true);
+            Toast.show({
+                type: 'success',
+                text1: 'Deal has been removed!'
+            });
+
+            updateData();
+        } else {
+            console.log("Deal not removed!");
+        }
+    }
     return (
         <TabView
             navigationState={{ index, routes }}
@@ -333,7 +446,7 @@ const SavedListingScreen = ({ navigation }) => {
                     case 'fourth':
                         return <TelecomRoute data={telecomData} viewTelecomListing={viewTelecomListing} removeTelecomListing={removeTelecomListing} />;
                     case 'fifth':
-                        return <DealRoute />;
+                        return <DealRoute userType={userType} data={dealData} removeDealListing={removeDealListing} />;
                     default:
                         return null;
                 }
@@ -387,7 +500,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: "50%",
-        
+
     }
 });
 

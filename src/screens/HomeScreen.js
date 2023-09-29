@@ -36,6 +36,10 @@ export const HomeScreen = ({ navigation }) => {
     navigation.navigate('TelecomScreen')
   }
 
+  const viewDeals = () => {
+    navigation.navigate('DealScreen')
+  }
+
   const onLogoutPressed = async () => {
     await clearStorage();
     await authContext.logout();
@@ -121,7 +125,7 @@ export const HomeScreen = ({ navigation }) => {
               Unlock unbeatable deals and discounts that add extra value to your Singapore journey. Don't miss out
               on the chance to save while indulging in the best Singapore can offer!
             </Text>
-            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewDeals} />
           </Card>
 
           <Button

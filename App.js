@@ -31,6 +31,8 @@ import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
 import { enGB,en, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
+import DealScreen from "./src/screens/Deal/DealScreen";
+import DealDetailsScreen from "./src/screens/Deal/DealDetailsScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
 
@@ -77,6 +79,8 @@ export const Layout = () => {
                         <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="TelecomScreen" component={TelecomScreen} options={{ title : 'Telecoms' }} />
                         <Stack.Screen name="TelecomDetailsScreen" component={TelecomDetailsScreen} options={{ title : 'Telecoms' }} />
+                        <Stack.Screen name="DealScreen" component={DealScreen} options={{ title : 'Deals' }} />
+                        <Stack.Screen name="DealDetailsScreen" component={DealDetailsScreen} options={{ title : 'Deal' }} />
                         <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />

@@ -7,6 +7,7 @@ import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { getAccommodation, getNumOfBookingsOnDate, getMinAvailableRoomsOnDateRange } from '../../redux/reduxAccommodation';
 import { useRoute } from '@react-navigation/native';
@@ -61,10 +62,10 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         const cartItems = [];
         const selectedRooms = [];
         const user_type = user.user_type;
-        const user_email = user.email;
+        const tourist_email = user.email;
         const activity_name = accommodation.name;
 
-        if (!startDate && !endDate) { // check if date is selected 
+        if (!range.startDate && !range.endDate) { // check if date is selected 
             Toast.show({
                 type: 'error',
                 text1: "Please Select a Booking Date!"
@@ -86,17 +87,19 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         activity_selection: roomType,
                         quantity: quantityByRoomType[roomType],
                         price: formattedRoomList.find(item => item.room_type === roomType).price, // price per ticket
-                        start_datetime: formattedDate,
-                        end_datetime: formattedDate,
+                        start_datetime: checkInDate,
+                        end_datetime: checkOutDate,
                     });
 
-                    // edit this chunk till 90, after editing the else block
+                    // removed as i don't use smthg similar to checkTicketInventory
+                    // for ticket, this was ticket type entity
                     selectedRooms.push({
-                        ticket_per_day_id: formattedPriceList.find(item => item.ticket_type === roomType).ticket_type_id,
+                        room_id: formattedRoomList.find(item => item.room_type === roomType).room_id,
+                        // amenities description
+                        // num of pax
+                        //ticket_price: formattedPriceList.find(item => item.ticket_type === roomType).amount // price per ticket 
                         room_type: roomType,
-                        ticket_date: formattedDate,
-                        ticket_count: quantityByRoomType[roomType],
-                        ticket_price: formattedPriceList.find(item => item.ticket_type === roomType).amount // price per ticket 
+                        quantity: quantityByRoomType[roomType],
                     });
 
                 }
@@ -108,29 +111,35 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                     text1: "Please Select your Room Quantity!"
                 })
 
-                // haven't looked at this chunk
+
             } else {  // when both ticket date + ticket types are selected 
-                let checkInventory = await checkTicketInventory(accommodation.accommodation_id, formattedDate, selectedRooms);
+
+                // already checked using getMinAvailableRoomsOnDateRange and disabling button if they try to select more than available rooms
+                // let checkInventory = await checkTicketInventory(accommodation.accommodation_id, formattedDate, selectedRooms);
+
                 // current date check 
                 const currentDate = new Date();
-
                 const year = currentDate.getFullYear();
                 const month = String(currentDate.getMonth() + 1).padStart(2, '0');
                 const day = String(currentDate.getDate()).padStart(2, '0');
                 const dateNow = `${year}-${month}-${day}`;
 
-                if (dateNow > formattedDate) { // check for date selected since UI cant block dates before tdy
+                if (dateNow > checkInDate) { // check for date selected since UI cant block dates before tdy
                     Toast.show({
                         type: 'error',
                         text1: 'Date selected should be today or after!'
                     })
-                } else if (checkInventory.status) {
-                    Toast.show({
-                        type: 'error',
-                        text1: checkInventory.error
-                    })
-                } else {
-                    const response = await cartApi.post(`/addCartItems/${user_type}/${user_email}/${activity_name}`, cartItems);
+                }
+                // no more checkinventory
+                // else if (checkInventory.status) {
+                //     Toast.show({
+                //         type: 'error',
+                //         text1: checkInventory.error
+                //     })
+
+                // } 
+                else {
+                    const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
                     console.log(response.data.httpStatusCode)
                     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
                         Toast.show({
@@ -139,7 +148,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         });
                     } else {
                         console.log('success', response.data)
-                        setSelectedDate(null); // must have = use this to reset date selection 
+                        setRange({ startDate: undefined, endDate: undefined }); // must have = use this to reset date selection 
                         setQuantityByRoomType(0) // must have = reset the quantity as well to 0 
                         if (response.data) {
                             Toast.show({
@@ -200,7 +209,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 const checkInDate = new Date(range.startDate);
                 checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
                 const checkInDateInLocalDateTime = checkInDate.toISOString();
-    
+
                 const checkOutDate = new Date(range.endDate);
                 checkOutDate.setDate(checkOutDate.getDate() + 1); // as datepicker is giving 1 day before
                 const checkOutDateInLocalDateTime = checkOutDate.toISOString();
@@ -236,7 +245,20 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         setFormattedRoomList(formattedRoomList);
     };
 
-
+    const renderRoomType = ({ item }) => {
+        return (
+            <View style={styles.roomTypeContainer}>
+                <Text style={styles.roomTypeName}>{item.room_type}</Text>
+                <Text style={styles.roomTypeDescription}>
+                    {item.amenities_description} | {item.num_of_pax} guests
+                </Text>
+                <Text style={styles.roomTypePrice}>Price: ${item.price}</Text>
+                <Text style={styles.roomTypeAvailability}>
+                    Available: {item.available_rooms || 0}
+                </Text>
+            </View>
+        );
+    };
 
     useEffect(() => {
         fetchAccommodation(); // when the page load the first time
@@ -245,15 +267,23 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     const onDismiss = useCallback(() => {
         setOpen(false);
-      }, [setOpen]);
-    
-     const onConfirm = useCallback(
+    }, [setOpen]);
+
+    const onConfirm = useCallback(
         ({ startDate, endDate }) => {
-          setOpen(false);
-          setRange({ startDate, endDate });
+            if (startDate && endDate) {
+                setOpen(false);
+                setRange({ startDate, endDate });
+            } else {
+                onDismiss();
+                Toast.show({
+                    type: 'error',
+                    text1: 'Both start and end dates must be selected.'
+                })
+            }
         },
         [setOpen, setRange]
-      );
+    );
 
     function formatLocalDateTime(localDateTimeString) {
         const dateTime = new Date(localDateTimeString);
@@ -304,22 +334,34 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                 </Card>
 
+                {formattedRoomList.map((item) => (
+                    <Card key={item.room_type} containerStyle={styles.roomCard}>
+                        <Card.Title style={styles.header}>{item.room_type}</Card.Title>
+
+                        <Text style={styles.details}>
+                            <Text style={styles.boldText}>Amenities:</Text>{' '}
+                            {item.amenities_description}
+                        </Text>
+                        <Text style={styles.details}>
+                            <Text style={styles.boldText}>Capacity:</Text>{' '}
+                            {item.num_of_pax}
+                        </Text>
+                        <Text style={styles.details}>
+                            <Text style={styles.boldText}>Price per Night:</Text>{' '}
+                            ${item.price}
+                        </Text>
+                        <Text style={styles.details}>
+                            <Text style={styles.boldText}>Available Rooms:</Text>{' '}
+                            {item.available_rooms || 0}
+                        </Text>
+                    </Card>
+                ))}
+
+
                 <Card containerStyle={styles.dropBorder}>
                     <Card.Title style={styles.header}>
-                        Rooms
+                        Book a Room
                     </Card.Title>
-
-                    {/* <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
-                        <DatePickerInput
-                            locale='en-GB'
-                            format
-                            label="Room Booking Date"
-                            value={selectedDate}
-                            onChange={(d) => setSelectedDate(d)}
-                            inputMode="start"
-                        />
-                    </View> */}
-
 
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
                         <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
@@ -355,12 +397,18 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                                 <Text style={{ marginLeft: 20 }}>{quantityByRoomType[item.room_type] || 0}</Text>
 
-                                <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleIncrease(item.room_type)}>
+                                <Button
+                                    mode="contained"
+                                    style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }}
+                                    onPress={() => handleIncrease(item.room_type)}
+                                    disabled={item.available_rooms <= 0 || (quantityByRoomType[item.room_type] || 0) >= (item.available_rooms || 0)}
+                                >
                                     +
                                 </Button>
                             </View>
                         ))}
                     </View>
+
 
                 </Card>
 
@@ -454,6 +502,13 @@ const styles = StyleSheet.create({
         marginTop: -5,
         width: '100%',
         alignSelf: 'center',
+    },
+    roomCard: {
+        margin: 10,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        borderRadius: 8,
+        padding: 10,
     }
 
 });

@@ -219,11 +219,13 @@ export const CartScreen = ({navigation}) => {
                 type: detail.type,
                 attraction_id: detail.attraction.attraction_id,
                 image: detail.attraction.attraction_image_list[0],
-                item_name: detail.activity_name,
-                activity_name: detail.attraction.name,
+                item_name: detail.activity_name, // Needs to be conditional
+                activity_name: detail.attraction.name, // Needs to be conditional
                 startTime: formatDateAndTime(detail.start_datetime),
                 endTime: formatDateAndTime(detail.end_datetime),
-                items: detail.cart_item_list, // get activity selection
+                items: detail.cart_item_list.filter(item => item.type === "ATTRACTION"), // get activity selection
+                tour: detail.cart_item_list.filter(item => item.type === "TOUR").length != 0
+                  ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
                 price: subtotal.toFixed(2),
                 quantity: quantities,
                 selections: selections
@@ -340,6 +342,10 @@ export const CartScreen = ({navigation}) => {
                       }
 
                       <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
+                      {cartItem.type === 'ATTRACTION' && cartItem.tour != null ? 
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
+                        Tour: {cartItem.tour[0].activity_selection}
+                      </ListItem.Subtitle> : <Text></Text>}
                       {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                       {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                     </View>

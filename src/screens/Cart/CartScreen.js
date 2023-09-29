@@ -196,87 +196,6 @@ export const CartScreen = ({ navigation }) => {
     setApiCallTimer(newTimer);
   };
 
-  // useEffect(() => {
-  //   async function onLoad() {
-  //     try {
-  //       const user_type = await getUserType();
-  //       const userData = await getUser()
-  //       setUser(userData)
-  //       setUserType(user_type)
-  //       const tourist_email = userData.email
-
-  //       const response = await cartApi.get(`/viewCart/${user_type}/${tourist_email}`)
-  //       if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
-  //         console.log('error', response.data)
-
-  //       } else {
-  //         const cartDetails = response.data;
-  //         const extractedDetails = cartDetails.map((detail) => {
-  //           const { subtotal, selections, quantities } = getFields(detail.cart_item_list);
-
-  //           if (detail.type === 'ATTRACTION') {
-  //             return {
-  //               id: parseInt(detail.cart_booking_id),
-  //               type: detail.type,
-  //               attraction_id: detail.attraction.attraction_id,
-  //               image: detail.attraction.attraction_image_list[0],
-  //               item_name: detail.activity_name,
-  //               activity_name: detail.attraction.name,
-  //               startTime: formatDateAndTime(detail.start_datetime),
-  //               endTime: formatDateAndTime(detail.end_datetime),
-  //               items: detail.cart_item_list, // get activity selection
-  //               price: subtotal.toFixed(2),
-  //               quantity: quantities,
-  //               selections: selections
-  //             };
-
-  //           } else if (detail.type === 'TELECOM') {
-  //             return {
-  //               id: parseInt(detail.cart_booking_id),
-  //               type: detail.type,
-  //               telecom_id: detail.telecom.telecom_id,
-  //               image: detail.telecom.plan_duration_category,
-  //               item_name: detail.activity_name,
-  //               activity_name: detail.activity_name,
-  //               startTime: formatDateAndTime(detail.start_datetime),
-  //               endTime: formatDateAndTime(detail.end_datetime),
-  //               items: detail.cart_item_list,
-  //               price: subtotal.toFixed(2),
-  //               quantity: quantities,
-  //             }
-  //           } else if (detail.type === 'ACCOMMODATION') {
-  //             return {
-  //               id: parseInt(detail.cart_booking_id),
-  //               type: detail.type,
-  //               // i need accomm id too!!!! so need to retrieve sigh 
-  //               room_id: detail.room.room_id,
-  //               image: detail.room.room_image,
-  //               item_name: detail.activity_name,
-  //               activity_name: "Room",
-  //               // activity_name: accommodation.name,
-  //               startTime: formatDateAndTime(detail.start_datetime),
-  //               endTime: formatDateAndTime(detail.end_datetime),
-  //               items: detail.cart_item_list,
-  //               price: subtotal.toFixed(2),
-  //               quantity: quantities,
-  //             }
-  //           }
-  //         })
-
-  //         setCartItems(extractedDetails);
-  //         if (extractedDetails.length > 0) {
-  //           setItemChecked(Array(extractedDetails.length).fill(false));
-  //         }
-  //       }
-
-  //     } catch (error) {
-  //       console.error("Error fetching cart items:", error);
-  //     }
-  //   }
-
-  //   onLoad();
-  // }, [deletion, isFocused]);
-
   useEffect(() => {
     async function onLoad() {
       try {
@@ -487,19 +406,23 @@ export const CartScreen = ({ navigation }) => {
                           <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
                         }
 
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
-                            borderRadius: 15, marginLeft: 5, marginBottom: 8
-                          }}
-                          onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
-                        >
+                        {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                              borderRadius: 15, marginLeft: 5, marginBottom: 8
+                            }}
+                            onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
+                          >
 
-                          <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> - </Text>
-                        </TouchableOpacity>
+
+                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> - </Text>
+                          </TouchableOpacity>
+                        )}
 
                         <Text style={{ marginLeft: 5, marginTop: 2, fontSize: 10 }}>{item.quantity} </Text>
 
+                        {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
                         <TouchableOpacity
                           style={{
                             backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
@@ -509,6 +432,7 @@ export const CartScreen = ({ navigation }) => {
                         >
                           <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
                         </TouchableOpacity>
+                        )}
                       </View>
                     ))}
                   </View>

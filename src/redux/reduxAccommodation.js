@@ -25,18 +25,32 @@ export async function getAccommodation(accommodation_id) {
     }
 }
 
-export async function getNumOfBookingsOnDate(accommodation_id, roomType, date) {
+
+export async function retrieveAccommodationByRoom(room_id) {
     try {
-        const response = await accommodationApi.get(`/getNumOfBookingsOnDate/${accommodation_id}/${roomType}/${date}`);
-        console.log("response", response.data);
+        const response = await accommodationApi.get(`/retrieveAccommodationByRoom/${room_id}`);
         if (response.data != []) {
             return response.data;
         }    
     } catch (error) {
-        console.error("getNumOfBookingsOnDate error!");
+        console.error("retrieveAccommodationByRoom error!");
         return {status: false, data: error.message};
     }
 }
+
+
+// export async function getNumOfBookingsOnDate(accommodation_id, roomType, date) {
+//     try {
+//         const response = await accommodationApi.get(`/getNumOfBookingsOnDate/${accommodation_id}/${roomType}/${date}`);
+//         console.log("response", response.data);
+//         if (response.data != []) {
+//             return response.data;
+//         }    
+//     } catch (error) {
+//         console.error("getNumOfBookingsOnDate error!");
+//         return {status: false, data: error.message};
+//     }
+// }
 
 export async function getMinAvailableRoomsOnDateRange(accommodation_id, roomType, checkInDate, checkOutDate) {
     try {

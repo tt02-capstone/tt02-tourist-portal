@@ -32,6 +32,10 @@ export const HomeScreen = ({ navigation }) => {
     navigation.navigate('AccommodationScreen')
   }
 
+  const viewTelecoms = () => {
+    navigation.navigate('TelecomScreen')
+  }
+
   const onLogoutPressed = async () => {
     await clearStorage();
     await authContext.logout();
@@ -102,7 +106,7 @@ export const HomeScreen = ({ navigation }) => {
               Stay connected during your Singapore adventure with tailored telecom packages designed especially for tourists.
               Choose from a variety of cost-effective plans and make the most of your visit with our telecom packages!
             </Text>
-            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewTelecoms} />
           </Card>
 
           <Card>

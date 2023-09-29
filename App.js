@@ -17,6 +17,8 @@ import {useContext, useEffect} from "react";
 import {Cart} from "./src/components/Cart";
 import AttractionScreen from "./src/screens/Attraction/AttractionScreen";
 import AttractionDetailsScreen from "./src/screens/Attraction/AttractionDetailsScreen";
+import TelecomScreen from './src/screens/Telecom/TelecomScreen';
+import TelecomDetailsScreen from './src/screens/Telecom/TelecomDetailsScreen';
 import BookingHistoryScreen from "./src/screens/Booking/BookingHistoryScreen";
 import BookingDetailsScreen from "./src/screens/Booking/BookingDetailsScreen";
 import PaymentHistoryScreen from "./src/screens/PaymentHistoryScreen";
@@ -56,8 +58,8 @@ export const Layout = () => {
     const {authState} = useContext(AuthContext);
 
     useEffect(() => {
-        console.log("auth-state:", authState)
-        console.log('authenticated', authState.authenticated)
+        // console.log("auth-state:", authState)
+        // console.log('authenticated', authState.authenticated)
     }, [authState]);
 
     return (
@@ -68,17 +70,15 @@ export const Layout = () => {
                 {authState?.authenticated? (
                     <>
                         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
-                        <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen}
-                                      options={{title: 'View Profile'}}/>
-                        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen}
-                                      options={{title: 'Edit Profile'}}/>
-                        <Stack.Screen name="EditPasswordScreen" component={EditPasswordScreen}
-                                      options={{title: 'Edit Password'}}/>
-
+                        <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{title: 'View Profile'}}/>
+                        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} options={{title: 'Edit Profile'}}/>
+                        <Stack.Screen name="EditPasswordScreen" component={EditPasswordScreen} options={{title: 'Edit Password'}}/>
                         <Stack.Screen name="AttractionScreen" component={AttractionScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
-                        <Stack.Screen name="AccommodationScreen" component={AccommodationScreen} options={{ title : 'Attractions' }} />
-                        <Stack.Screen name="AccommodationDetailsScreen" component={ AccommodationDetailsScreen} options={{ title : 'Attractions' }} />
+                        <Stack.Screen name="AccommodationScreen" component={AccommodationScreen} options={{ title : 'Accommodations' }} />
+                        <Stack.Screen name="AccommodationDetailsScreen" component={ AccommodationDetailsScreen} options={{ title : 'Accommodations' }} />
+                        <Stack.Screen name="TelecomScreen" component={TelecomScreen} options={{ title : 'Telecoms' }} />
+                        <Stack.Screen name="TelecomDetailsScreen" component={TelecomDetailsScreen} options={{ title : 'Telecoms' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
@@ -93,14 +93,10 @@ export const Layout = () => {
                     <>
                         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
                         <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{title: 'Sign Up '}}/>
-                        <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen}
-                                      options={{title: 'Verify Code'}}/>
-                        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}
-                                      options={{title: 'Reset Password'}}/>
-                        <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen}
-                                      options={{title: 'Forgot Password'}}/>
-                        <Stack.Screen name="EmailVerificationScreen" component={EmailVerificationScreen}
-                                      options={{title: 'Verify Email'}}/>
+                        <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen} options={{title: 'Verify Code'}}/>
+                        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{title: 'Reset Password'}}/>
+                        <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{title: 'Forgot Password'}}/>
+                        <Stack.Screen name="EmailVerificationScreen" component={EmailVerificationScreen} options={{title: 'Verify Email'}}/>
                     </>
                 )}
             </Stack.Navigator>

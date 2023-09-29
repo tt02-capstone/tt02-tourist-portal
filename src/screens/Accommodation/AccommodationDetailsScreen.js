@@ -9,10 +9,11 @@ import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { DatePickerModal } from 'react-native-paper-dates';
-import { getAccommodation, getNumOfBookingsOnDate, getMinAvailableRoomsOnDateRange } from '../../redux/reduxAccommodation';
+import { getAccommodation, getMinAvailableRoomsOnDateRange } from '../../redux/reduxAccommodation';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
+import { addRoomToCart } from '../../redux/cartRedux';
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -59,13 +60,11 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
 
     const addToCart = async () => {
+        const cartBookings = [];
         const cartItems = [];
         const selectedRooms = [];
-        const user_type = user.user_type;
-        const tourist_email = user.email;
-        const activity_name = accommodation.name;
 
-        if (!range.startDate && !range.endDate) { // check if date is selected 
+        if (!range.startDate && !range.endDate) {
             Toast.show({
                 type: 'error',
                 text1: "Please Select a Booking Date!"
@@ -80,20 +79,18 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             checkOutDate.setDate(checkOutDate.getDate() + 1); // as datepicker is giving 1 day before
             const checkOutDateInLocalDateTime = checkOutDate.toISOString();
 
+            console.log("formattedRoomList", formattedRoomList);
+
             for (const roomType in quantityByRoomType) {
+
+                console.log("roomType", roomType);
+
                 if (quantityByRoomType[roomType] > 0) {
-                    cartItems.push({
-                        type: "ACCOMMODATION",
-                        activity_selection: roomType,
-                        quantity: quantityByRoomType[roomType],
-                        price: formattedRoomList.find(item => item.room_type === roomType).price, // price per ticket
-                        start_datetime: checkInDate,
-                        end_datetime: checkOutDate,
-                    });
 
                     // removed as i don't use smthg similar to checkTicketInventory
                     // for ticket, this was ticket type entity
                     selectedRooms.push({
+                        // this is undefined 
                         room_id: formattedRoomList.find(item => item.room_type === roomType).room_id,
                         // amenities description
                         // num of pax
@@ -105,6 +102,9 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 }
             }
 
+            console.log("cartBookings", cartBookings);
+            console.log("selectedRooms", selectedRooms);
+
             if (selectedRooms.length === 0) { // when room date is selected but room type quantity are all 0
                 Toast.show({
                     type: 'error',
@@ -113,9 +113,6 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
 
             } else {  // when both ticket date + ticket types are selected 
-
-                // already checked using getMinAvailableRoomsOnDateRange and disabling button if they try to select more than available rooms
-                // let checkInventory = await checkTicketInventory(accommodation.accommodation_id, formattedDate, selectedRooms);
 
                 // current date check 
                 const currentDate = new Date();
@@ -127,39 +124,44 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 if (dateNow > checkInDate) { // check for date selected since UI cant block dates before tdy
                     Toast.show({
                         type: 'error',
-                        text1: 'Date selected should be today or after!'
+                        text1: 'Please select a future date!'
                     })
-                }
-                // no more checkinventory
-                // else if (checkInventory.status) {
-                //     Toast.show({
-                //         type: 'error',
-                //         text1: checkInventory.error
-                //     })
+                } else {
+                    for (const room of selectedRooms) {
+                        let cartBooking = {
+                            activity_name: accommodation.name,
+                            start_datetime: checkInDateInLocalDateTime,
+                            end_datetime: checkOutDateInLocalDateTime,
+                            type: 'ACCOMMODATION',
+                            cart_item_list: [{
+                                type: "ACCOMMODATION",
+                                activity_selection: room.room_type,
+                                quantity: room.quantity,
+                                price: formattedRoomList.find(item => item.room_type === room.room_type).price,
+                                start_datetime: checkInDate,
+                                end_datetime: checkOutDate,
+                            }],
+                        };
 
-                // } 
-                else {
-                    const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
-                    console.log(response.data.httpStatusCode)
-                    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-                        Toast.show({
-                            type: 'error',
-                            text1: 'Unable to add items to cart'
-                        });
-                    } else {
-                        console.log('success', response.data)
-                        setRange({ startDate: undefined, endDate: undefined }); // must have = use this to reset date selection 
-                        setQuantityByRoomType(0) // must have = reset the quantity as well to 0 
-                        if (response.data) {
+                        // room.room_id is undefined!!
+                        console.log("room.room_id", room.room_id);
+                        console.log("cartBooking", cartBooking);
+
+                        // Call addRoomToCart for each room
+                        let response = await addRoomToCart(user.user_id, room.room_id, cartBooking);
+                        if (response.status) {
+                            setQuantityByRoomType(0);
+                            setRange({ startDate: undefined, endDate: undefined });
                             Toast.show({
                                 type: 'success',
-                                text1: 'Added Items to Cart!'
+                                text1: 'Room has been added to cart!'
                             });
-                            // Update Cart Badge 
                         } else {
+                            console.log("Room was not added to cart!");
+                            console.log(response.data);
                             Toast.show({
                                 type: 'error',
-                                text1: 'Unable to add items to cart'
+                                text1: response.data.errorMessage,
                             });
                         }
                     }
@@ -195,6 +197,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     const fetchRoom = async () => {
         const formattedRoomList = await Promise.all(roomList.map(async (room) => {
+            const room_id = room.room_id;
             const amenities_description = room.amenities_description;
             const num_of_pax = room.num_of_pax;
             const price = room.price;
@@ -232,6 +235,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             //   console.log("roomCount", roomCount);
 
             return {
+                room_id,
                 room_type: room.room_type,
                 amenities_description,
                 num_of_pax,

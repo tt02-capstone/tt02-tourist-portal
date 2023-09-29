@@ -302,8 +302,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 setSeasonalActivity(activity); // get seasonal
             }
 
-            // let reccoms = await getAttractionRecommendation(attractionId);
-            // setRecommendation(reccoms)
+            let reccoms = await getAttractionRecommendation(attractionId);
+            setRecommendation(reccoms)
 
             setLoading(false);
             fetchUser();
@@ -354,13 +354,10 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const fetchTours = async () => {
         try {
             if (selectedDate != undefined) {
-                console.log('in ttour')
                 setLoading(true);
                 let response = await getAllTourTypesByAttraction(attractionId, selectedDate);
                 setTours(response.data);
                 setLoading(false);
-
-                console.log(response)
             }
         } catch (error) {
             // alert('An error occurred! Failed to retrieve tours list!');

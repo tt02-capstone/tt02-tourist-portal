@@ -25,9 +25,25 @@ const TourDetailsScreen = ({ navigation }) => {
         const usertype = await getUserType()
     }
 
-    const handleRadioButtonChange = (tourListItem) => {
-        console.log('gab', tourListItem);
+    useEffect(() => {
+        async function onLoad() {
+            const selectedTourId = await AsyncStorage.getItem('selectedTourId');
+    
+            if (selectedTourId) {
+                const selectedTourItem = item.tour_list.find(
+                    (tourListItem) => tourListItem.tour_id === JSON.parse(selectedTourId)
+                );
+    
+                if (selectedTourItem) {
+                    setSelectedTour(selectedTourItem);
+                }
+            }
+        }
+    
+        onLoad();
+    }, []);
 
+    const handleRadioButtonChange = (tourListItem) => {
         if (selectedTour === tourListItem) {
             setSelectedTour(null);
 

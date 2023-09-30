@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         margin: 5,
         width: 90,
-        fontSize: 10,
+        fontSize: 7.5,
         fontWeight: 'bold'
     },
     dropBorder: {

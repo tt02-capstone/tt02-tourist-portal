@@ -31,6 +31,8 @@ import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
 import { enGB,en, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
+import TourScreen from './src/screens/Attraction/TourScreen';
+import TourDetailsScreen from './src/screens/Attraction/TourDetailsScreen';
 import DealScreen from "./src/screens/Deal/DealScreen";
 import DealDetailsScreen from "./src/screens/Deal/DealDetailsScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
@@ -92,6 +94,8 @@ export const Layout = () => {
                         <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
                         <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
                         <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
+                        <Stack.Screen name="TourScreen" component={TourScreen} options={{ title : 'Tours' }} />
+                        <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
                     </>
                 ) : (
                     <>

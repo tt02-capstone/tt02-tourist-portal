@@ -22,7 +22,7 @@ export const CartScreen = ({navigation}) => {
       month: '2-digit',
       day: '2-digit',
     };
-  
+
     const formattedDate = new Date(date).toLocaleString(undefined, options);
     return formattedDate;
   }
@@ -48,8 +48,8 @@ export const CartScreen = ({navigation}) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Button 
-          title="Delete" 
+        <Button
+          title="Delete"
           type="error"
           onPress={() => handleDeleteCartItem(user, itemChecked)}
         />
@@ -60,11 +60,11 @@ export const CartScreen = ({navigation}) => {
   const handleDeleteCartItem = async (user,itemChecked) => {
     const tourist_email = user.email;
     const booking_ids = [];
-      itemChecked.forEach((isChecked, index) => {
-        if (isChecked) {
-            booking_ids.push(cartItems[index].id);
+    itemChecked.forEach((isChecked, index) => {
+      if (isChecked) {
+        booking_ids.push(cartItems[index].id);
 
-        }
+      }
     });
 
     const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`,booking_ids)
@@ -144,21 +144,30 @@ export const CartScreen = ({navigation}) => {
     setItemChecked(updatedChecked);
   };
 
-  const updateQuantity = (cartItemIndex,itemIndex, delta) => {
+  const updateQuantity = (cartItemIndex, itemIndex, delta) => {
+    let tourPrice = 0
+
+    if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
+      tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
+      let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
+      cartItems[cartItemIndex].tour[0].quantity = oldQ + delta; // update per pax for tours 
+    }
 
     // Update the cart items with new quantity for the specified ticket type
     const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
 
     if (currentQuantity + delta >= 0) { // quantity can never go  below 0
-      cartItems[cartItemIndex].items[itemIndex].quantity += delta ;
-      
+      cartItems[cartItemIndex].items[itemIndex].quantity += delta;
+
       // deal w the pricing change 
       const price = parseFloat(cartItems[cartItemIndex].items[itemIndex].price)
-      const difference = price  * delta; // get the change either +ve or - ve
-      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference; // new total price for the list item 
+      const difference = price * delta; // get the change either +ve or - ve
+      const tourDiff = tourPrice * delta 
+      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference + parseFloat(tourDiff); // new total price for the list item 
       cartItems[cartItemIndex].price = newTotalPrice.toFixed(2).toString(); // set it back to 2 dp and set as string 
 
       setCartItems([...cartItems]);
+
     }
 
     // Clear any pending API call
@@ -203,7 +212,7 @@ export const CartScreen = ({navigation}) => {
         setUser(userData)
         setUserType(user_type)
         const tourist_email = userData.email
-        
+
         const response = await cartApi.get(`/viewCart/${user_type}/${tourist_email}`)
           if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
             console.log('error',response.data)
@@ -219,11 +228,13 @@ export const CartScreen = ({navigation}) => {
                 type: detail.type,
                 attraction_id: detail.attraction.attraction_id,
                 image: detail.attraction.attraction_image_list[0],
-                item_name: detail.activity_name,
-                activity_name: detail.attraction.name,
+                item_name: detail.activity_name, // Needs to be conditional
+                activity_name: detail.attraction.name, // Needs to be conditional
                 startTime: formatDateAndTime(detail.start_datetime),
                 endTime: formatDateAndTime(detail.end_datetime),
-                items: detail.cart_item_list, // get activity selection
+                items: detail.cart_item_list.filter(item => item.type === "ATTRACTION"), // get activity selection
+                tour: detail.cart_item_list.filter(item => item.type === "TOUR").length != 0
+                  ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
                 price: subtotal.toFixed(2),
                 quantity: quantities,
                 selections: selections
@@ -329,7 +340,7 @@ export const CartScreen = ({navigation}) => {
                 {/* Common */}
                 <ListItem.Content style={{padding: 0, marginLeft: -10, height:80}}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "column" , width:130}}>
+                    <View style={{ flexDirection: "column", width: 130 }}>
                       <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
                       
                       {cartItem.type === 'ATTRACTION' && 
@@ -340,10 +351,14 @@ export const CartScreen = ({navigation}) => {
                       }
 
                       <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
+                      {cartItem.type === 'ATTRACTION' && cartItem.tour != null ? 
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
+                        Tour: {cartItem.tour[0].activity_selection}
+                      </ListItem.Subtitle> : <Text></Text>}
                       {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                       {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                     </View>
-                    
+
                     <View style={{ flexDirection: "column" }}>
                     {cartItem.items.map((item, itemIndex) => (
                       <View style={{ flexDirection: "row" }} key={itemIndex}>

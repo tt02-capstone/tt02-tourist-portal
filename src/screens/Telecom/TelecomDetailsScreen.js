@@ -197,8 +197,8 @@ const TelecomDetailsScreen = ({ navigation }) => {
                     <Card.Title style={styles.header}>
                         {telecom.name} 
                         <Button mode="text" style={{ marginTop: -10}} onPress={save} >
-                            {isSaved && <Icon name="heart" size={20} color='red' />}
-                            {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                            {isSaved && <Icon name="heart" size={15} color='red' />}
+                            {!isSaved && <Icon name="heart" size={15} color='grey'/>}
                         </Button>
                     </Card.Title>
 

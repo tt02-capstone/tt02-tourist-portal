@@ -381,9 +381,9 @@ const AttractionDetailsScreen = ({ navigation }) => {
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
-                        {attraction.name}
-                        <Button mode="text" style={{ marginTop: -13 }} onPress={saveAttr} >
-                            <Icon name="heart" size={20} color='blue' />
+                        {attraction.name} 
+                        <Button mode="text" style={{ marginTop: -13}} onPress={saveAttr} >
+                            <Icon name="heart" size={15} color='blue'/>
                         </Button>
                     </Card.Title>
 

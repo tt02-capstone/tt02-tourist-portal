@@ -298,7 +298,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttrTicketList(attraction.ticket_per_day_list);
 
             let activity = await getSeasonalActivity(attractionId);
-            if (activity.length != 0) {
+            if (activity !== undefined && activity.length != 0) {
                 setSeasonalActivity(activity); // get seasonal
             }
 

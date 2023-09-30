@@ -6,7 +6,7 @@ import { getUser } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { getRestaurantById, saveRestaurantForUser , getRestaurantDish } from '../../redux/restaurantRedux';
+import { getRestaurantById, saveRestaurantForUser , getRestaurantDish, getAllSavedRestaurantForUser , removeSavedRestaurantForUser} from '../../redux/restaurantRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { useIsFocused } from "@react-navigation/native";
@@ -20,6 +20,7 @@ const RestaurantDetailsScreen = ({ navigation }) => {
     const [dishList, setDishList] = useState([]);
     const [imgList, setImgList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
     const isFocused = useIsFocused();
     const route = useRoute();
     const { restId } = route.params;
@@ -120,21 +121,57 @@ const RestaurantDetailsScreen = ({ navigation }) => {
         }
     }, [isFocused]);
 
+    useEffect(() => {
+        if (user) {
+            const fetchSaved = async () => {
+                let saved = false;
+                let check = await getAllSavedRestaurantForUser(user.user_id);
+                if (check.data.length) {
+                    for (var i = 0; i < check.data.length; i++) {
+                        if(check.data[i].restaurant_id == restId) {
+                            saved = true;
+                            break;
+                        } 
+                    }
+                    setIsSaved(saved);
+                }
+            }
+            fetchSaved();
+        }
+    }, [user])
 
     const saveRest = async () => {
-        let response = await saveRestaurantForUser(user.user_id, restaurant.restaurant_id);
-        if (response.status) {
-            fetchUser();
-            Toast.show({
-                type: 'success',
-                text1: 'Restaurant has been saved!'
-            });
-
+        if (!isSaved) {
+            let response = await saveRestaurantForUser(user.user_id, restaurant.restaurant_id);
+            if (response.status) {
+                setIsSaved(true);
+                fetchUser();
+                Toast.show({
+                    type: 'success',
+                    text1: 'Restaurant has been saved!'
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage
+                })
+            }
         } else {
-            Toast.show({
-                type: 'error',
-                text1: response.data.errorMessage
-            })
+            // remove saved listing here 
+            let response = await removeSavedRestaurantForUser(user.user_id, restaurant.restaurant_id);
+            if (response.status) {
+                setIsSaved(false);
+                fetchUser();
+                Toast.show({
+                    type: 'success',
+                    text1: 'Restaurant has been unsaved!'
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage
+                })
+            }
         }
     }
 
@@ -152,7 +189,9 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                         <Card.Title style={styles.header}>
                             {restaurant.name} 
                             <Button mode="text" style={{ marginTop: -13}} onPress={saveRest} >
-                                <Icon name="heart" size={15} color='blue'/>
+                                {isSaved && <Icon name="heart" size={15} color='red' />}
+                                {!isSaved && <Icon name="heart" size={15} color='grey'/>}
+                                {/* <Icon name="heart" size={15} color='red'/> */}
                             </Button>
                         </Card.Title>
                         

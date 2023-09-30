@@ -49,7 +49,7 @@ const RestaurantScreen = ({ navigation }) => {
 
     const viewRestaurant = (restId) => {
         navigation.navigate('RestaurantDetailsScreen', {restId : restId}); // set the rest id to bring to the nxt page 
-    }
+    }   
 
     return (
         <Background>
@@ -68,7 +68,6 @@ const RestaurantScreen = ({ navigation }) => {
                                     uri: item.restaurant_image_list[0] // KIV for image 
                                     }}
                                 />
-
                                 <Text style={styles.description}>{item.description}</Text>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Text style={[styles.tag, {backgroundColor:getColorForType(item.restaurant_type)}]}>{item.restaurant_type}</Text>

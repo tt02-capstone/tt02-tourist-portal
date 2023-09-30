@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 110,
-        fontSize: 11,
+        width: 90,
+        fontSize: 7.5,
         fontWeight: 'bold'
     },
     header:{

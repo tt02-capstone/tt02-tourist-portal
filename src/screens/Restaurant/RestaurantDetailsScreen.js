@@ -10,6 +10,9 @@ import { getRestaurantById, saveRestaurantForUser , getRestaurantDish } from '..
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { useIsFocused } from "@react-navigation/native";
+import AttractionRecom from '../Recommendation/AttractionRecom';
+import RestaurantRecom from '../Recommendation/RestaurantRecom';
+import { getRecommendation } from '../../redux/recommendationRedux';
 
 const RestaurantDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -20,6 +23,7 @@ const RestaurantDetailsScreen = ({ navigation }) => {
     const isFocused = useIsFocused();
     const route = useRoute();
     const { restId } = route.params;
+    const [recommendation, setRecommendation] = useState([]);
 
     async function fetchUser() {
         const userData = await getUser()
@@ -29,8 +33,9 @@ const RestaurantDetailsScreen = ({ navigation }) => {
     const getRestaurant = async () => {        
         let response = await getRestaurantById(restId);
         if (response.status) {
-            setRestaurant(response.data);
-            setImgList(response.data.restaurant_image_list);
+            let restaurant = response.data;
+            setRestaurant(restaurant);
+            setImgList(restaurant.restaurant_image_list);
 
             let dishes = await getRestaurantDish(restId)
 
@@ -49,10 +54,32 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                 setDishList(groupedDishes);
             } 
 
+            let recoms = await getRecommendation(restaurant.generic_location, restaurant.listing_type, restId);
+            if (recoms.status) {
+                setRecommendation(recoms.data)
+            }
+
         } else {
             console.log("Restaurant not fetched!");
         }
         setLoading(false);
+    }
+
+    // factor for recommendations 
+    const viewRecommendedAttraction = (redirect_attraction_id) => {
+        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id }); 
+    }
+
+    const viewRecommendedRest = (redirect_rest_id) => {
+        navigation.push('RestaurantDetailsScreen', { restId: redirect_rest_id });
+    }
+
+    const handleItemClick = (item) => {
+        if (item.listing_type === "ATTRACTION") {
+            viewRecommendedAttraction(item.attraction_id);
+        } else if (item.listing_type === "RESTAURANT") {
+            viewRecommendedRest(item.restaurant_id);
+        }
     }
 
     const showDishList = Object.keys(dishList).map(type => (
@@ -93,18 +120,6 @@ const RestaurantDetailsScreen = ({ navigation }) => {
         }
     }, [isFocused]);
 
-    const getColorForType = (label) => {
-        const labelColorMap = {
-          'KOREAN': 'lightblue',
-          'MEXICAN': 'lightgreen',
-          'CHINESE': 'orange',
-          'WESTERN' : 'yellow',
-          'FAST_FOOD' : 'turquoise',
-          'JAPANESE' : 'lightpink'
-        };
-
-        return labelColorMap[label] || 'gray';
-    };
 
     const saveRest = async () => {
         let response = await saveRestaurantForUser(user.user_id, restaurant.restaurant_id);
@@ -144,7 +159,7 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                         <Text style={[styles.subtitle]}>{restaurant.address}</Text>
                         <Text style={styles.subtitle}>Operating Hours: {restaurant.opening_hours}</Text>
                         <Text style={styles.description}>{restaurant.description}</Text>
-                        <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{restaurant.estimated_price_tier}</Text>
+                        {/* <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{restaurant.estimated_price_tier}</Text> */}
 
                     </Card>
                     
@@ -159,13 +174,33 @@ const RestaurantDetailsScreen = ({ navigation }) => {
 
                     </Card>
             
-                    <Card containerStyle={styles.dropBorder}>
-                        <Card.Title style={styles.header}>
-                            Nearby Recommendation
-                        </Card.Title>
+                    <View> 
+                        { recommendation.length > 0 && (
+                        <Card containerStyle={styles.dropBorder}>
+                            <Card.Title style={styles.header}>
+                                Nearby Recommendation
+                            </Card.Title>
 
-                        {/* to be continued */}
-                    </Card>
+                            <ScrollView horizontal>
+                                <View style={{ flexDirection: 'row', height: 350 }}>
+                                    {
+                                        recommendation.map((item, index) => (
+                                            <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
+                                                {item.listing_type === 'ATTRACTION' && (
+                                                    <AttractionRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'RESTAURANT' && (
+                                                    <RestaurantRecom item={item} />
+                                                )}
+                                                
+                                            </TouchableOpacity>
+                                        ))
+                                    }
+                                </View>
+                            </ScrollView>
+                        </Card>
+                        )}
+                    </View>
                 </ScrollView>
             </Background>
     )

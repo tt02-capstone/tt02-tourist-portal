@@ -8,13 +8,16 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
-import { getAttraction, getAttractionRecommendation, saveAttraction, checkTicketInventory, getSeasonalActivity } from '../../redux/reduxAttraction';
+import { getAttraction, saveAttraction, checkTicketInventory, getSeasonalActivity } from '../../redux/reduxAttraction';
+import { getRecommendation } from '../../redux/recommendationRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { getAllTourTypesByAttraction } from '../../redux/tourRedux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import AttractionRecom from '../Recommendation/AttractionRecom';
+import RestaurantRecom from '../Recommendation/RestaurantRecom';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -26,7 +29,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const [selectedDate, setSelectedDate] = useState();
     const [formattedPriceList, setFormattedPriceList] = useState([]);
     const [quantityByTicketType, setQuantityByTicketType] = useState({});
-    const [seasonalActivity, setSeasonalActivity] = useState([]);
+    const [seasonalActivity, setSeasonalActivity] = useState("");
     const route = useRoute();
     const { attractionId } = route.params;
     const [tours, setTours] = useState([]);
@@ -255,21 +258,21 @@ const AttractionDetailsScreen = ({ navigation }) => {
         };
     }
 
-    const getColorForType = (label) => {
-        const labelColorMap = {
-            'HISTORICAL': 'lightblue',
-            'CULTURAL': 'lightgreen',
-            'NATURE': 'orange',
-            'ADVENTURE': 'yellow',
-            'SHOPPING': 'turquoise',
-            'ENTERTAINMENT': 'lightpink'
-        };
-
-        return labelColorMap[label] || 'gray';
-    };
-
+    // factor for recommendations 
     const viewRecommendedAttraction = (redirect_attraction_id) => {
-        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id }); // push on to the nxt nav stack 
+        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id }); 
+    }
+
+    const viewRecommendedRest = (redirect_rest_id) => {
+        navigation.push('RestaurantDetailsScreen', { restId: redirect_rest_id });
+    }
+
+    const handleItemClick = (item) => {
+        if (item.listing_type === "ATTRACTION") {
+            viewRecommendedAttraction(item.attraction_id);
+        } else if (item.listing_type === "RESTAURANT") {
+            viewRecommendedRest(item.restaurant_id);
+        }
     }
 
     const saveAttr = async () => {
@@ -301,9 +304,11 @@ const AttractionDetailsScreen = ({ navigation }) => {
             if (activity !== undefined && activity.length != 0) {
                 setSeasonalActivity(activity); // get seasonal
             }
-
-            let reccoms = await getAttractionRecommendation(attractionId);
-            setRecommendation(reccoms)
+            
+            let recoms = await getRecommendation(attraction.generic_location, attraction.listing_type, attractionId);
+            if (recoms.status) {
+                setRecommendation(recoms.data)
+            }
 
             setLoading(false);
             fetchUser();
@@ -468,43 +473,33 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     />
                 </View>
 
-                <Card containerStyle={styles.dropBorder}>
-                    <Card.Title style={styles.header}>
-                        Nearby Recommendation
-                    </Card.Title>
+                <View> 
+                    { recommendation.length > 0 && (
+                    <Card containerStyle={styles.dropBorder}>
+                        <Card.Title style={styles.header}>
+                            Nearby Recommendation
+                        </Card.Title>
 
-                    <ScrollView horizontal>
-                        <View style={{ flexDirection: 'row', height: 350 }}>
-                            {
-                                recommendation.length > 0 && recommendation.map((item, index) => (
-                                    <TouchableOpacity key={index} onPress={() => viewRecommendedAttraction(item.attraction_id)}>
-                                        <View style={styles.rCard}>
-                                            <Card style={styles.reccom}>
-                                                <Card.Title style={styles.header}>
-                                                    {item.name}
-                                                </Card.Title>
-                                                <Card.Image
-                                                    style={{ padding: 0, width: 260, height: 100 }}
-                                                    source={{
-                                                        uri: item.attraction_image_list[0] // KIV for image 
-                                                    }}
-                                                />
-                                                <Text style={{ marginBottom: 15 }}></Text>
-
-                                                <View style={{ flexDirection: 'row' }}>
-                                                    <Text style={[styles.tag, { backgroundColor: getColorForType(item.attraction_category) }]}>{item.attraction_category}</Text>
-                                                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>{item.estimated_price_tier}</Text>
-                                                </View>
-                                            </Card>
-
-                                            <Text style={{ marginBottom: 15 }}></Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                ))
-                            }
-                        </View>
-                    </ScrollView>
-                </Card>
+                        <ScrollView horizontal>
+                            <View style={{ flexDirection: 'row', height: 350 }}>
+                                {
+                                    recommendation.map((item, index) => (
+                                        <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
+                                            {item.listing_type === 'ATTRACTION' && (
+                                                <AttractionRecom item={item} />
+                                            )}
+                                            {item.listing_type === 'RESTAURANT' && (
+                                                <RestaurantRecom item={item} />
+                                            )}
+                                            
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                            </View>
+                        </ScrollView>
+                    </Card>
+                    )}
+                </View>
             </ScrollView>
         </Background>
     )

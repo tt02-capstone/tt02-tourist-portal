@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, LogBox } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import Toast from 'react-native-toast-message';
 import { HomeScreen } from "./src/screens/HomeScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
@@ -49,6 +50,7 @@ initStripe({
 registerTranslation('en-GB', enGB)
 registerTranslation('en', en)
 const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
 
 export default function App() {
     return (
@@ -56,6 +58,23 @@ export default function App() {
             <Layout>
             </Layout>
         </AuthProvider>
+    );
+}
+
+function MyDrawer() {
+    return (
+      <Drawer.Navigator screenOptions={{ headerRight: () => <Cart /> }}>
+        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Profile" component={ViewProfileScreen} />
+        <Drawer.Screen name="Attractions" component={AttractionScreen} />
+        <Drawer.Screen name="Accommodations" component={AccommodationScreen} />
+        <Drawer.Screen name="Telecoms" component={TelecomScreen} />
+        <Drawer.Screen name="Restaurants" component={RestaurantScreen} />
+        <Drawer.Screen name="Deals" component={DealScreen} />
+        <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
+        <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
+        <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
+      </Drawer.Navigator>
     );
 }
 
@@ -74,6 +93,7 @@ export const Layout = () => {
             }}   initialRouteName="LoginScreen">
                 {authState?.authenticated? (
                     <>
+                        <Stack.Screen name="Drawer" component={MyDrawer} options={{ headerShown: false }} />
                         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
                         <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{title: 'View Profile'}}/>
                         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} options={{title: 'Edit Profile'}}/>

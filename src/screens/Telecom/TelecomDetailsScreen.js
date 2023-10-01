@@ -14,7 +14,6 @@ import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { getTelecomById, toggleSaveTelecom } from '../../redux/telecomRedux';
 import { addTelecomToCart } from '../../redux/cartRedux';
-import moment from 'moment-timezone';
 import {timeZoneOffset} from "../../helpers/DateFormat";
 
 const TelecomDetailsScreen = ({ navigation }) => {

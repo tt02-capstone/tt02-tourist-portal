@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, LogBox } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
@@ -39,6 +40,7 @@ import DealScreen from "./src/screens/Deal/DealScreen";
 import DealDetailsScreen from "./src/screens/Deal/DealDetailsScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 LogBox.ignoreAllLogs(true)
 
@@ -57,6 +59,17 @@ export default function App() {
             <Layout>
             </Layout>
         </AuthProvider>
+    );
+}
+
+const Drawer = createDrawerNavigator();
+
+function Root() {
+    return (
+        <Drawer.Navigator>
+            <Drawer.Screen name="HomeScreen" component={HomeScreen} />
+            <Drawer.Screen name="ViewProfileScreen" component={ViewProfileScreen} />
+        </Drawer.Navigator>
     );
 }
 

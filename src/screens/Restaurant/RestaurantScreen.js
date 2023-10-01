@@ -3,11 +3,11 @@ import Background from '../../components/CardBackground';
 import Header from '../../components/Header';
 import Button from '../../components/Button';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Text, Card, Icon } from '@rneui/themed';
-import { getAttractionList  } from '../../redux/reduxAttraction';
-import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
+import { Text, Card } from '@rneui/themed';
+import { getRestaurantList } from '../../redux/restaurantRedux';
+import { getUser } from '../../helpers/LocalStorage';
 
-const AttractionScreen = ({ navigation }) => {
+const RestaurantScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -15,18 +15,18 @@ const AttractionScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
-    
-        const usertype =  await getUserType()
     }
 
     useEffect(() => {
         const fetchData = async() => {
             try {
-                let listOfAttractions = await getAttractionList();
-                setData(listOfAttractions);
+                let listofRest = await getRestaurantList();
+                if (listofRest.status) {
+                    setData(listofRest.data);
+                } 
                 setLoading(false);
             } catch (error) {
-                alert ('An error occur! Failed to retrieve attraction list!');
+                alert ('An error occur! Failed to retrieve restaurant list!');
                 setLoading(false);
             }    
         };
@@ -36,20 +36,20 @@ const AttractionScreen = ({ navigation }) => {
 
     const getColorForType = (label) => {
         const labelColorMap = {
-          'HISTORICAL': 'lightblue',
-          'CULTURAL': 'lightgreen',
-          'NATURE': 'orange',
-          'ADVENTURE' : 'yellow',
-          'SHOPPING' : 'turquoise',
-          'ENTERTAINMENT' : 'lightpink'
+          'KOREAN': 'lightblue',
+          'MEXICAN': 'lightgreen',
+          'CHINESE': 'orange',
+          'WESTERN' : 'yellow',
+          'FAST_FOOD' : 'turquoise',
+          'JAPANESE' : 'lightpink'
         };
 
         return labelColorMap[label] || 'gray';
     };
 
-    const viewAttraction = (attraction_id) => {
-        navigation.navigate('AttractionDetailsScreen', {attractionId : attraction_id}); // set the attraction id here 
-    }
+    const viewRestaurant = (restId) => {
+        navigation.navigate('RestaurantDetailsScreen', {restId : restId}); // set the rest id to bring to the nxt page 
+    }   
 
     return (
         <Background>
@@ -57,7 +57,7 @@ const AttractionScreen = ({ navigation }) => {
                 <View style={styles.container}>
                     { 
                         data.map((item, index) => (
-                        <TouchableOpacity key={index} onPress={() => viewAttraction(item.attraction_id)}>
+                        <TouchableOpacity key={index} onPress={() => viewRestaurant(item.restaurant_id)}>
                             <Card>
                                 <Card.Title style={styles.header}>
                                     {item.name} 
@@ -65,13 +65,12 @@ const AttractionScreen = ({ navigation }) => {
                                 <Card.Image
                                     style={{ padding: 0}}
                                     source={{
-                                    uri: item.attraction_image_list[0] // KIV for image 
+                                    uri: item.restaurant_image_list[0] // KIV for image 
                                     }}
                                 />
-
                                 <Text style={styles.description}>{item.description}</Text>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[styles.tag, {backgroundColor:getColorForType(item.attraction_category)}]}>{item.attraction_category}</Text>
+                                    <Text style={[styles.tag, {backgroundColor:getColorForType(item.restaurant_type)}]}>{item.restaurant_type}</Text>
                                     <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
                                 </View>
                             </Card>
@@ -109,8 +108,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
-        fontSize: 7.5,
+        width: 110,
+        fontSize: 11,
         fontWeight: 'bold'
     },
     header:{
@@ -119,4 +118,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default AttractionScreen
+export default RestaurantScreen

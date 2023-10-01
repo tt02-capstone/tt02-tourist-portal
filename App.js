@@ -17,6 +17,8 @@ import {useContext, useEffect} from "react";
 import {Cart} from "./src/components/Cart";
 import AttractionScreen from "./src/screens/Attraction/AttractionScreen";
 import AttractionDetailsScreen from "./src/screens/Attraction/AttractionDetailsScreen";
+import TelecomScreen from './src/screens/Telecom/TelecomScreen';
+import TelecomDetailsScreen from './src/screens/Telecom/TelecomDetailsScreen';
 import BookingHistoryScreen from "./src/screens/Booking/BookingHistoryScreen";
 import BookingDetailsScreen from "./src/screens/Booking/BookingDetailsScreen";
 import PaymentHistoryScreen from "./src/screens/PaymentHistoryScreen";
@@ -29,6 +31,12 @@ import {CheckoutScreen} from "./src/screens/Cart/CheckoutScreen";
 import { enGB,en, registerTranslation } from 'react-native-paper-dates'
 import { initStripe } from '@stripe/stripe-react-native';
 import {EmailVerificationScreen} from "./src/screens/SignUp/EmailVerificationScreen";
+import TourScreen from './src/screens/Attraction/TourScreen';
+import TourDetailsScreen from './src/screens/Attraction/TourDetailsScreen';
+import DealScreen from "./src/screens/Deal/DealScreen";
+import DealDetailsScreen from "./src/screens/Deal/DealDetailsScreen";
+import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
+import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -54,8 +62,8 @@ export const Layout = () => {
     const {authState} = useContext(AuthContext);
 
     useEffect(() => {
-        console.log("auth-state:", authState)
-        console.log('authenticated', authState.authenticated)
+        // console.log("auth-state:", authState)
+        // console.log('authenticated', authState.authenticated)
     }, [authState]);
 
     return (
@@ -66,15 +74,17 @@ export const Layout = () => {
                 {authState?.authenticated? (
                     <>
                         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{title: 'Home '}}/>
-                        <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen}
-                                      options={{title: 'View Profile'}}/>
-                        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen}
-                                      options={{title: 'Edit Profile'}}/>
-                        <Stack.Screen name="EditPasswordScreen" component={EditPasswordScreen}
-                                      options={{title: 'Edit Password'}}/>
-
+                        <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{title: 'View Profile'}}/>
+                        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} options={{title: 'Edit Profile'}}/>
+                        <Stack.Screen name="EditPasswordScreen" component={EditPasswordScreen} options={{title: 'Edit Password'}}/>
                         <Stack.Screen name="AttractionScreen" component={AttractionScreen} options={{ title : 'Attractions' }} />
                         <Stack.Screen name="AttractionDetailsScreen" component={ AttractionDetailsScreen} options={{ title : 'Attractions' }} />
+                        <Stack.Screen name="TelecomScreen" component={TelecomScreen} options={{ title : 'Telecoms' }} />
+                        <Stack.Screen name="TelecomDetailsScreen" component={TelecomDetailsScreen} options={{ title : 'Telecoms' }} />
+                        <Stack.Screen name="DealScreen" component={DealScreen} options={{ title : 'Deals' }} />
+                        <Stack.Screen name="DealDetailsScreen" component={DealDetailsScreen} options={{ title : 'Deal' }} />
+                        <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
+                        <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
@@ -84,19 +94,17 @@ export const Layout = () => {
                         <Stack.Screen name="CreditCardScreen" component={CreditCardScreen} options={{title: 'View Credit Card'}}/>
                         <Stack.Screen name="CartScreen" component={CartScreen} options={{ title : 'My Cart' }} />
                         <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
+                        <Stack.Screen name="TourScreen" component={TourScreen} options={{ title : 'Tours' }} />
+                        <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
                     </>
                 ) : (
                     <>
                         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{title: 'Login '}}/>
                         <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{title: 'Sign Up '}}/>
-                        <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen}
-                                      options={{title: 'Verify Code'}}/>
-                        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}
-                                      options={{title: 'Reset Password'}}/>
-                        <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen}
-                                      options={{title: 'Forgot Password'}}/>
-                        <Stack.Screen name="EmailVerificationScreen" component={EmailVerificationScreen}
-                                      options={{title: 'Verify Email'}}/>
+                        <Stack.Screen name="CodeVerificationScreen" component={CodeVerificationScreen} options={{title: 'Verify Code'}}/>
+                        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{title: 'Reset Password'}}/>
+                        <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{title: 'Forgot Password'}}/>
+                        <Stack.Screen name="EmailVerificationScreen" component={EmailVerificationScreen} options={{title: 'Verify Email'}}/>
                     </>
                 )}
             </Stack.Navigator>

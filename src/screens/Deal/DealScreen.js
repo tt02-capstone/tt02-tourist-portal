@@ -128,13 +128,31 @@ const DealScreen = ({navigation}) => {
                         if ((userType === 'TOURIST' && !item.is_govt_voucher) || userType === 'LOCAL') {
                             return (
                                     <Card key={index}>
-                                        <Card.Title style={styles.header}>
-                                            {item.promo_code ? item.promo_code : 'NO PROMO CODE REQUIRED'}
-                                        </Card.Title>
-                                        <Button mode="text" style={{ marginTop: -45, alignSelf: 'flex-end'}} onPress={() => save(item.deal_id)} >
+                                        {new Date(item.start_datetime) > new Date()?
+                                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                                <Text style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                                    UPCOMING
+                                                </Text>
+                                            </View>:
+                                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                                <Text style={{ backgroundColor: 'green', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                                    AVAILABLE
+                                                </Text>
+                                            </View>
+                                        }
+
+                                        <Button mode="text" style={{ marginTop: -35, alignSelf: 'flex-end'}} onPress={() => save(item.deal_id)} >
                                             {isSaved(item.deal_id) && <Icon name="heart" size={20} color='red' />}
                                             {!isSaved(item.deal_id) && <Icon name="heart" size={20} color='grey'/>}
                                         </Button>
+
+
+                                        <Card.Title style={styles.header}>
+                                            {/*{item.promo_code ? item.promo_code : 'NO PROMO CODE REQUIRED'}*/}
+                                        </Card.Title>
+
+
+
                                         {item.deal_image_list.length > 0 ? (
                                             <Card.Image
                                                 style={{ padding: 0, height: 200 }}
@@ -152,7 +170,7 @@ const DealScreen = ({navigation}) => {
                                         </Text>
 
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', fontWeight: 'bold' }]}>
+                                            <Text style={[styles.tag, { backgroundColor: 'blue', color: 'white', fontWeight: 'bold' }]}>
                                                 {item.discount_percent} % for GRABS
                                             </Text>
                                             <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>

@@ -10,3 +10,13 @@ export async function addTelecomToCart(userId, telecomId, cartBooking) {
     return {status: false, data: error.message};
   }
 }
+
+export async function addRoomToCart(userId, roomId, cartBooking) {
+  try {
+    const response = await cartApi.post(`/addRoomToCart/${userId}/${roomId}`, cartBooking);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("cartRedux addRoomToCart: ", error);
+    return {status: false, data: error.message};
+  }
+}

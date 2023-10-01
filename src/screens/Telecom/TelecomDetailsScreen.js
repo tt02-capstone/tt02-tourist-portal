@@ -14,6 +14,8 @@ import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { getTelecomById, toggleSaveTelecom } from '../../redux/telecomRedux';
 import { addTelecomToCart } from '../../redux/cartRedux';
+import moment from 'moment-timezone';
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 const TelecomDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -151,6 +153,7 @@ const TelecomDetailsScreen = ({ navigation }) => {
             })
 
         } else {
+            selectedDate.setHours(selectedDate.getHours() + timeZoneOffset);
             let endDate = new Date(selectedDate);
             endDate.setDate(endDate.getDate() + telecom.num_of_days_valid-1);
 

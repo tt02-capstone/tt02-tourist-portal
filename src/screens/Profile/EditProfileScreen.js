@@ -13,6 +13,7 @@ import { editTouristProfile } from '../../redux/touristRedux';
 import { storeUser } from '../../helpers/LocalStorage';
 import {AuthContext, TOKEN_KEY} from "../../helpers/AuthContext";
 import * as SecureStore from 'expo-secure-store';
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 export const EditProfileScreen = ({route, navigation}) => {
 
@@ -54,7 +55,8 @@ export const EditProfileScreen = ({route, navigation}) => {
 
             // console.log(inputDate)
             let newDate = inputDate;
-            newDate.setHours(inputDate.getHours() + 16)
+            newDate.setHours(newDate.getHours() + timeZoneOffset)
+            console.log(newDate)
 
             if (newDate > new Date()) {
                 Toast.show({

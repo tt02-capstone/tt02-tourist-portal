@@ -15,3 +15,5 @@ moment().format('LLL');  // September 15, 2023 5:28 PM
 moment().format('lll');  // Sep 15, 2023 5:28 PM
 moment().format('LLLL'); // Friday, September 15, 2023 5:28 PM
 moment().format('llll');
+
+export const timeZoneOffset = 8; // Offset in hours for Singapore Standard Time (GMT+8)

@@ -337,7 +337,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 const matchingTicket = attrTicketList.find(ticket =>
                     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
                 );
-
                 if (matchingTicket) {
                     ticket_count = matchingTicket.ticket_count;
                     ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;

@@ -32,7 +32,7 @@ export const CartScreen = ({ navigation }) => {
     const checkInTime = accommodation.check_in_time.split('T')[1];
 
     const checkInDate = new Date(date);
-    checkInDate.setDate(checkInDate.getDate()); 
+    checkInDate.setDate(checkInDate.getDate());
     const checkInDateInLocalDateTime = `${checkInDate.toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' })}`;
 
     return checkInDateInLocalDateTime;
@@ -43,12 +43,12 @@ export const CartScreen = ({ navigation }) => {
 
     const checkOutDate = new Date(date);
     checkOutDate.setDate(checkOutDate.getDate());
-    
+
     const options = { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' };
     const checkOutDateInLocalDateTime = `${checkOutDate.toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' })}`;
 
     return checkOutDateInLocalDateTime;
-}
+  }
 
   const checkout = async () => {
     const booking_ids = [];
@@ -178,10 +178,12 @@ export const CartScreen = ({ navigation }) => {
       // deal w the pricing change 
       const price = parseFloat(cartItems[cartItemIndex].items[itemIndex].price)
       const difference = price * delta; // get the change either +ve or - ve
-      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference; // new total price for the list item 
+      const tourDiff = tourPrice * delta
+      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference + parseFloat(tourDiff); // new total price for the list item 
       cartItems[cartItemIndex].price = newTotalPrice.toFixed(2).toString(); // set it back to 2 dp and set as string 
 
       setCartItems([...cartItems]);
+
     }
 
     // Clear any pending API call
@@ -243,11 +245,13 @@ export const CartScreen = ({ navigation }) => {
                 type: detail.type,
                 attraction_id: detail.attraction.attraction_id,
                 image: detail.attraction.attraction_image_list[0],
-                item_name: detail.activity_name,
-                activity_name: detail.attraction.name,
+                item_name: detail.activity_name, // Needs to be conditional
+                activity_name: detail.attraction.name, // Needs to be conditional
                 startTime: formatDateAndTime(detail.start_datetime),
                 endTime: formatDateAndTime(detail.end_datetime),
-                items: detail.cart_item_list,
+                items: detail.cart_item_list.filter(item => item.type === "ATTRACTION"), // get activity selection
+                tour: detail.cart_item_list.filter(item => item.type === "TOUR").length != 0
+                  ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
                 price: subtotal.toFixed(2),
                 quantity: quantities,
                 selections: selections
@@ -416,6 +420,10 @@ export const CartScreen = ({ navigation }) => {
                     )}
 
                     <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>S$ {cartItem.price}</ListItem.Subtitle>
+                    {cartItem.type === 'ATTRACTION' && cartItem.tour != null ?
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
+                        Tour: {cartItem.tour[0].activity_selection}
+                      </ListItem.Subtitle> : <Text></Text>}
                     {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                     {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                   </View>

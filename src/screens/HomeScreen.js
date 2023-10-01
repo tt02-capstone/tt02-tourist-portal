@@ -32,8 +32,16 @@ export const HomeScreen = ({ navigation }) => {
     navigation.navigate('AccommodationScreen')
   }
 
+  const viewRestaurant = () => {
+    navigation.navigate('RestaurantScreen')
+  }
+
   const viewTelecoms = () => {
     navigation.navigate('TelecomScreen')
+  }
+
+  const viewDeals = () => {
+    navigation.navigate('DealScreen')
   }
 
   const onLogoutPressed = async () => {
@@ -91,7 +99,7 @@ export const HomeScreen = ({ navigation }) => {
               Indulge your taste buds in Singapore's vibrant culinary scene, where a myriad of restaurants await to
               delight your palate. Come and savor the extraordinary culinary delights that await you!
             </Text>
-            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewRestaurant} />
           </Card>
 
           <Card>
@@ -121,7 +129,7 @@ export const HomeScreen = ({ navigation }) => {
               Unlock unbeatable deals and discounts that add extra value to your Singapore journey. Don't miss out
               on the chance to save while indulging in the best Singapore can offer!
             </Text>
-            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+            <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewDeals} />
           </Card>
 
           <Button
@@ -188,7 +196,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   description: {
-    marginBottom: 10, fontSize: 13, marginTop: 10
+    marginBottom: 10, fontSize: 12, marginTop: 10
   },
   button: {
     width: '92%',

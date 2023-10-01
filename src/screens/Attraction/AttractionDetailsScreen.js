@@ -333,15 +333,9 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
                 const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
                 const formattedDate = `${year}-${month}-${day}`;
-<<<<<<< HEAD
-                console.log('formattedDate', formattedDate);
-                const matchingTicket = attrTicketList.find(ticket => 
-=======
                 const matchingTicket = attrTicketList.find(ticket =>
->>>>>>> 343534fa3b8b4d5bb5bcebd4a1a5d10dd4dbbe2e
                     ticket.ticket_type === ticket_type && ticket.ticket_date === formattedDate
                 );
-
                 if (matchingTicket) {
                     ticket_count = matchingTicket.ticket_count;
                     ticket_type_id = matchingTicket ? matchingTicket.ticket_per_day_id : null;

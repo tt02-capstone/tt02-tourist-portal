@@ -42,35 +42,6 @@ const AccommodationScreen = ({ navigation }) => {
         fetchData();
     }, []);
 
-    // useEffect(() => {
-    //     try {
-    //         let filteredList = fullAccommodationList;
-
-    //         // Apply filters based on selected filter values
-    //         for (const filter of selectedFilters) {
-    //             switch (filter.type) {
-    //                 case 'accommodationType':
-    //                     filteredList = filteredList.filter(item => item.type === filter.value);
-    //                     break;
-    //                 case 'genericLocation':
-    //                     filteredList = filteredList.filter(item => item.generic_location === filter.value);
-    //                     break;
-    //                 case 'priceTier':
-    //                     filteredList = filteredList.filter(item => item.estimated_price_tier === filter.value);
-    //                     break;
-    //                 default:
-    //                     break;
-    //             }
-    //         }
-
-    //         setData(filteredList);
-    //         setLoading(false);
-    //     } catch (error) {
-    //         alert('An error occurred! Failed to retrieve accommodation list!');
-    //         setLoading(false);
-    //     }
-    // }, [selectedFilters]);
-
     // Function to handle filter selection
     const handleFilterSelect = (filterType, filterValue) => {
         const newSelectedFilters = [...selectedFilters];
@@ -102,17 +73,14 @@ const AccommodationScreen = ({ navigation }) => {
         }
     };
 
-    // Function to clear all filters
     const clearFilters = () => {
         setSelectedFilters([]);
         setAccommodationTypeFilter(null);
         setGenericLocationFilter(null);
         setPriceTierFilter(null);
-        // setData(fullAccommodationList);
         setTimeout(() => {
             setData(fullAccommodationList);
         }, 10);
-        toggleFilterModal();
     };
 
     const toggleFilterModal = () => {
@@ -120,8 +88,6 @@ const AccommodationScreen = ({ navigation }) => {
     };
 
     const applyFilters = () => {
-        // Apply filters here
-        // For example, you can filter data based on selected filter values
         let filteredList = fullAccommodationList;
 
         for (const filter of selectedFilters) {
@@ -141,7 +107,7 @@ const AccommodationScreen = ({ navigation }) => {
         }
 
         setData(filteredList);
-        toggleFilterModal(); // Close the modal after applying filters
+        toggleFilterModal();
     };
 
     const getColorForType = (label) => {
@@ -161,78 +127,15 @@ const AccommodationScreen = ({ navigation }) => {
         <Background>
             <ScrollView>
                 <View style={styles.container}>
-                    {/* <View style={styles.filterContainer}>
-                        <View style={styles.filterBox}>
-                            <RNPickerSelect
-                                placeholder={{
-                                    label: 'Select Type...',
-                                    value: null,
-                                }}
-                                onValueChange={(value) =>
-                                    handleFilterSelect('accommodationType', value)
-                                }
-                                items={[
-                                    { label: 'HOTEL', value: 'HOTEL' },
-                                    { label: 'AIRBNB', value: 'AIRBNB' },
-                                ]}
-                                value={accommodationTypeFilter}
-                                style={pickerSelectStyles}
-                            />
-                        </View>
-                        <View style={styles.filterBox}>
-                            <RNPickerSelect
-                                placeholder={{
-                                    label: 'Select Location...',
-                                    value: null,
-                                }}
-                                onValueChange={(value) =>
-                                    handleFilterSelect('genericLocation', value)
-                                }
-                                items={[
-                                    { label: 'Marina Bay', value: 'MARINA_BAY' },
-                                    { label: 'Raffles Place', value: 'RAFFLES_PLACE' },
-                                    { label: 'Shenton Way', value: 'SHENTON_WAY' },
-                                    { label: 'Tanjong Pagar', value: 'TANJONG_PAGAR' },
-                                    { label: 'Orchard', value: 'ORCHARD' },
-                                    { label: 'Newton', value: 'NEWTON' },
-                                    { label: 'Dhoby Ghaut', value: 'DHOBY_GHAUT' },
-                                    { label: 'Chinatown', value: 'CHINATOWN' },
-                                    { label: 'Bugis', value: 'BUGIS' },
-                                    { label: 'Clarke Quay', value: 'CLARKE_QUAY' },
-                                    { label: 'Sentosa', value: 'SENTOSA' },
-                                ]}
-                                value={genericLocationFilter}
-                                style={pickerSelectStyles}
-                            />
-                        </View>
-                        <View style={styles.filterBox}>
-                            <RNPickerSelect
-                                placeholder={{
-                                    label: 'Select Price Tier...',
-                                    value: null,
-                                }}
-                                onValueChange={(value) => handleFilterSelect('priceTier', value)}
-                                items={[
-                                    { label: 'Tier 1', value: 'TIER_1' },
-                                    { label: 'Tier 2', value: 'TIER_2' },
-                                    { label: 'Tier 3', value: 'TIER_3' },
-                                    { label: 'Tier 4', value: 'TIER_4' },
-                                    { label: 'Tier 5', value: 'TIER_5' },
-                                ]}
-                                value={priceTierFilter}
-                                style={pickerSelectStyles}
-                            />
-                        </View>
-                        <TouchableOpacity onPress={clearFilters} style={styles.clearFilterButton}>
-                            <Text style={styles.clearFilterText}>Clear Filters</Text>
+
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                            <Text style={styles.filterText}>Filter</Text>
                         </TouchableOpacity>
-                    </View> */}
 
-
-                    <View style={{ flex: 1, alignItems: 'center', marginTop: 15 }}>
-                        <Button onPress={toggleFilterModal} uppercase={false} mode="outlined" style={styles.filterText}>
-                            Filter
-                        </Button>
+                        <TouchableOpacity onPress={clearFilters} style={styles.filterButton}>
+                            <Text style={styles.filterText}>Clear Filters</Text>
+                        </TouchableOpacity>
                     </View>
 
                     {data.map((item, index) => (
@@ -301,8 +204,8 @@ const AccommodationScreen = ({ navigation }) => {
                                                 handleFilterSelect('accommodationType', value)
                                             }
                                             items={[
-                                                { label: 'HOTEL', value: 'HOTEL' },
-                                                { label: 'AIRBNB', value: 'AIRBNB' },
+                                                { label: 'Hotel', value: 'HOTEL' },
+                                                { label: 'Airbnb', value: 'AIRBNB' },
                                             ]}
                                             value={accommodationTypeFilter}
                                             style={pickerSelectStyles}
@@ -350,12 +253,14 @@ const AccommodationScreen = ({ navigation }) => {
                                             style={pickerSelectStyles}
                                         />
                                     </View>
-                                    <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
-                                        <Text style={styles.filterText}>Apply Filters</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={clearFilters} style={styles.filterButton}>
-                                        <Text style={styles.filterText}>Clear Filters</Text>
-                                    </TouchableOpacity>
+
+                                    <View style={styles.buttonContainer}>
+                                        <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
+                                            <Text style={styles.filterText}>Apply</Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+
                                 </ScrollView>
                             </View>
                         </View>
@@ -376,7 +281,8 @@ const pickerSelectStyles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 4,
         color: 'black',
-        paddingRight: 30, // to ensure the text is never behind the icon
+        paddingRight: 30,
+        marginBottom: 5,
     },
     inputAndroid: {
         fontSize: 16,
@@ -386,7 +292,7 @@ const pickerSelectStyles = StyleSheet.create({
         borderColor: 'purple',
         borderRadius: 8,
         color: 'black',
-        paddingRight: 30, // to ensure the text is never behind the icon
+        paddingRight: 30, 
     },
 });
 
@@ -440,11 +346,14 @@ const styles = StyleSheet.create({
         margin: 8,
     },
     filterButton: {
-        backgroundColor: 'purple',
+        backgroundColor: '#eb8810',
         padding: 10,
-        borderRadius: 4,
+        borderRadius: 8,
         marginTop: 10,
+        marginLeft: 10,
         alignItems: 'center',
+        alignSelf: 'center', 
+        width: '30%',
     },
     filterText: {
         color: 'white',
@@ -481,6 +390,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 16,
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+        width: '100%',
+    },
+
 });
 
 

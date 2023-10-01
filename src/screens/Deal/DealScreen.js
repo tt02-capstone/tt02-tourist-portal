@@ -32,7 +32,7 @@ const DealScreen = ({ navigation }) => {
         const fetchData = async () => {
             let response = await getPublishedDealList();
             if (response.status) {
-                console.log(response.data)
+                console.log("response.data", response.data)
                 setFullDealList(response.data);
                 setData(response.data);
             } else {
@@ -49,6 +49,7 @@ const DealScreen = ({ navigation }) => {
     // }
 
     // Function to handle filter selection
+
     const handleFilterSelect = (filterType, filterValue) => {
         const newSelectedFilters = [...selectedFilters];
         const filterIndex = newSelectedFilters.findIndex(filter => filter.type === filterType);
@@ -65,7 +66,7 @@ const DealScreen = ({ navigation }) => {
 
         // Update individual filter states
         switch (filterType) {
-            case 'DealType':
+            case 'dealType':
                 setDealTypeFilter(filterValue);
                 break;
             default:

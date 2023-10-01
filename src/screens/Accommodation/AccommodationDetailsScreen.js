@@ -15,6 +15,7 @@ import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { addRoomToCart } from '../../redux/cartRedux';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -93,7 +94,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             console.log("checkOutTime", checkOutTime);
 
             const checkInDate = new Date(range.startDate);
-            checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
+            checkInDate.setHours(checkInDate.getHours() + timeZoneOffset);
+            // checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
             const checkInDateInLocalDateTime = `${checkInDate.toISOString().split('T')[0]}T${checkInTime}Z`;
 
             const checkOutDate = new Date(range.endDate);
@@ -226,6 +228,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             const price = room.price;
             const roomCount = room.quantity;
 
+            let available_rooms = 0;
+
             console.log("accommodation.check_in_time", accommodation.check_in_time);
             const checkInTime = accommodation.check_in_time.split('T')[1];
             const checkOutTime = accommodation.check_out_time.split('T')[1];
@@ -238,7 +242,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 console.log("range.endDate", range.endDate);
 
                 const checkInDate = new Date(range.startDate);
-                checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
+                checkInDate.setHours(checkInDate.getHours() + timeZoneOffset);
+                // checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
                 const checkInDateInLocalDateTime = `${checkInDate.toISOString().split('T')[0]}T${checkInTime}Z`;
 
                 const checkOutDate = new Date(range.endDate);

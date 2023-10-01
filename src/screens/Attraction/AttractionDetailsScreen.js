@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -77,6 +78,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
             })
         } else {
             // format date
+            selectedDate.setHours(selectedDate.getHours() + timeZoneOffset);
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
             const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 

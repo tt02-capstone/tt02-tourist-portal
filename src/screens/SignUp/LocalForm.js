@@ -4,6 +4,7 @@ import InputValidator from "../../helpers/InputValidator";
 import {DatePickerInput} from "react-native-paper-dates";
 import React, {useState} from "react";
 import PhoneInput from "react-native-international-phone-number";
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 
 export const LocalForm = ({formData, setFormData}) => {
@@ -13,6 +14,7 @@ export const LocalForm = ({formData, setFormData}) => {
     const setDate = (selectedDate) => {
         console.log(selectedDate)
         setSelectedDate(selectedDate)
+        selectedDate.setHours(selectedDate.getDate()+ timeZoneOffset)
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone

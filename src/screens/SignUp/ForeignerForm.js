@@ -5,6 +5,7 @@ import {DatePickerInput} from "react-native-paper-dates";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 import React, {useState} from "react";
 import PhoneInput, {ICountry} from 'react-native-international-phone-number';
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 export const ForeignerForm = ({formData, setFormData}) => {
     const [selectedCountry, setSelectedCountry] = useState(null);
@@ -13,6 +14,7 @@ export const ForeignerForm = ({formData, setFormData}) => {
     const setDate = (selectedDate) => {
         console.log(selectedDate)
         setSelectedDate(selectedDate)
+        selectedDate.setHours(selectedDate.getDate()+ timeZoneOffset)
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone

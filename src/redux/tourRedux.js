@@ -1,6 +1,5 @@
 import { tourApi } from "../helpers/api";
 import { handleApiErrors } from "../helpers/errorCatching";
-import { format, addMinutes, parseISO } from 'date-fns';
 
 export async function getAllTourTypesByAttraction(attractionId, dateSelected) {
     try {

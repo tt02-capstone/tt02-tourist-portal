@@ -23,6 +23,7 @@ const AccommodationScreen = ({ navigation }) => {
         const fetchData = async() => {
             try {
                 let listOfAccommodations = await getAccommodationList();
+                console.log(listOfAccommodations)
                 setData(listOfAccommodations);
                 setLoading(false);
             } catch (error) {

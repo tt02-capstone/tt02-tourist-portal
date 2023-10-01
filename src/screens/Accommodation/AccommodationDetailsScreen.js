@@ -8,7 +8,8 @@ import { View, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-nat
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerModal } from 'react-native-paper-dates';
-import { getAccommodation, getMinAvailableRoomsOnDateRange } from '../../redux/reduxAccommodation';
+import { getAccommodation, getMinAvailableRoomsOnDateRange, toggleSaveAccommodation } from '../../redux/reduxAccommodation';
+import { DatePickerInput } from 'react-native-paper-dates';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
@@ -25,6 +26,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     const [formattedRoomList, setFormattedRoomList] = useState([]);
     const [quantityByRoomType, setQuantityByRoomType] = useState({});
     const route = useRoute();
+    const [isSaved, setIsSaved] = useState(false);
+
     const { accommodationId } = route.params;
     const [activeSlide, setActiveSlide] = useState(0);
 
@@ -109,11 +112,11 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                     // removed as i don't use smthg similar to checkTicketInventory
                     // for ticket, this was ticket type entity
                     selectedRooms.push({
-                        // this is undefined 
+                        // this is undefined
                         room_id: formattedRoomList.find(item => item.room_type === roomType).room_id,
                         // amenities description
                         // num of pax
-                        //ticket_price: formattedPriceList.find(item => item.ticket_type === roomType).amount // price per ticket 
+                        //ticket_price: formattedPriceList.find(item => item.ticket_type === roomType).amount // price per ticket
                         room_type: roomType,
                         quantity: quantityByRoomType[roomType],
                     });
@@ -131,9 +134,9 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 })
 
 
-            } else {  // when both ticket date + ticket types are selected 
+            } else {  // when both ticket date + ticket types are selected
 
-                // current date check 
+                // current date check
                 const currentDate = new Date();
                 const year = currentDate.getFullYear();
                 const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -329,12 +332,69 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             ;
     }
 
+    useEffect(() => {
+        if (user) {
+            let saved = false;
+            for (var i = 0; i < user.accommodation_list.length; i++) {
+                if(user.accommodation_list[i].accommodation_id === accommodationId) {
+                    saved = true;
+                    break;
+                }
+            }
+            setIsSaved(saved);
+        }
+    }, [user])
+
+    // add to saved listing
+    const save = async () => {
+        let response = await toggleSaveAccommodation(user.user_id, accommodation.accommodation_id);
+        console.log('toggle res', response.data)
+        if (response.status) {
+            if (!isSaved) {
+                setIsSaved(true);
+                let obj = {
+                    ...user,
+                    accommodation_list: response.data
+                }
+                await storeUser(obj);
+                fetchUser();
+                Toast.show({
+                    type: 'success',
+                    text1: 'Accommodation has been saved!'
+                });
+            } else {
+                setIsSaved(false);
+                let obj = {
+                    ...user,
+                    accommodation_list: response.data
+                }
+
+                await storeUser(obj);
+                fetchUser();
+                Toast.show({
+                    type: 'success',
+                    text1: 'Accommodation has been unsaved!'
+                });
+            }
+
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: response.info
+            })
+        }
+    }
+
     return (
         <Background>
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
                         {accommodation.name}
+                        <Button mode="text" style={{ marginTop: -10}} onPress={save} >
+                            {isSaved && <Icon name="heart" size={20} color='red' />}
+                            {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                        </Button>
                     </Card.Title>
 
                     <View style={{ flexDirection: 'row' }}>
@@ -389,8 +449,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                             </View>
                         </Card>
                     )}
-                    sliderWidth={400} 
-                    itemWidth={360}  
+                    sliderWidth={400}
+                    itemWidth={360}
                     layout={'default'}
                     onSnapToItem={(index) => setActiveSlide(index)}
                 />

@@ -25,18 +25,6 @@ export async function getAttraction(attraction_id) {
     }
 }
 
-export async function getAttractionRecommendation(attraction_id) {
-    try {
-        const response = await attractionApi.get(`/getAttractionRecommendation/${attraction_id}`);
-        if (response.data != []) {
-            return response.data;
-        }    
-    } catch (error) {
-        console.error("Retrieve recommendation error!");
-        return {status: false, data: error.message};
-    }
-}
-
 export async function checkTicketInventory(attraction_id,ticket_date,request_body) {
     try {
         const response = await attractionApi.post(`/checkTicketInventory/${attraction_id}/${ticket_date}`,request_body);
@@ -96,8 +84,6 @@ export async function getSeasonalActivity(attraction_id) {
     try {
         const response = await attractionApi.get(`/getSeasonalActivity/${attraction_id}`);
         if (response.data != [] && response.data.httpStatusCode != 404) { // not going to catch error here since errors means thr is no seasonal activity now 
-            // console.log('seasonal');
-            // console.log(response.data);
             return response.data;
         }    
     } catch (error) {
@@ -105,4 +91,3 @@ export async function getSeasonalActivity(attraction_id) {
         return {status: false, data: error.message};
     }
 }
-

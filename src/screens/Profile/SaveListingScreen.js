@@ -5,48 +5,84 @@ import { View, ScrollView, StyleSheet, Image, TouchableOpacity, useWindowDimensi
 import { Text, Card, Icon } from '@rneui/themed';
 import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
 import { getSavedAttractionList, deleteSavedAttraction } from '../../redux/reduxAttraction';
+import { getAllSavedRestaurantForUser, removeSavedRestaurantForUser } from '../../redux/restaurantRedux';
+import { getUserSavedTelecom, toggleSaveTelecom } from '../../redux/telecomRedux';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import {getUserSavedDeal, toggleSaveDeal} from "../../redux/dealRedux";
 import {getAccommodationList, getUserSavedAccommodation, toggleSaveAccommodation} from "../../redux/reduxAccommodation";
+import {useIsFocused} from "@react-navigation/native";
 
 const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) => (
     <Background>
-            <ScrollView>
-                <View style={styles.container}>
-                    { 
-                        data.map((item, index) => (
-                            <Card key={index}>
-                                <Card.Title style={styles.header}>
-                                    {item.name} 
-                                </Card.Title>
-                                <Card.Image
-                                    style={{ padding: 0}}
-                                    source={{
-                                    uri: item.attraction_image_list[0] // KIV for image 
-                                    }}
-                                />
+        <ScrollView>
+            <View style={styles.container}>
+                {
+                    data.map((item, index) => (
+                        <Card key={index}>
+                            <Card.Title style={styles.header}>
+                                {item.name}
+                            </Card.Title>
+                            <Card.Image
+                                style={{ padding: 0}}
+                                source={{
+                                uri: item.attraction_image_list[0]
+                                }}
+                            />
 
-                                <Text style={styles.description}>{item.description}</Text>
-                                <View style={{ flexDirection: 'row'}}>
-                                    <Text style={[styles.tag, {backgroundColor:getColorForType(item.attraction_category)}]}>{item.attraction_category}</Text>
-                                    <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
-                                </View>
+                            <Text style={styles.description}>{item.description}</Text>
+                            <View style={{ flexDirection: 'row'}}>
+                                <Text style={[styles.tag, {backgroundColor:getColorForType(item.attraction_category)}]}>{item.attraction_category}</Text>
+                                <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
+                            </View>
 
-                                <View style={{ flexDirection: 'row'}}>
-                                    <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeListing(item.attraction_id)} />
-                                    <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewListing(item.attraction_id)}/>
-                                </View>
+                            <View style={{ flexDirection: 'row'}}>
+                                <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeListing(item.attraction_id)} />
+                                <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewListing(item.attraction_id)}/>
+                            </View>
 
-                            </Card>
-                        )) 
-                    }
-                </View>
-            </ScrollView>
-        </Background>
+                        </Card>
+                    ))
+                }
+            </View>
+        </ScrollView>
+    </Background>
 );
 
-const RestaurantRoute = () => (
-    <View style={{ flex: 1, backgroundColor: 'white' }} />
+const RestaurantRoute = ({data, removeListing, viewListing, getColorForType}) => (
+    <Background>
+        <ScrollView>
+            <View style={styles.container}>
+                {
+                    data.map((item, index) => (
+                        <Card key={index}>
+                            <Card.Title style={styles.header}>
+                                {item.name}
+                            </Card.Title>
+                            <Card.Image
+                                style={{ padding: 0}}
+                                source={{
+                                    uri: item.restaurant_image_list[0]
+                                }}
+                            />
+
+                            <Text style={styles.description}>{item.description}</Text>
+                            <View style={{ flexDirection: 'row'}}>
+                                <Text style={[styles.tag, {backgroundColor:getColorForType(item.restaurant_type)}]}>{item.restaurant_type}</Text>
+                                <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'row'}}>
+                                <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeListing(item.restaurant_id)} />
+                                <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewListing(item.restaurant_id)}/>
+                            </View>
+
+                        </Card>
+                    ))
+                }
+            </View>
+        </ScrollView>
+    </Background>
 );
 
 const AccommodationRoute =({ data, removeListing, viewListing, getColorForType }) => (
@@ -83,8 +119,57 @@ const AccommodationRoute =({ data, removeListing, viewListing, getColorForType }
     </Background>
 );
 
-const TelecomRoute = () => (
-    <View style={{ flex: 1, backgroundColor: 'white' }} />
+function formatTelecomImage(text) {
+    if (text === 'ONE_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_1_day.JPG';
+    } else if (text === 'THREE_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_3_day.JPG';
+    } else if (text === 'SEVEN_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_7_day.JPG';
+    } else if (text === 'FOURTEEN_DAY') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_14_day.JPG';
+    } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
+        return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_more_than_14_day.JPG';
+    } else {
+        return text;
+    }
+}
+
+const TelecomRoute = ({data, viewTelecomListing, removeTelecomListing}) => (
+    <Background>
+        <ScrollView>
+            <View style={styles.container}>
+                {
+                    data.map((item, index) => (
+                        <Card key={index}>
+                            <Card.Title style={styles.header}>
+                                {item.name}
+                            </Card.Title>
+                            <Card.Image
+                                style={{ padding: 0, height: 200, marginBottom: 20}}
+                                source={{
+                                uri: formatTelecomImage(item.plan_duration_category)
+                                }}
+                            />
+
+                            <Text style={styles.subtitle}>
+                                <Text style={{fontWeight: 'bold'}}>Price: </Text><Text>${item.price} </Text>
+                                <Text style={{fontWeight: 'bold'}}>Duration: </Text><Text>{item.num_of_days_valid} day(s) </Text>
+                                <Text style={{fontWeight: 'bold'}}>Data Limit: </Text><Text>{item.data_limit}GB</Text>
+                            </Text>
+
+                            <Text style={styles.description}>{item.description}</Text>
+
+                            <View style={{ flexDirection: 'row'}}>
+                                <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeTelecomListing(item.telecom_id)} />
+                                <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewTelecomListing(item.telecom_id)}/>
+                            </View>
+                        </Card>
+                    ))
+                }
+            </View>
+        </ScrollView>
+    </Background>
 );
 
 const DealRoute = () => (
@@ -101,10 +186,26 @@ const renderScene = SceneMap({
 
 const SavedListingScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
-    const [data, setData] = useState([]);
     const layout = useWindowDimensions();
+    const isFocused = useIsFocused(); // to call useEffect whenever the page is seen regardless of on top of stack
+
+    // attraction
+    const [data, setData] = useState([]);
+
+    //deal
+    const [dealData, setDealData] = useState([]);
+
+    // telecom
+    const [telecomData, setTelecomData] = useState([]);
     const [fetchData, setFetchData] = useState(true);
+    const [userType, setUserType] = useState('');
+
+    // restaurant
+    const [restData, setRestData] = useState([]);
+
+    //accommodation
     const [accommodationData, setAccommodationData] =useState([]);
+
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
         { key: 'first', title: 'Attraction' },
@@ -117,38 +218,58 @@ const SavedListingScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
+        setUserType(await getUserType());
     }
 
     async function updateData() {
         const savedAttractions = await getSavedAttractionList(user.user_id);
         setData(savedAttractions);
+
+        const savedRest = await getAllSavedRestaurantForUser(user.user_id);
+        setRestData(savedRest.data)
     }
 
     useEffect(() => {
         const fetchData = async() => {
             try {
-                const userData = await getUser()
-                setUser(userData)
+                if (fetchData || isFocused) {
+                    const userData = await getUser()
+                    setUser(userData)
 
-                let savedAttractions = await getSavedAttractionList(userData.user_id);
-                setData(savedAttractions);
+                    let savedAttractions = await getSavedAttractionList(userData.user_id);
+                    setData(savedAttractions);
 
-                let savedAccommodations = await getUserSavedAccommodation(userData.user_id);
+                    let telecomResponse = await getUserSavedTelecom(userData.user_id);
+                    if (telecomResponse.status) {
+                        setTelecomData(telecomResponse.data);
+                    }
 
-                if (savedAccommodations.status) {
-                    setAccommodationData(savedAccommodations.data);
+                    let dealResponse = await getUserSavedDeal(userData.user_id);
+                    if (dealResponse.status) {
+                        setDealData(dealResponse.data);
+                    }
+
+                    let savedRest = await getAllSavedRestaurantForUser(userData.user_id);
+                    if (savedRest.status) {
+                        setRestData(savedRest.data);
+                    }
+
+                    let savedAccommodations = await getUserSavedAccommodation(userData.user_id);
+                    if (savedAccommodations.status) {
+                        setAccommodationData(savedAccommodations.data);
+                    }
+                    setFetchData(false);
                 }
 
-                setFetchData(false);
-
             } catch (error) {
-                alert ('An error occur! Failed to retrieve saved attraction listing!');
+                alert ('An error occur! Failed to retrieve saved listing!');
             }    
         };
         fetchUser();
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isFocused]);
 
+    // attractions
     const getColorForType = (label) => {
         const labelColorMap = {
           'HISTORICAL': 'lightblue',
@@ -198,6 +319,89 @@ const SavedListingScreen = ({ navigation }) => {
         }
     }
 
+    // telecom
+    const viewTelecomListing = (id) => {
+        navigation.navigate('TelecomDetailsScreen', {id: id});
+    }
+
+    const removeTelecomListing = async (id) => {
+        let response = await toggleSaveTelecom(user.user_id, id);
+        if (response.status) {
+            let obj = {
+                ...user,
+                telecom_list: response.data
+            }
+            await storeUser(obj);
+            fetchUser();
+            setFetchData(true);
+            Toast.show({
+                type: 'success',
+                text1: 'Listing has been removed!'
+            });
+
+            updateData();
+        } else {
+            console.log("Telecom not removed!");
+        }
+    }
+
+    // restaurant
+    const getColorForTypeRest = (label) => {
+        const labelColorMap = {
+            'KOREAN': 'lightblue',
+            'MEXICAN': 'lightgreen',
+            'CHINESE': 'orange',
+            'WESTERN' : 'yellow',
+            'FAST_FOOD' : 'turquoise',
+            'JAPANESE' : 'lightpink'
+          };
+
+        return labelColorMap[label] || 'gray';
+    };
+
+    const viewRestListing = (restId) => {
+        navigation.navigate('RestaurantDetailsScreen', {restId : restId}); // redirect to rest
+    }
+
+    const removeRestListing = async (restId) => {
+        let response = await removeSavedRestaurantForUser(user.user_id, restId)
+        if (response.status) {
+            fetchUser();
+            Toast.show({
+                type: 'success',
+                text1: 'Listing has been removed!'
+            });
+
+            updateData();
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: response.info
+            })
+        }
+    }
+
+    //deal
+    const removeDealListing = async (id) => {
+        let response = await toggleSaveDeal(user.user_id, id);
+        if (response.status) {
+            let obj = {
+                ...user,
+                deals_list: response.data
+            }
+            await storeUser(obj);
+            fetchUser();
+            setFetchData(true);
+            Toast.show({
+                type: 'success',
+                text1: 'Deal has been removed!'
+            });
+
+            updateData();
+        } else {
+            console.log("Deal not removed!");
+        }
+    }
     const removeAccommodationListing = async (accommodation_id) => {
         let response = await toggleSaveAccommodation(user.user_id,accommodation_id);
         if (response.status) {
@@ -228,13 +432,13 @@ const SavedListingScreen = ({ navigation }) => {
                     case 'first':
                         return <AttractionRoute data={data} removeListing={removeListing} viewListing={viewListing}  getColorForType={getColorForType}/>;
                     case 'second':
-                        return <RestaurantRoute/>;
+                        return <RestaurantRoute data={restData} removeListing={removeRestListing} viewListing={viewRestListing} getColorForType={getColorForTypeRest} />;
                     case 'third':
                         return <AccommodationRoute data={accommodationData} removeListing={removeAccommodationListing} viewListing={viewAccommodationListing} getColorForType={getColorForTypeAccommodation}/>;
                     case 'fourth':
-                        return <TelecomRoute />;
+                        return <TelecomRoute data={telecomData} viewTelecomListing={viewTelecomListing} removeTelecomListing={removeTelecomListing} />;
                     case 'fifth':
-                        return <DealRoute />;
+                        return <DealRoute userType={userType} data={dealData} removeDealListing={removeDealListing} />;
                     default:
                         return null;
                 }
@@ -287,7 +491,8 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     button: {
-        width: "50%"
+        width: "50%",
+
     }
 });
 

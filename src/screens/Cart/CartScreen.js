@@ -1,64 +1,78 @@
-import React , { useState, useEffect, useRef } from 'react';
-import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { ListItem, Button, CheckBox, Card, Avatar, Image, Text } from '@rneui/themed';
-import { clearStorage, getUser, getUserType } from '../../helpers/LocalStorage';
+import React, { useState, useEffect, } from 'react';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { ListItem, Button, CheckBox, Image, Text } from '@rneui/themed';
+import { getUser, getUserType } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
-import Background from '../../components/Background';
 import { useIsFocused } from '@react-navigation/native';
+import { retrieveAccommodationByRoom } from '../../redux/reduxAccommodation';
 
-
-export const CartScreen = ({navigation}) => {
-    const [user, setUser] = useState('');
-    const [cartItems, setCartItems] = useState([]); 
-    const [user_type, setUserType] = useState('');
-    const [deletion, setDeletion] = useState(false);
-    const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
-    const [totalPrice, setTotalPrice] = useState(0);
-    const [apiCallTimer, setApiCallTimer] = useState(null);
-    const isFocused = useIsFocused();
+export const CartScreen = ({ navigation }) => {
+  const [user, setUser] = useState('');
+  const [cartItems, setCartItems] = useState([]);
+  const [user_type, setUserType] = useState('');
+  const [deletion, setDeletion] = useState(false);
+  const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [apiCallTimer, setApiCallTimer] = useState(null);
+  const isFocused = useIsFocused();
 
   function formatDateAndTime(date) {
     const options = {
       year: '2-digit',
       month: '2-digit',
       day: '2-digit',
-
     };
-  
+
     const formattedDate = new Date(date).toLocaleString(undefined, options);
     return formattedDate;
   }
 
+  function formatCheckInDateTime(accommodation, date) {
+    const checkInTime = accommodation.check_in_time.split('T')[1];
+
+    const checkInDate = new Date(date);
+    checkInDate.setDate(checkInDate.getDate());
+    const checkInDateInLocalDateTime = `${checkInDate.toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' })}`;
+
+    return checkInDateInLocalDateTime;
+  }
+
+  function formatCheckOutDateTime(accommodation, date) {
+    const checkOutTime = accommodation.check_out_time.split('T')[1];
+
+    const checkOutDate = new Date(date);
+    checkOutDate.setDate(checkOutDate.getDate());
+
+    const options = { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' };
+    const checkOutDateInLocalDateTime = `${checkOutDate.toLocaleString('en-US', { day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit' })}`;
+
+    return checkOutDateInLocalDateTime;
+  }
+
   const checkout = async () => {
     const booking_ids = [];
-      const selectedCartItems = [];
-      itemChecked.forEach((isChecked, index) => {
-        if (isChecked) {
-            console.log("WATTT " + cartItems[index])
-            console.log(cartItems[index])
-            booking_ids.push(cartItems[index].id);
-            selectedCartItems.push(cartItems[index]);
-        }
+    const selectedCartItems = [];
+    itemChecked.forEach((isChecked, index) => {
+      if (isChecked) {
+        // console.log("WATTT " + cartItems[index])
+        // console.log(cartItems[index])
+        booking_ids.push(cartItems[index].id);
+        selectedCartItems.push(cartItems[index]);
+      }
     });
 
     if (selectedCartItems.length > 0) {
-    
-        console.log(booking_ids)
-        navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
-    } 
-
-    // Should give warning
-
-  
-}
-
+      navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
+    }
+    // should give warning
+  }
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Button 
-          title="Delete" 
+        <Button
+          title="Delete"
           type="error"
           onPress={() => handleDeleteCartItem(user, itemChecked)}
         />
@@ -66,74 +80,69 @@ export const CartScreen = ({navigation}) => {
     });
   }, [navigation, user, itemChecked]);
 
-  const handleDeleteCartItem = async (user,itemChecked) => {
-    console.log(user) //There seems to be a bug with the useLayoutEffect, it would not retrieve the user object
+  const handleDeleteCartItem = async (user, itemChecked) => {
     const tourist_email = user.email;
     const booking_ids = [];
-      itemChecked.forEach((isChecked, index) => {
-        if (isChecked) {
-            booking_ids.push(cartItems[index].id);
+    itemChecked.forEach((isChecked, index) => {
+      if (isChecked) {
+        booking_ids.push(cartItems[index].id);
 
-        }
+      }
     });
-    console.log(tourist_email,booking_ids)
-    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`,booking_ids)
+
+    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`, booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-      console.log('error',response.data)
+      console.log('error', response.data)
 
-  } else {
-    console.log('success', response.data)
-    if (response.data) {
-      setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
-
-      setDeletion(!deletion);
-      Toast.show({
-        type: 'success',
-        text1: 'Successfully deleted cart item(s)'
-    });
-    
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Unable to delete cart item(s)'
-    });
+      // console.log('success', response.data)
+      if (response.data) {
+        setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
+        setDeletion(!deletion);
+        Toast.show({
+          type: 'success',
+          text1: 'Successfully deleted cart item(s)'
+        });
+
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Unable to delete cart item(s)'
+        });
+      }
     }
-  }
+  };
 
-};
-
-const getFields = (cartItems) => {
+  const getFields = (cartItems) => {
     let subtotal = 0;
     const selections = [];
     const quantities = [];
 
     cartItems.forEach((cartItem) => {
-
-        subtotal += (cartItem.price * cartItem.quantity);
-        selections.push(cartItem.activity_selection);
-        quantities.push(cartItem.quantity);
-      });
-
+      subtotal += (cartItem.price * cartItem.quantity);
+      selections.push(cartItem.activity_selection);
+      quantities.push(cartItem.quantity);
+    });
 
     return { subtotal, selections, quantities };
-}
-    
+  }
 
-const handleCheckBoxToggle = (index) => {
+  const handleCheckBoxToggle = (index) => {
     const updatedChecked = [...itemChecked];
+
     if (updatedChecked[index]) {
-        const cartItem = cartItems[index];
-        const newPrice = totalPrice - parseFloat(cartItem.price);
-        setTotalPrice(newPrice);
+      const cartItem = cartItems[index];
+      const newPrice = totalPrice - parseFloat(cartItem.price);
+      setTotalPrice(newPrice);
+
     } else {
-        const cartItem = cartItems[index];
-        const newPrice = totalPrice + parseFloat(cartItem.price);
-        setTotalPrice(newPrice);
+      const cartItem = cartItems[index];
+      const newPrice = totalPrice + parseFloat(cartItem.price);
+      setTotalPrice(newPrice);
     }
 
     updatedChecked[index] = !updatedChecked[index];
     setItemChecked(updatedChecked);
-    
   };
 
   const isAllChecked = () => {
@@ -142,33 +151,39 @@ const handleCheckBoxToggle = (index) => {
 
   const handleCheckAllToggle = () => {
     const updatedChecked = itemChecked.map(() => !isAllChecked());
+
     if (isAllChecked()) {
-        setTotalPrice(0);
+      setTotalPrice(0);
+
     } else {
-        let newPrice = 0;
-        cartItems.forEach((cartItem) => {
-            newPrice += parseFloat(cartItem.price);
-        });
-        setTotalPrice(newPrice);
+      let newPrice = 0;
+      cartItems.forEach((cartItem) => {
+        newPrice += parseFloat(cartItem.price);
+      });
+
+      setTotalPrice(newPrice);
     }
+
     setItemChecked(updatedChecked);
   };
 
-  const updateQuantity = (cartItemIndex,itemIndex, delta) => {
+  const updateQuantity = (cartItemIndex, itemIndex, delta) => {
 
     // Update the cart items with new quantity for the specified ticket type
     const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
 
     if (currentQuantity + delta >= 0) { // quantity can never go  below 0
-      cartItems[cartItemIndex].items[itemIndex].quantity += delta ;
-      
+      cartItems[cartItemIndex].items[itemIndex].quantity += delta;
+
       // deal w the pricing change 
       const price = parseFloat(cartItems[cartItemIndex].items[itemIndex].price)
-      const difference = price  * delta; // get the change either +ve or - ve
-      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference; // new total price for the list item 
+      const difference = price * delta; // get the change either +ve or - ve
+      const tourDiff = tourPrice * delta
+      const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference + parseFloat(tourDiff); // new total price for the list item 
       cartItems[cartItemIndex].price = newTotalPrice.toFixed(2).toString(); // set it back to 2 dp and set as string 
 
       setCartItems([...cartItems]);
+
     }
 
     // Clear any pending API call
@@ -183,7 +198,6 @@ const handleCheckBoxToggle = (index) => {
 
     if (currentQuantity + delta === 0) { // Delete cart item if quantity is 0
       cartItems[cartItemIndex].items.splice(itemIndex, 1);
-
     }
 
     if (cartItems[cartItemIndex].items.length === 0) { // Delete cart booking if no cart items
@@ -193,15 +207,13 @@ const handleCheckBoxToggle = (index) => {
     setCartItems([...cartItems]);
 
     const newTimer = setTimeout(async () => {
-      
-
-      if (quantity >= 0 ){ // dbl check agn
+      if (quantity >= 0) {
         const response = await cartApi.put(`/updateCartItem/${user_type}/${tourist_email}/${cart_item_id}/${cart_booking_id}/${quantity}`)
-          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-              console.log('error',response.data)
-          } else {
-              console.log('success',response.data)
-          }
+        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+          console.log('error', response.data)
+        } else {
+          console.log('success', response.data)
+        }
       }
     }, 1000);
 
@@ -211,47 +223,93 @@ const handleCheckBoxToggle = (index) => {
   useEffect(() => {
     async function onLoad() {
       try {
-        
         const user_type = await getUserType();
         const userData = await getUser()
         setUser(userData)
         setUserType(user_type)
         const tourist_email = userData.email
-        
+
         const response = await cartApi.get(`/viewCart/${user_type}/${tourist_email}`)
-          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-              console.log('error',response.data)
+        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
+          console.log('error', response.data)
 
-          } else {
-              // console.log(response.data)
-              const cartDetails = response.data;
-              const extractedDetails = cartDetails.map((detail) => {
-                console.log(detail)
-                //console.log(detail.attraction.attraction_id)
-                const { subtotal, selections, quantities } = getFields(detail.cart_item_list);
-  
+        } else {
+          const cartDetails = response.data;
+          console.log("cartDetails", cartDetails);
+          const extractedDetails = await Promise.all(cartDetails.map(async (detail) => {
+            const { subtotal, selections, quantities } = getFields(detail.cart_item_list);
+
+            if (detail.type === 'ATTRACTION') {
+              return {
+                id: parseInt(detail.cart_booking_id),
+                type: detail.type,
+                attraction_id: detail.attraction.attraction_id,
+                image: detail.attraction.attraction_image_list[0],
+                item_name: detail.activity_name, // Needs to be conditional
+                activity_name: detail.attraction.name, // Needs to be conditional
+                startTime: formatDateAndTime(detail.start_datetime),
+                endTime: formatDateAndTime(detail.end_datetime),
+                items: detail.cart_item_list.filter(item => item.type === "ATTRACTION"), // get activity selection
+                tour: detail.cart_item_list.filter(item => item.type === "TOUR").length != 0
+                  ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
+                price: subtotal.toFixed(2),
+                quantity: quantities,
+                selections: selections
+              };
+            } else if (detail.type === 'TELECOM') {
+              return {
+                id: parseInt(detail.cart_booking_id),
+                type: detail.type,
+                telecom_id: detail.telecom.telecom_id,
+                image: detail.telecom.plan_duration_category,
+                item_name: detail.activity_name,
+                activity_name: detail.activity_name,
+                startTime: formatDateAndTime(detail.start_datetime),
+                endTime: formatDateAndTime(detail.end_datetime),
+                items: detail.cart_item_list,
+                price: subtotal.toFixed(2),
+                quantity: quantities,
+              };
+            } else if (detail.type === 'ACCOMMODATION') {
+              try {
+                const accommodation = await retrieveAccommodationByRoom(detail.room.room_id);
+
+                console.log("startTime HERE", detail.start_datetime);
+                console.log("endTime HERE", detail.end_datetime);
+
+                console.log("formatCheckInDateTime HERE", formatCheckInDateTime(accommodation, detail.start_datetime));
+                console.log("formatCheckOutDateTime HERE", formatCheckOutDateTime(accommodation, detail.end_datetime));
+
                 return {
-                    id: parseInt(detail.cart_booking_id),
-                    type: detail.type,
-                    attraction_id: detail.attraction.attraction_id,
-                    image: detail.attraction.attraction_image_list[0],
-                    item_name: detail.activity_name, // Needs to be conditional
-                    activity_name: detail.attraction.name, // Needs to be conditional
-                    startTime: formatDateAndTime(detail.start_datetime),
-                    endTime: formatDateAndTime(detail.end_datetime),
-                    items: detail.cart_item_list, // get activity selection
-                    price: subtotal.toFixed(2),
-                    quantity: quantities,
-                    selections: selections
-                    //price: detail.price.toFixed(2),
+                  id: parseInt(detail.cart_booking_id),
+                  type: detail.type,
+                  room_id: detail.room.room_id,
+                  image: detail.room.room_image,
+                  item_name: detail.activity_name,
+                  activity_name: detail.activity_name,
+                  startTime: formatCheckInDateTime(accommodation, detail.start_datetime),
+                  endTime: formatCheckOutDateTime(accommodation, detail.end_datetime),
+                  items: detail.cart_item_list,
+                  price: subtotal.toFixed(2),
+                  quantity: quantities,
+                  accommodation: accommodation,
+                };
+              } catch (error) {
+                console.error('Error fetching accommodation:', error);
 
-                    };
-              })
-              setCartItems(extractedDetails);
-              if (extractedDetails.length > 0) {
-                setItemChecked(Array(extractedDetails.length).fill(false));
-              } 
+                return {
+                  error: 'Failed to fetch accommodation data',
+                }
+              }
+            }
+          }));
+
+          setCartItems(extractedDetails);
+          if (extractedDetails.length > 0) {
+            setItemChecked(Array(extractedDetails.length).fill(false));
           }
+        }
+
 
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -259,115 +317,183 @@ const handleCheckBoxToggle = (index) => {
     }
 
     onLoad();
-  }, [deletion,isFocused]);
+  }, [deletion, isFocused]);
 
-  
+  // telecom images
+  function formatTelecomImage(text) {
+    if (text === 'ONE_DAY') {
+      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_1_day.JPG';
+    } else if (text === 'THREE_DAY') {
+      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_3_day.JPG';
+    } else if (text === 'SEVEN_DAY') {
+      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_7_day.JPG';
+    } else if (text === 'FOURTEEN_DAY') {
+      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_14_day.JPG';
+    } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
+      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_more_than_14_day.JPG';
+    } else {
+      return text;
+    }
+  }
+
   return (
-  <View>
-    <ScrollView>
-      <View>
-        {
-            cartItems.map((cartItem, cartItemIndex) => (
-              
-              <ListItem.Swipeable
-                  shouldCancelWhenOutside={false} 
-                  rightWidth={90}
-                  minSlideWidth={40}
-                  key={cartItemIndex}
-                  rightContent={
-                      <Button
-                        containerStyle={{
-                          flex: 1,
-                          justifyContent: "center",
-                          backgroundColor: "#DC143C",
-                        }}
-                        type="clear"
-                        icon={{ name: "delete-outline" }}
-                        onPress={ () => { handleDeleteCartItem(cartItem.id);}}
-                    />
-                  }
-                >
-
-                <CheckBox left
-                    iconType="material-community"
-                    checkedIcon="checkbox-outline"
-                    uncheckedIcon={'checkbox-blank-outline'}
-                    containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
-                    checked={itemChecked[cartItemIndex]}
-                    onPress={() => handleCheckBoxToggle(cartItemIndex)}
+    <View>
+      <ScrollView>
+        <View>
+          {cartItems.map((cartItem, cartItemIndex) => (
+            <ListItem.Swipeable
+              shouldCancelWhenOutside={false}
+              rightWidth={90}
+              minSlideWidth={40}
+              key={cartItemIndex}
+              rightContent={
+                <Button
+                  containerStyle={{ flex: 1, justifyContent: "center", backgroundColor: "#DC143C" }}
+                  type="clear"
+                  icon={{ name: "delete-outline" }}
+                  onPress={() => { handleDeleteCartItem(cartItem.id); }}
                 />
-      
-                <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AttractionDetailsScreen', {attractionId: cartItem.attraction_id});}}>
-                    <Image
-                      source={{
-                        uri: cartItem.image// KIV for image 
-                      }} 
-                      style={{ width: 65, height: 65, borderRadius: 10, marginLeft:5, marginRight: 0}} />
+              }
+            >
+
+              <CheckBox left
+                iconType="material-community"
+                checkedIcon="checkbox-outline"
+                uncheckedIcon={'checkbox-blank-outline'}
+                containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
+                checked={itemChecked[cartItemIndex]}
+                onPress={() => handleCheckBoxToggle(cartItemIndex)}
+              />
+
+              {/* attraction */}
+              {cartItem.type === 'ATTRACTION' &&
+                <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AttractionDetailsScreen', { attractionId: cartItem.accommodation.accommodation_id }); }}>
+                  <Image
+                    source={{ uri: cartItem.image }}
+                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
                 </TouchableOpacity>
-                    
-                    
-                <ListItem.Content style={{padding: 0, marginLeft: -10, height:80}}>
-                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "column" , width:130}}>
-                      <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
-                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
-                      <ListItem.Subtitle style={{ fontSize: 10 , color: 'grey', fontWeight: 'bold'}}>S$ {cartItem.price}</ListItem.Subtitle>
-                      {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
-                      {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
-                    </View>
-                    
-                    <View style={{ flexDirection: "column" }}>
-                    {
-                      cartItem.items.map((item, itemIndex) => (
-                      <View style={{ flexDirection: "row" }} key={itemIndex}>
-                        <Text key={itemIndex} style={{marginLeft:8, marginBottom:10 , fontSize:10, fontWeight: 'bold'}}>{item.activity_selection} </Text> 
-                          <TouchableOpacity 
-                              style={{ backgroundColor: '#044537', height: 16, width: 16,justifyContent: 'center',alignItems: 'center',borderRadius: 9, marginLeft:5, marginBottom: 8 }} 
-                              onPress={() => updateQuantity(cartItemIndex,itemIndex, -1)}
-                          >
-                          
-                            <Text style={{color: 'white', fontSize: 12, fontWeight:'bold'}}> - </Text>
-                          </TouchableOpacity>
+              }
 
-                          <Text style={{ marginLeft: 5, marginTop: 2 ,fontSize:10}}>{item.quantity} </Text>
+              {/* Telecom */}
+              {cartItem.type === 'TELECOM' &&
+                <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('TelecomDetailsScreen', { id: cartItem.telecom_id }); }}>
+                  <Image
+                    source={{
+                      uri: formatTelecomImage(cartItem.image)
+                    }}
+                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
+                </TouchableOpacity>
+              }
 
-                          <TouchableOpacity style={{ backgroundColor: '#044537',  height: 16, width: 16 ,justifyContent: 'center',alignItems: 'center',borderRadius: 10 , marginLeft:5, marginBottom: 8}} 
-                            onPress={() => updateQuantity(cartItemIndex,itemIndex, 1)}>
-                          
-                            <Text style={{color: 'white', fontSize: 12, fontWeight:'bold' }}> + </Text>
+              {/* Accommodation */}
+              {cartItem.type === 'ACCOMMODATION' &&
+                <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AccommodationDetailsScreen', { id: cartItem.accommodation_id }); }}>
+                  <Image
+                    source={{
+                      uri: cartItem.image
+                    }}
+                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
+                </TouchableOpacity>
+              }
 
-                          </TouchableOpacity>
-                      </View>
-                    ))} 
+              {/* Common */}
+              <ListItem.Content style={{ padding: 0, marginLeft: -10, height: 80 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                  <View style={{ flexDirection: "column", width: 130 }}>
+                    <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
+
+                    {cartItem.type === 'ATTRACTION' &&
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
+                    }
+                    {cartItem.type === 'TELECOM' &&
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Start Date : {cartItem.startTime}</ListItem.Subtitle>
+                    }
+                    {cartItem.type === 'ACCOMMODATION' && (
+                      <>
+                        <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
+                          Check In: {cartItem.startTime}
+                        </ListItem.Subtitle>
+                        <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
+                          Check Out: {cartItem.endTime}
+                        </ListItem.Subtitle>
+                      </>
+                    )}
+
+                    <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>S$ {cartItem.price}</ListItem.Subtitle>
+                    {cartItem.type === 'ATTRACTION' && cartItem.tour != null ?
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
+                        Tour: {cartItem.tour[0].activity_selection}
+                      </ListItem.Subtitle> : <Text></Text>}
+                    {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
+                    {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                   </View>
-                </View>       
+
+                  <View style={{ flexDirection: "column" }}>
+                    {cartItem.items.map((item, itemIndex) => (
+                      <View style={{ flexDirection: "row" }} key={itemIndex}>
+
+                        {cartItem.type === 'ATTRACTION' &&
+                          <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
+                        }
+
+                        {cartItem.type === 'ACCOMMODATION' &&
+                          <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
+                        }
+
+                        {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                              borderRadius: 15, marginLeft: 5, marginBottom: 8
+                            }}
+                            onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
+                          >
+
+
+                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> - </Text>
+                          </TouchableOpacity>
+                        )}
+
+                        <Text style={{ marginLeft: 5, marginTop: 2, fontSize: 10 }}>{item.quantity} </Text>
+
+                        {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                              borderRadius: 15, marginLeft: 5, marginBottom: 8
+                            }}
+                            onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
+                          >
+                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                </View>
               </ListItem.Content>
             </ListItem.Swipeable>
           ))}
+        </View>
+      </ScrollView>
 
-    </View>
-  </ScrollView>
-
-
-    
-  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10 , height: 70 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10, height: 70 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CheckBox
-          left
-          iconType="material-community"
-              checkedIcon="checkbox-outline"
-              uncheckedIcon={'checkbox-blank-outline'}
-          title="All"
-          style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight:'bold', color:'black'}}
-          containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color:'black' }}
-          checked={isAllChecked()} // Check if all items are checked
-          onPress={handleCheckAllToggle}/>
-            <Text style = {{fontWeight:'bold', color:'black'}}>Total Price: ${totalPrice.toFixed(2)}</Text>
+            left
+            iconType="material-community"
+            checkedIcon="checkbox-outline"
+            uncheckedIcon={'checkbox-blank-outline'}
+            title="All"
+            style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight: 'bold', color: 'black' }}
+            containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color: 'black' }}
+            checked={isAllChecked()} // Check if all items are checked
+            onPress={handleCheckAllToggle} />
+          <Text style={{ fontWeight: 'bold', color: 'black' }}>Total Price: ${totalPrice.toFixed(2)}</Text>
+        </View>
+
+        <Button style={{ borderRadius: 10, backgroundColor: '#044537' }} title="Checkout" onPress={() => { checkout(); }} />
       </View>
-
-      <Button style={{borderRadius: 10, backgroundColor:'#044537'}} title="Checkout" onPress={() => { checkout();}} />
-  </View>
-
-</View>
+    </View>
   );
 };

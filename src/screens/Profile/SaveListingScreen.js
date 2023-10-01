@@ -1,5 +1,4 @@
 import React , { useState, useEffect } from 'react';
-import { useIsFocused } from "@react-navigation/native";
 import Background from '../../components/CardBackground';
 import Button from '../../components/Button';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, useWindowDimensions  } from 'react-native';
@@ -11,16 +10,18 @@ import { getUserSavedTelecom, toggleSaveTelecom } from '../../redux/telecomRedux
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import {getUserSavedDeal, toggleSaveDeal} from "../../redux/dealRedux";
+import {getAccommodationList, getUserSavedAccommodation, toggleSaveAccommodation} from "../../redux/reduxAccommodation";
+import {useIsFocused} from "@react-navigation/native";
 
 const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) => (
     <Background>
         <ScrollView>
             <View style={styles.container}>
-                { 
+                {
                     data.map((item, index) => (
                         <Card key={index}>
                             <Card.Title style={styles.header}>
-                                {item.name} 
+                                {item.name}
                             </Card.Title>
                             <Card.Image
                                 style={{ padding: 0}}
@@ -41,7 +42,7 @@ const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) 
                             </View>
 
                         </Card>
-                    )) 
+                    ))
                 }
             </View>
         </ScrollView>
@@ -84,8 +85,38 @@ const RestaurantRoute = ({data, removeListing, viewListing, getColorForType}) =>
     </Background>
 );
 
-const AccomodationRoute = () => (
-    <View style={{ flex: 1, backgroundColor: 'white' }} />
+const AccommodationRoute =({ data, removeListing, viewListing, getColorForType }) => (
+    <Background>
+        <ScrollView>
+            <View style={styles.container}>
+                {
+                    data.map((item, index) => (
+                            <Card key={index}>
+                                <Card.Title style={styles.header}>
+                                    {item.name}
+                                </Card.Title>
+                                <Card.Image
+                                    style={{ padding: 0}}
+                                    source={{
+                                        uri: item.accommodation_image_list[0]
+                                    }}
+                                />
+
+                                <Text style={styles.description}>{item.description}</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={[styles.tag, {backgroundColor: getColorForType(item.type)}]}>{item.type}</Text>
+                                    <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{item.estimated_price_tier}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row'}}>
+                                    <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeListing(item.accommodation_id)} />
+                                    <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewListing(item.accommodation_id)}/>
+                                </View>
+                            </Card>
+                    ))
+                }
+            </View>
+        </ScrollView>
+    </Background>
 );
 
 function formatTelecomImage(text) {
@@ -112,12 +143,12 @@ const TelecomRoute = ({data, viewTelecomListing, removeTelecomListing}) => (
                     data.map((item, index) => (
                         <Card key={index}>
                             <Card.Title style={styles.header}>
-                                {item.name} 
+                                {item.name}
                             </Card.Title>
                             <Card.Image
                                 style={{ padding: 0, height: 200, marginBottom: 20}}
                                 source={{
-                                uri: formatTelecomImage(item.plan_duration_category) 
+                                uri: formatTelecomImage(item.plan_duration_category)
                                 }}
                             />
 
@@ -228,7 +259,7 @@ const DealRoute = ({userType, data, removeDealListing}) => (
 const renderScene = SceneMap({
     first: AttractionRoute,
     second: RestaurantRoute,
-    third: AccomodationRoute,
+    third: AccommodationRoute,
     fourth: TelecomRoute,
     fifth: DealRoute
 });
@@ -251,6 +282,9 @@ const SavedListingScreen = ({ navigation }) => {
 
     // restaurant
     const [restData, setRestData] = useState([]);
+
+    //accommodation
+    const [accommodationData, setAccommodationData] =useState([]);
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
@@ -281,10 +315,10 @@ const SavedListingScreen = ({ navigation }) => {
                 if (fetchData || isFocused) {
                     const userData = await getUser()
                     setUser(userData)
-    
+
                     let savedAttractions = await getSavedAttractionList(userData.user_id);
                     setData(savedAttractions);
-    
+
                     let telecomResponse = await getUserSavedTelecom(userData.user_id);
                     if (telecomResponse.status) {
                         setTelecomData(telecomResponse.data);
@@ -295,12 +329,15 @@ const SavedListingScreen = ({ navigation }) => {
                         setDealData(dealResponse.data);
                     }
 
-
                     let savedRest = await getAllSavedRestaurantForUser(userData.user_id);
                     if (savedRest.status) {
                         setRestData(savedRest.data);
                     }
 
+                    let savedAccommodations = await getUserSavedAccommodation(userData.user_id);
+                    if (savedAccommodations.status) {
+                        setAccommodationData(savedAccommodations.data);
+                    }
                     setFetchData(false);
                 }
 
@@ -326,9 +363,22 @@ const SavedListingScreen = ({ navigation }) => {
         return labelColorMap[label] || 'gray';
     };
 
+    const getColorForTypeAccommodation = (label) => {
+        const labelColorMap = {
+            'HOTEL': 'lightblue',
+            'AIRBNB': 'lightgreen',
+        };
+
+        return labelColorMap[label] || 'gray';
+    };
     const viewListing = (attraction_id) => {
         navigation.navigate('AttractionDetailsScreen', {attractionId : attraction_id}); // set the attraction id here 
     }
+
+    const viewAccommodationListing = (accommodation_id) => {
+        navigation.navigate('AccommodationDetailsScreen', {accommodationId : accommodation_id}); // set the attraction id here
+    }
+
 
     const removeListing = async (attraction_id) => {
         let response = await deleteSavedAttraction(user.user_id,attraction_id);
@@ -361,7 +411,7 @@ const SavedListingScreen = ({ navigation }) => {
                 ...user,
                 telecom_list: response.data
             }
-            await storeUser(obj); 
+            await storeUser(obj);
             fetchUser();
             setFetchData(true);
             Toast.show({
@@ -432,6 +482,28 @@ const SavedListingScreen = ({ navigation }) => {
             console.log("Deal not removed!");
         }
     }
+    const removeAccommodationListing = async (accommodation_id) => {
+        let response = await toggleSaveAccommodation(user.user_id,accommodation_id);
+        if (response.status) {
+            let obj = {
+                ...user,
+                accommodation_list: response.data
+            }
+            await storeUser(obj);
+            fetchUser();
+            setFetchData(true);
+            Toast.show({
+                type: 'success',
+                text1: 'Listing has been removed!'
+            });
+
+            updateData();
+        } else {
+            console.log("Telecom not removed!");
+        }
+    }
+
+
     return (
         <TabView
             navigationState={{ index, routes }}
@@ -442,7 +514,7 @@ const SavedListingScreen = ({ navigation }) => {
                     case 'second':
                         return <RestaurantRoute data={restData} removeListing={removeRestListing} viewListing={viewRestListing} getColorForType={getColorForTypeRest} />;
                     case 'third':
-                        return <AccomodationRoute />;
+                        return <AccommodationRoute data={accommodationData} removeListing={removeAccommodationListing} viewListing={viewAccommodationListing} getColorForType={getColorForTypeAccommodation}/>;
                     case 'fourth':
                         return <TelecomRoute data={telecomData} viewTelecomListing={viewTelecomListing} removeTelecomListing={removeTelecomListing} />;
                     case 'fifth':

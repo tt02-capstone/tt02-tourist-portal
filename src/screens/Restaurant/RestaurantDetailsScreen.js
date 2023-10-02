@@ -198,14 +198,13 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                             <Button mode="text" style={{ marginTop: -13}} onPress={saveRest} >
                                 {isSaved && <Icon name="heart" size={15} color='red' />}
                                 {!isSaved && <Icon name="heart" size={15} color='grey'/>}
-                                {/* <Icon name="heart" size={15} color='red'/> */}
                             </Button>
                         </Card.Title>
                         
                         <Text style={[styles.subtitle]}>{restaurant.address}</Text>
                         <Text style={styles.subtitle}>Operating Hours: {restaurant.opening_hours}</Text>
+                        <Text style={styles.subtitle}>Contact Us @ {restaurant.contact_num}</Text>
                         <Text style={styles.description}>{restaurant.description}</Text>
-                        {/* <Text style={[styles.tag, {backgroundColor:'purple', color: 'white'}]}>{restaurant.estimated_price_tier}</Text> */}
 
                     </Card>
                     

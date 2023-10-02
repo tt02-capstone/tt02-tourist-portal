@@ -261,7 +261,7 @@ export const CartScreen = ({ navigation }) => {
                 id: parseInt(detail.cart_booking_id),
                 type: detail.type,
                 telecom_id: detail.telecom.telecom_id,
-                image: detail.telecom.plan_duration_category,
+                image: detail.telecom.image,
                 item_name: detail.activity_name,
                 activity_name: detail.activity_name,
                 startTime: formatDateAndTime(detail.start_datetime),

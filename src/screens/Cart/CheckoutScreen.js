@@ -7,18 +7,17 @@ import { cartApi, paymentsApi } from '../../helpers/api';
 import { useRoute } from '@react-navigation/native';
 import { useIsFocused } from '@react-navigation/native';
 
-
 export const CheckoutScreen = ({navigation}) => {
-    const route = useRoute();
-    const [user, setUser] = useState('');
-    const [cartItems, setCartItems] = useState([]); 
-    const [user_type, setUserType] = useState('');
-    const [deletion, setDeletion] = useState(false);
-    const [cards, setCards] = useState([]); 
-    const [itemChecked, setItemChecked] = useState([false]); 
-    const { booking_ids, selectedCartItems, totalPrice} = route.params;
-    const isFocused = useIsFocused();
-
+    
+  const route = useRoute();
+  const [user, setUser] = useState('');
+  const [cartItems, setCartItems] = useState([]); 
+  const [user_type, setUserType] = useState('');
+  const [deletion, setDeletion] = useState(false);
+  const [cards, setCards] = useState([]); 
+  const [itemChecked, setItemChecked] = useState([false]); 
+  const { booking_ids, selectedCartItems, totalPrice} = route.params;
+  const isFocused = useIsFocused();
 
   function formatDateAndTime(date) {
     const options = {
@@ -42,55 +41,46 @@ export const CheckoutScreen = ({navigation}) => {
   }).filter(index => index !== -1);
 
   const checkout = async () => {
-  
     const tourist_email = user.email;
     const user_type = await getUserType();
     const payment_method_id = cards[getSelectedCard].id;
     console.log(booking_ids)
 
     try {
-
       const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-      console.log('error',response.data)
+      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+        console.log('error',response.data)
 
   } else {
-    console.log('success', response.data)
-    if (response.data) {
-        navigation.navigate('BookingHistoryScreen'); // Should navigate to Bookings Screen?
-        setDeletion(!deletion);
-      Toast.show({
-        type: 'success',
-        text1: 'Successfully checked out cart item(s)'
-    });
+      console.log('success', response.data)
+      if (response.data) {
+          navigation.navigate('BookingHistoryScreen'); // Should navigate to Bookings Screen?
+          setDeletion(!deletion);
+        Toast.show({
+          type: 'success',
+          text1: 'Successfully checked out cart item(s)'
+      });
     
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Unable to checkout cart item(s)'
-    });
-    }
-    }
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Unable to checkout cart item(s)'
+          });
+        }
+      }
 
     } catch {
-      Toast.show({
-        type: 'error',
-        text1: 'Error creating a booking'
-    });
+        Toast.show({
+          type: 'error',
+          text1: 'Error creating a booking'
+      });
     }
-    
-    
-    
-
   }
 
   const handleCheckBoxToggle = (index) => {
     const updatedChecked = itemChecked.map((isChecked, i) => i === index);
-  setItemChecked(updatedChecked);
-    
+    setItemChecked(updatedChecked);
   };
-
-
 
   useEffect(() => {
     async function onLoad() {
@@ -126,9 +116,7 @@ export const CheckoutScreen = ({navigation}) => {
               });
               setCards(extractedDetails)
               setItemChecked(Array(extractedDetails.length).fill(false))
-        
           }
-        
         
       } catch (error) {
         console.error("Error fetching payment methods:", error);
@@ -138,26 +126,20 @@ export const CheckoutScreen = ({navigation}) => {
     onLoad();
   }, [isFocused]);
 
-
-
-
   return (
     <View>
-    <ScrollView>
-    <View>
-    {
+      <ScrollView>
+        <View>
+          {
           selectedCartItems.map((cartItem) => (
             <ListItem.Swipeable
-            shouldCancelWhenOutside={false} 
-            rightWidth={90}
-            minSlideWidth={40}
-            key={cartItem.id}
+              shouldCancelWhenOutside={false} 
+              rightWidth={90}
+              minSlideWidth={40}
+              key={cartItem.id}
+            >
 
-          >
-
-
-    
-     {/* <TouchableOpacity style={{ flexDirection: "row" }}
+            {/* <TouchableOpacity style={{ flexDirection: "row" }}
               onPress={() => {
                 navigation.navigate('AttractionDetailsScreen', {
                     attractionId: cartItem.attraction_id,
@@ -165,13 +147,12 @@ export const CheckoutScreen = ({navigation}) => {
               }}
             > */}
             
-    <Image
-                                    
-                                    source={{
-                                    uri: cartItem.image// KIV for image 
-                                    }}
-                                    style={{ width: 75, height: 75, borderRadius: 10, marginLeft: 0, marginRight: 0}}
-                                />
+            <Image
+              source={{
+                uri: cartItem.image// KIV for image
+              }}
+              style={{ width: 75, height: 75, borderRadius: 10, marginLeft: 0, marginRight: 0}}
+            />
             <ListItem.Content style={{padding: 0, margin: 0}}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
             <View style={{ flexDirection: "column", }}>
@@ -179,23 +160,17 @@ export const CheckoutScreen = ({navigation}) => {
               <ListItem.Subtitle style={{fontSize: 14}}>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
               <View style={{ flexDirection: "column" }}>
               {
-          cartItem.items.map((item, index) => (
-            <Text key={index} style={{fontSize: 13}} >{item.activity_selection} Qty: {item.quantity}</Text> 
-          ))
-
-          }
+              cartItem.items.map((item, index) => (
+                <Text key={index} style={{fontSize: 13}} >{item.activity_selection} Qty: {item.quantity}</Text> 
+              ))
+            }
               
               </View>
               <ListItem.Subtitle style={{fontSize: 14}}>${cartItem.price}</ListItem.Subtitle>
-
-              
-              </View>
-              
-              </View>       
-            </ListItem.Content>
-            {/* </TouchableOpacity> */}
-            
-            
+            </View>
+          </View>       
+          </ListItem.Content>
+          {/* </TouchableOpacity> */}    
           </ListItem.Swipeable>
         ))}
         <ListItem containerStyle={padding= 20}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
-import { ListItem, Button, CheckBox, Image, Text } from '@rneui/themed';
+import { ListItem, CheckBox, Image, Text, Button } from '@rneui/themed';
+import CustomButton from '../../components/CustomButton';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
@@ -16,6 +17,13 @@ export const CartScreen = ({ navigation }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [apiCallTimer, setApiCallTimer] = useState(null);
   const isFocused = useIsFocused();
+
+  // if there is no item in cart, set total price to 0
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      setTotalPrice(0);
+    }
+  },[cartItems])
 
   function formatDateAndTime(date) {
     const options = {
@@ -55,8 +63,6 @@ export const CartScreen = ({ navigation }) => {
     const selectedCartItems = [];
     itemChecked.forEach((isChecked, index) => {
       if (isChecked) {
-        // console.log("WATTT " + cartItems[index])
-        // console.log(cartItems[index])
         booking_ids.push(cartItems[index].id);
         selectedCartItems.push(cartItems[index]);
       }
@@ -64,8 +70,12 @@ export const CartScreen = ({ navigation }) => {
 
     if (selectedCartItems.length > 0) {
       navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Please select at least 1 item!'
+      });
     }
-    // should give warning
   }
 
   useEffect(() => {
@@ -168,6 +178,13 @@ export const CartScreen = ({ navigation }) => {
   };
 
   const updateQuantity = (cartItemIndex, itemIndex, delta) => {
+    let tourPrice = 0
+
+    if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
+      tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
+      let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
+      cartItems[cartItemIndex].tour[0].quantity = oldQ + delta; // update per pax for tours 
+    }
 
     // Update the cart items with new quantity for the specified ticket type
     const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
@@ -261,7 +278,7 @@ export const CartScreen = ({ navigation }) => {
                 id: parseInt(detail.cart_booking_id),
                 type: detail.type,
                 telecom_id: detail.telecom.telecom_id,
-                image: detail.telecom.plan_duration_category,
+                image: detail.telecom.image,
                 item_name: detail.activity_name,
                 activity_name: detail.activity_name,
                 startTime: formatDateAndTime(detail.start_datetime),
@@ -319,18 +336,33 @@ export const CartScreen = ({ navigation }) => {
     onLoad();
   }, [deletion, isFocused]);
 
-  // telecom images
-  function formatTelecomImage(text) {
-    if (text === 'ONE_DAY') {
-      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_1_day.JPG';
-    } else if (text === 'THREE_DAY') {
-      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_3_day.JPG';
-    } else if (text === 'SEVEN_DAY') {
-      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_7_day.JPG';
-    } else if (text === 'FOURTEEN_DAY') {
-      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_14_day.JPG';
-    } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
-      return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_more_than_14_day.JPG';
+  function formatAttractionTicket(text) {
+    if (text === 'ALL') {
+      return 'All';
+    } else if (text === 'CHILD') {
+      return 'Child';
+    } else if (text === 'TEENAGER') {
+      return 'Teenager';
+    } else if (text === 'ADULT') {
+      return 'Adult';
+    } else if (text === 'SENIOR') {
+      return 'Senior'
+    } else {
+      return text;
+    }
+  }
+
+  function formatAccommodation(text) {
+    if (text === 'STANDARD') {
+      return 'Standard'
+    } else if (text === 'DOUBLE') {
+      return 'Double';
+    } else if (text === 'SUITE') {
+      return 'Suite';
+    } else if (text === 'JUNIOR_SUITE') {
+      return 'Junior Suite';
+    } else if (text === 'DELUXE_SUITE') {
+      return 'Deluxe Suite';
     } else {
       return text;
     }
@@ -360,7 +392,7 @@ export const CartScreen = ({ navigation }) => {
                 iconType="material-community"
                 checkedIcon="checkbox-outline"
                 uncheckedIcon={'checkbox-blank-outline'}
-                containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
+                containerStyle={{ marginLeft: -5, marginRight: -10, padding: 0 }}
                 checked={itemChecked[cartItemIndex]}
                 onPress={() => handleCheckBoxToggle(cartItemIndex)}
               />
@@ -370,7 +402,7 @@ export const CartScreen = ({ navigation }) => {
                 <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('AttractionDetailsScreen', { attractionId: cartItem.accommodation.accommodation_id }); }}>
                   <Image
                     source={{ uri: cartItem.image }}
-                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
+                    style={{ width: 60, height: 60, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
                 </TouchableOpacity>
               }
 
@@ -379,9 +411,9 @@ export const CartScreen = ({ navigation }) => {
                 <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('TelecomDetailsScreen', { id: cartItem.telecom_id }); }}>
                   <Image
                     source={{
-                      uri: formatTelecomImage(cartItem.image)
+                      uri: cartItem.image
                     }}
-                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
+                    style={{ width: 60, height: 60, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
                 </TouchableOpacity>
               }
 
@@ -392,37 +424,37 @@ export const CartScreen = ({ navigation }) => {
                     source={{
                       uri: cartItem.image
                     }}
-                    style={{ width: 65, height: 65, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
+                    style={{ width: 60, height: 60, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
                 </TouchableOpacity>
               }
 
               {/* Common */}
-              <ListItem.Content style={{ padding: 0, marginLeft: -10, height: 80 }}>
+              <ListItem.Content style={{ padding: 0, marginLeft: -10, height: 80,}}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                  <View style={{ flexDirection: "column", width: 130 }}>
+                  <View style={{ flexDirection: "column", width: 140 }}>
                     <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
 
                     {cartItem.type === 'ATTRACTION' &&
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Booking Date : {cartItem.startTime}</ListItem.Subtitle>
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Date: {cartItem.startTime}</ListItem.Subtitle>
                     }
                     {cartItem.type === 'TELECOM' &&
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Start Date : {cartItem.startTime}</ListItem.Subtitle>
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }} >Date: {cartItem.startTime}</ListItem.Subtitle>
                     }
                     {cartItem.type === 'ACCOMMODATION' && (
                       <>
                         <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
-                          Check In: {cartItem.startTime}
+                          Start: {cartItem.startTime}
                         </ListItem.Subtitle>
                         <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
-                          Check Out: {cartItem.endTime}
+                          End: {cartItem.endTime}
                         </ListItem.Subtitle>
                       </>
                     )}
 
                     <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>S$ {cartItem.price}</ListItem.Subtitle>
                     {cartItem.type === 'ATTRACTION' && cartItem.tour != null ?
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
-                        Tour: {cartItem.tour[0].activity_selection}
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'red', fontWeight: 'bold' }}>
+                        Add Ons : {cartItem.tour[0].activity_selection}
                       </ListItem.Subtitle> : <Text></Text>}
                     {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                     {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
@@ -430,41 +462,42 @@ export const CartScreen = ({ navigation }) => {
 
                   <View style={{ flexDirection: "column" }}>
                     {cartItem.items.map((item, itemIndex) => (
-                      <View style={{ flexDirection: "row" }} key={itemIndex}>
+                      <View style={{ flexDirection: "row"}} key={itemIndex}>
 
                         {cartItem.type === 'ATTRACTION' &&
-                          <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
+                          <Text 
+                            key={itemIndex} style={{ minWidth: 50, margin: 5, fontSize: 10, fontWeight: 'bold' }}>{formatAttractionTicket(item.activity_selection)} </Text>
                         }
 
                         {cartItem.type === 'ACCOMMODATION' &&
-                          <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
+                          <Text 
+                            key={itemIndex} style={{ minWidth: 50, margin: 5, fontSize: 10, fontWeight: 'bold' }}>{formatAccommodation(item.activity_selection)} </Text>
                         }
 
                         {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
                           <TouchableOpacity
                             style={{
-                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
-                              borderRadius: 15, marginLeft: 5, marginBottom: 8
+                              backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
+                              borderRadius: 15, marginLeft: 0, marginBottom: 8
                             }}
                             onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
                           >
-
-
+                            {cartItem.type === 'TELECOM' && <View></View>}
                             <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> - </Text>
                           </TouchableOpacity>
                         )}
 
-                        <Text style={{ marginLeft: 5, marginTop: 2, fontSize: 10 }}>{item.quantity} </Text>
+                        <Text style={{ marginLeft: 10, marginRight: 10, marginTop: 2, fontSize: 15 }}>{item.quantity}</Text>
 
                         {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
                           <TouchableOpacity
                             style={{
-                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
-                              borderRadius: 15, marginLeft: 5, marginBottom: 8
+                              backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
+                              borderRadius: 15, marginLeft: 0, marginBottom: 8
                             }}
                             onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
                           >
-                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
+                            <Text style={{ color: 'white', fontSize: 13, fontWeight: 'bold' }}> + </Text>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -477,7 +510,7 @@ export const CartScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightblue', padding: 10, height: 70 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightgreen', padding: 10, height: 70 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CheckBox
             left
@@ -492,7 +525,8 @@ export const CartScreen = ({ navigation }) => {
           <Text style={{ fontWeight: 'bold', color: 'black' }}>Total Price: ${totalPrice.toFixed(2)}</Text>
         </View>
 
-        <Button style={{ borderRadius: 10, backgroundColor: '#044537' }} title="Checkout" onPress={() => { checkout(); }} />
+        {/* <Button title="Checkout" onPress={() => {checkout()}} /> */}
+        <Button color='#044537' style={{ borderRadius: '10' }} onPress={() => {checkout()}} >Checkout</Button>
       </View>
     </View>
   );

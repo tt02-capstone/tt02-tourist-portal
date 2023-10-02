@@ -118,22 +118,6 @@ const TelecomScreen = ({ navigation }) => {
         navigation.navigate('TelecomDetailsScreen', { id: id }); // set the attraction id here 
     }
 
-    function formatImage(text) {
-        if (text === 'ONE_DAY') {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_1_day.JPG';
-        } else if (text === 'THREE_DAY') {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_3_day.JPG';
-        } else if (text === 'SEVEN_DAY') {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_7_day.JPG';
-        } else if (text === 'FOURTEEN_DAY') {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_14_day.JPG';
-        } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/telecom/telecom_more_than_14_day.JPG';
-        } else {
-            return text;
-        }
-    }
-
     function formatEstimatedPriceTier(text) {
         if (text === 'TIER_1') {
             return '$';
@@ -206,7 +190,7 @@ const TelecomScreen = ({ navigation }) => {
                                 <Card.Image
                                     style={{ padding: 0, height: 200 }}
                                     source={{
-                                        uri: formatImage(item.plan_duration_category)
+                                        uri: item.image
                                     }}
                                 />
 

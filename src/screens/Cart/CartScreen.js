@@ -178,6 +178,13 @@ export const CartScreen = ({ navigation }) => {
   };
 
   const updateQuantity = (cartItemIndex, itemIndex, delta) => {
+    let tourPrice = 0
+
+    if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
+      tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
+      let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
+      cartItems[cartItemIndex].tour[0].quantity = oldQ + delta; // update per pax for tours 
+    }
 
     // Update the cart items with new quantity for the specified ticket type
     const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
@@ -446,8 +453,8 @@ export const CartScreen = ({ navigation }) => {
 
                     <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>S$ {cartItem.price}</ListItem.Subtitle>
                     {cartItem.type === 'ATTRACTION' && cartItem.tour != null ?
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
-                        Tour: {cartItem.tour[0].activity_selection}
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'red', fontWeight: 'bold' }}>
+                        Add Ons : {cartItem.tour[0].activity_selection}
                       </ListItem.Subtitle> : <Text></Text>}
                     {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                     {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
@@ -455,7 +462,7 @@ export const CartScreen = ({ navigation }) => {
 
                   <View style={{ flexDirection: "column" }}>
                     {cartItem.items.map((item, itemIndex) => (
-                      <View style={{ flexDirection: "row" }} key={itemIndex}>
+                      <View style={{ flexDirection: "row"}} key={itemIndex}>
 
                         {cartItem.type === 'ATTRACTION' &&
                           <Text 
@@ -490,7 +497,7 @@ export const CartScreen = ({ navigation }) => {
                             }}
                             onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
                           >
-                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
+                            <Text style={{ color: 'white', fontSize: 13, fontWeight: 'bold' }}> + </Text>
                           </TouchableOpacity>
                         )}
                       </View>

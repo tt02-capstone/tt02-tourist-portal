@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
+import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import {timeZoneOffset} from "../../helpers/DateFormat";
 
 const AttractionDetailsScreen = ({ navigation }) => {
@@ -269,11 +270,17 @@ const AttractionDetailsScreen = ({ navigation }) => {
         navigation.push('RestaurantDetailsScreen', { restId: redirect_rest_id });
     }
 
+    const viewRecommendedAccom = (redirect_accom_id) => {
+        navigation.push('AccommodationDetailsScreen', { accommodationId: redirect_accom_id });
+    }
+
     const handleItemClick = (item) => {
         if (item.listing_type === "ATTRACTION") {
             viewRecommendedAttraction(item.attraction_id);
         } else if (item.listing_type === "RESTAURANT") {
             viewRecommendedRest(item.restaurant_id);
+        } else if (item.listing_type === "ACCOMMODATION") {
+            viewRecommendedAccom(item.accommodation_id);
         }
     }
 
@@ -493,7 +500,9 @@ const AttractionDetailsScreen = ({ navigation }) => {
                                             {item.listing_type === 'RESTAURANT' && (
                                                 <RestaurantRecom item={item} />
                                             )}
-                                            
+                                            {item.listing_type === 'ACCOMMODATION' && (
+                                                <AccommodationRecom item={item} />
+                                            )}
                                         </TouchableOpacity>
                                     ))
                                 }

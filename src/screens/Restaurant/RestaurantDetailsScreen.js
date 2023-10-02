@@ -12,6 +12,7 @@ import Toast from "react-native-toast-message";
 import { useIsFocused } from "@react-navigation/native";
 import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
+import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { getRecommendation } from '../../redux/recommendationRedux';
 
 const RestaurantDetailsScreen = ({ navigation }) => {
@@ -75,11 +76,17 @@ const RestaurantDetailsScreen = ({ navigation }) => {
         navigation.push('RestaurantDetailsScreen', { restId: redirect_rest_id });
     }
 
+    const viewRecommendedAccom = (redirect_accom_id) => {
+        navigation.push('AccommodationDetailsScreen', { accommodationId: redirect_accom_id });
+    }
+
     const handleItemClick = (item) => {
         if (item.listing_type === "ATTRACTION") {
             viewRecommendedAttraction(item.attraction_id);
         } else if (item.listing_type === "RESTAURANT") {
             viewRecommendedRest(item.restaurant_id);
+        } else if (item.listing_type === "ACCOMMODATION") {
+            viewRecommendedAccom(item.accommodation_id);
         }
     }
 
@@ -231,7 +238,9 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                                                 {item.listing_type === 'RESTAURANT' && (
                                                     <RestaurantRecom item={item} />
                                                 )}
-                                                
+                                                {item.listing_type === 'ACCOMMODATION' && (
+                                                    <AccommodationRecom item={item} />
+                                                )}
                                             </TouchableOpacity>
                                         ))
                                     }

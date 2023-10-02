@@ -16,6 +16,10 @@ import { cartApi } from '../../helpers/api';
 import { addRoomToCart } from '../../redux/cartRedux';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import {timeZoneOffset} from "../../helpers/DateFormat";
+import AttractionRecom from '../Recommendation/AttractionRecom';
+import RestaurantRecom from '../Recommendation/RestaurantRecom';
+import AccommodationRecom from '../Recommendation/AccommodationRecom';
+import { getRecommendation } from '../../redux/recommendationRedux';
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -28,6 +32,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
     const [quantityByRoomType, setQuantityByRoomType] = useState({});
     const route = useRoute();
     const [isSaved, setIsSaved] = useState(false);
+    const [recommendation, setRecommendation] = useState([]);
 
     const { accommodationId } = route.params;
     const [activeSlide, setActiveSlide] = useState(0);
@@ -211,6 +216,12 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             setRoomList(accommodation.room_list);
             console.log("roomList", accommodation.room_list);
 
+            // for recommendations 
+            let recoms = await getRecommendation(accommodation.generic_location, accommodation.listing_type, accommodationId);
+            if (recoms.status) {
+                setRecommendation(recoms.data);
+            }
+
             setLoading(false);
             fetchUser();
         } catch (error) {
@@ -390,6 +401,29 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         }
     }
 
+    // factor for recommendations 
+    const viewRecommendedAttraction = (redirect_attraction_id) => {
+        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id }); 
+    }
+
+    const viewRecommendedRest = (redirect_rest_id) => {
+        navigation.push('RestaurantDetailsScreen', { restId: redirect_rest_id });
+    }
+
+    const viewRecommendedAccom = (redirect_accom_id) => {
+        navigation.push('AccommodationDetailsScreen', { accommodationId: redirect_accom_id });
+    }
+
+    const handleItemClick = (item) => {
+        if (item.listing_type === "ATTRACTION") {
+            viewRecommendedAttraction(item.attraction_id);
+        } else if (item.listing_type === "RESTAURANT") {
+            viewRecommendedRest(item.restaurant_id);
+        } else if (item.listing_type === "ACCOMMODATION") {
+            viewRecommendedAccom(item.accommodation_id);
+        }
+    }
+
     return (
         <Background>
             <ScrollView>
@@ -525,8 +559,6 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                             </View>
                         ))}
                     </View>
-
-
                 </Card>
 
                 <View style={styles.cartOut}>
@@ -537,6 +569,37 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         onPress={addToCart}
                     />
                 </View>
+
+                {/* to view recommendations */}
+                <View> 
+                    { recommendation.length > 0 && (
+                    <Card containerStyle={styles.dropBorder}>
+                        <Card.Title style={styles.header}>
+                            Nearby Recommendation
+                        </Card.Title>
+
+                        <ScrollView horizontal>
+                            <View style={{ flexDirection: 'row', height: 350 }}>
+                                {
+                                    recommendation.map((item, index) => (
+                                        <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
+                                            {item.listing_type === 'ATTRACTION' && (
+                                                <AttractionRecom item={item} />
+                                            )}
+                                            {item.listing_type === 'RESTAURANT' && (
+                                                <RestaurantRecom item={item} />
+                                            )}
+                                            {item.listing_type === 'ACCOMMODATION' && (
+                                                <AccommodationRecom item={item} />
+                                            )}
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                            </View>
+                        </ScrollView>
+                    </Card>
+                    )}
+                    </View>
 
             </ScrollView>
         </Background>

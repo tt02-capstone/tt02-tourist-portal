@@ -10,6 +10,7 @@ import { toggleSaveTelecom } from "../../redux/telecomRedux";
 import { Button } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import RNPickerSelect from 'react-native-picker-select';
+import {timeZoneOffset} from "../../helpers/DateFormat";
 
 const DealScreen = ({ navigation }) => {
     const [data, setData] = useState([]);
@@ -19,6 +20,7 @@ const DealScreen = ({ navigation }) => {
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [dealTypeFilter, setDealTypeFilter] = useState(null);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     async function fetchUser() {
         const userData = await getUser()
@@ -35,6 +37,8 @@ const DealScreen = ({ navigation }) => {
                 console.log("response.data", response.data)
                 setFullDealList(response.data);
                 setData(response.data);
+                currentDate.setHours(currentDate.getHours() + timeZoneOffset)
+                setCurrentDate(currentDate)
             } else {
                 console.log("Deal list not fetch!");
             }
@@ -199,13 +203,24 @@ const DealScreen = ({ navigation }) => {
                     </View>
 
                     {data.map((item, index) => {
-                        if ((userType === 'TOURIST' && !item.is_govt_voucher) || userType === 'LOCAL') {
+                        if (((userType === 'TOURIST' && !item.is_govt_voucher) || userType === 'LOCAL') && new Date(item.end_datetime) >= currentDate) {
                             return (
                                 <Card key={index}>
-                                    <Card.Title style={styles.header}>
-                                        {item.promo_code ? item.promo_code : 'NO PROMO CODE REQUIRED'}
-                                    </Card.Title>
-                                    <Button mode="text" style={{ marginTop: -45, alignSelf: 'flex-end' }} onPress={() => save(item.deal_id)} >
+                                    <View style={{ marginBottom: 20}} >
+                                    {new Date(item.start_datetime) >= new Date()?
+                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                            UPCOMING
+                                        </Text>
+                                    </View>:
+                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{ backgroundColor: 'green', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                            AVAILABLE
+                                        </Text>
+                                    </View>
+                                    }
+                                    </View>
+                                    <Button mode="text" style={{ marginTop: -55, alignSelf: 'flex-end' }} onPress={() => save(item.deal_id)} >
                                         {isSaved(item.deal_id) && <Icon name="heart" size={20} color='red' />}
                                         {!isSaved(item.deal_id) && <Icon name="heart" size={20} color='grey' />}
                                     </Button>
@@ -226,7 +241,7 @@ const DealScreen = ({ navigation }) => {
                                     </Text>
 
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                        <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', fontWeight: 'bold' }]}>
+                                        <Text style={[styles.tag, { backgroundColor: 'blue', color: 'white', fontWeight: 'bold' }]}>
                                             {item.discount_percent} % for GRABS
                                         </Text>
                                         <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>

@@ -57,7 +57,7 @@ const BookingDetailsScreen = ({ navigation }) => {
         if (item.attraction != null) {
             return item.attraction.name;
         } else if (item.room != null) {
-            return item.room.name;
+            return item.activity_name;
         } else if (item.tour != null) {
             return item.tour.name;
         } else if (item.telecom != null) {

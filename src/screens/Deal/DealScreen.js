@@ -11,6 +11,7 @@ import { Button } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import RNPickerSelect from 'react-native-picker-select';
 import {timeZoneOffset} from "../../helpers/DateFormat";
+import {useIsFocused} from "@react-navigation/native";
 
 const DealScreen = ({ navigation }) => {
     const [data, setData] = useState([]);
@@ -21,13 +22,14 @@ const DealScreen = ({ navigation }) => {
     const [dealTypeFilter, setDealTypeFilter] = useState(null);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [currentDate, setCurrentDate] = useState(new Date());
+    const isFocused = useIsFocused();
 
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
-        console.log(userData)
+        // console.log(userData)
         setUserType(await getUserType());
-        console.log(userType)
+        // console.log(userType)
     }
 
     useEffect(() => {
@@ -46,7 +48,7 @@ const DealScreen = ({ navigation }) => {
 
         fetchData();
         fetchUser();
-    }, []);
+    }, [isFocused]);
 
     // const viewDealDetails = (id) => {
     //     navigation.navigate('DealDetailsScreen', {id: id}); // set the attraction id here
@@ -103,7 +105,7 @@ const DealScreen = ({ navigation }) => {
             }
         }
 
-        console.log(filteredList);
+        // console.log(filteredList);
 
         setData(filteredList);
         toggleFilterModal();
@@ -147,13 +149,13 @@ const DealScreen = ({ navigation }) => {
 
     const isSaved = (deal_id) => {
         const savedList = user.deals_list ? user.deals_list.map((deal) => deal_id === deal.deal_id) : [false];
-        console.log(savedList)
+        // console.log(savedList)
         return savedList.includes(true)
     }
     const save = async (deal_id) => {
-        console.log('inside toggle')
+        // console.log('inside toggle')
         let response = await toggleSaveDeal(user.user_id, deal_id);
-        console.log(isSaved(deal_id))
+        // console.log(isSaved(deal_id))
         if (response.status) {
             if (!isSaved(deal_id)) {
                 let obj = {

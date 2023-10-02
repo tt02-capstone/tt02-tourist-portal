@@ -398,7 +398,6 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         width: '100%',
     },
-
 });
 
 

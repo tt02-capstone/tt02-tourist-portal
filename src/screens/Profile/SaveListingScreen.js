@@ -212,44 +212,51 @@ const DealRoute = ({userType, data, removeDealListing}) => (
         <ScrollView>
             <View style={styles.container}>
                 {data.map((item, index) => {
-                    if ((userType === 'TOURIST' && !item.is_govt_voucher) || userType === 'LOCAL') {
-                        return (
-                            <Card key={index}>
-                                <Card.Title style={styles.header}>
-                                    {item.promo_code ? item.promo_code : 'NO PROMO CODE REQUIRED'}
-                                </Card.Title>
-                                {item.deal_image_list.length > 0 ? (
-                                    <Card.Image
-                                        style={{ padding: 0, height: 200 }}
-                                        source={{
-                                            uri: item.deal_image_list[0] // KIV for image
-                                        }}
-                                    />
-                                ) : null}
+                    return (
+                        <Card key={index}>
+                            <View style={{ marginBottom: 20}} >
+                                {new Date(item.start_datetime) >= new Date()?
+                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{ backgroundColor: 'orange', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                            UPCOMING
+                                        </Text>
+                                    </View>:
+                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{ backgroundColor: 'green', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                            AVAILABLE
+                                        </Text>
+                                    </View>
+                                }
+                            </View>
+                            {item.deal_image_list.length > 0 ? (
+                                <Card.Image
+                                    style={{ padding: 0, height: 200 }}
+                                    source={{
+                                        uri: item.deal_image_list[0] // KIV for image
+                                    }}
+                                />
+                            ) : null}
 
 
-                                <Text style={styles.description}>
-                                    <Text style={{ fontWeight: 'bold' }}>Start Date:</Text>  {formatDate(item.start_datetime)} {'\n'} {'\n'}
-                                    <Text style={{ fontWeight: 'bold' }}>End Date:</Text> {formatDate(item.end_datetime)} {'\n'} {'\n'}
-                                    <Text style={{ fontWeight: 'bold' }}>Promo Code:</Text> {item.promo_code}
+                            <Text style={styles.description}>
+                                <Text style={{ fontWeight: 'bold' }}>Start Date:</Text>  {formatDate(item.start_datetime)} {'\n'} {'\n'}
+                                <Text style={{ fontWeight: 'bold' }}>End Date:</Text> {formatDate(item.end_datetime)} {'\n'} {'\n'}
+                                <Text style={{ fontWeight: 'bold' }}>Promo Code:</Text> {item.promo_code}
+                            </Text>
+
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={[styles.tag, { backgroundColor: 'blue', color: 'white', fontWeight: 'bold' }]}>
+                                    {item.discount_percent} % for GRABS
                                 </Text>
-
-                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', fontWeight: 'bold' }]}>
-                                        {item.discount_percent} % for GRABS
-                                    </Text>
-                                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>
-                                        {formatDealType(item.deal_type)}
-                                    </Text>
-                                </View>
-                                <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
-                                    <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeDealListing(item.deal_id)} />
-                                </View>
-                            </Card>
-                        );
-                    } else {
-                        return null;
-                    }
+                                <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>
+                                    {formatDealType(item.deal_type)}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+                                <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeDealListing(item.deal_id)} />
+                            </View>
+                        </Card>
+                    );
                 })}
             </View>
         </ScrollView>

@@ -177,10 +177,6 @@ export const CheckoutScreen = ({navigation}) => {
             <View style={{ flexDirection: "column", }}>
               <ListItem.Title style={{fontSize: 16}}>{cartItem.item_name}</ListItem.Title>
               <ListItem.Subtitle style={{fontSize: 14}}>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
-              <ListItem.Subtitle style={{fontSize: 14}}>${cartItem.price}</ListItem.Subtitle>
-
-              
-              </View>
               <View style={{ flexDirection: "column" }}>
               {
           cartItem.items.map((item, index) => (
@@ -190,6 +186,11 @@ export const CheckoutScreen = ({navigation}) => {
           }
               
               </View>
+              <ListItem.Subtitle style={{fontSize: 14}}>${cartItem.price}</ListItem.Subtitle>
+
+              
+              </View>
+              
               </View>       
             </ListItem.Content>
             {/* </TouchableOpacity> */}

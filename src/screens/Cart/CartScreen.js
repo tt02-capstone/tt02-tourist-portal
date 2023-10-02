@@ -168,6 +168,13 @@ export const CartScreen = ({ navigation }) => {
   };
 
   const updateQuantity = (cartItemIndex, itemIndex, delta) => {
+    let tourPrice = 0
+
+    if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
+      tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
+      let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
+      cartItems[cartItemIndex].tour[0].quantity = oldQ + delta; // update per pax for tours 
+    }
 
     // Update the cart items with new quantity for the specified ticket type
     const currentQuantity = cartItems[cartItemIndex].items[itemIndex].quantity;
@@ -399,7 +406,7 @@ export const CartScreen = ({ navigation }) => {
               {/* Common */}
               <ListItem.Content style={{ padding: 0, marginLeft: -10, height: 80 }}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                  <View style={{ flexDirection: "column", width: 130 }}>
+                  <View style={{ flexDirection: "column", width: 150 }}>
                     <ListItem.Title style={{ fontSize: 12, fontWeight: 'bold' }} >{cartItem.item_name}</ListItem.Title>
 
                     {cartItem.type === 'ATTRACTION' &&
@@ -421,8 +428,8 @@ export const CartScreen = ({ navigation }) => {
 
                     <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>S$ {cartItem.price}</ListItem.Subtitle>
                     {cartItem.type === 'ATTRACTION' && cartItem.tour != null ?
-                      <ListItem.Subtitle style={{ fontSize: 10, color: 'grey', fontWeight: 'bold' }}>
-                        Tour: {cartItem.tour[0].activity_selection}
+                      <ListItem.Subtitle style={{ fontSize: 10, color: 'red', fontWeight: 'bold' }}>
+                        Add Ons : {cartItem.tour[0].activity_selection}
                       </ListItem.Subtitle> : <Text></Text>}
                     {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
                     {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
@@ -430,7 +437,7 @@ export const CartScreen = ({ navigation }) => {
 
                   <View style={{ flexDirection: "column" }}>
                     {cartItem.items.map((item, itemIndex) => (
-                      <View style={{ flexDirection: "row" }} key={itemIndex}>
+                      <View style={{ flexDirection: "row"}} key={itemIndex}>
 
                         {cartItem.type === 'ATTRACTION' &&
                           <Text key={itemIndex} style={{ marginLeft: 8, marginBottom: 10, fontSize: 10, fontWeight: 'bold' }}>{item.activity_selection} </Text>
@@ -443,14 +450,14 @@ export const CartScreen = ({ navigation }) => {
                         {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
                           <TouchableOpacity
                             style={{
-                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                              backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
                               borderRadius: 15, marginLeft: 5, marginBottom: 8
                             }}
                             onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
                           >
 
 
-                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> - </Text>
+                            <Text style={{ color: 'white', fontSize: 13, fontWeight: 'bold' }}> - </Text>
                           </TouchableOpacity>
                         )}
 
@@ -459,12 +466,12 @@ export const CartScreen = ({ navigation }) => {
                         {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
                           <TouchableOpacity
                             style={{
-                              backgroundColor: '#044537', height: 30, width: 30, justifyContent: 'center', alignItems: 'center',
+                              backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
                               borderRadius: 15, marginLeft: 5, marginBottom: 8
                             }}
                             onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
                           >
-                            <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> + </Text>
+                            <Text style={{ color: 'white', fontSize: 13, fontWeight: 'bold' }}> + </Text>
                           </TouchableOpacity>
                         )}
                       </View>

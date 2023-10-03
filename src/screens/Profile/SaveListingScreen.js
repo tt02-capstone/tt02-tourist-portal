@@ -310,7 +310,7 @@ const SavedListingScreen = ({ navigation }) => {
 
     async function updateData() {
         const savedAttractions = await getSavedAttractionList(user.user_id);
-        setData(savedAttractions);
+        setData(savedAttractions.data);
 
         const savedRest = await getAllSavedRestaurantForUser(user.user_id);
         setRestData(savedRest.data)
@@ -324,7 +324,9 @@ const SavedListingScreen = ({ navigation }) => {
                     setUser(userData)
 
                     let savedAttractions = await getSavedAttractionList(userData.user_id);
-                    setData(savedAttractions);
+                    if (savedAttractions.status) {    
+                        setData(savedAttractions.data);
+                    }
 
                     let telecomResponse = await getUserSavedTelecom(userData.user_id);
                     if (telecomResponse.status) {

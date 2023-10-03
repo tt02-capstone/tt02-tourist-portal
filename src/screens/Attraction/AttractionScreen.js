@@ -30,9 +30,10 @@ const AttractionScreen = ({ navigation }) => {
         const fetchData = async () => {
             try {
                 let listOfAttractions = await getAttractionList();
-                console.log("listOfAttractions", listOfAttractions);
-                setData(listOfAttractions);
-                setFullAttractionList(listOfAttractions);
+                if (listOfAttractions.status) {
+                    setData(listOfAttractions.data);
+                    setFullAttractionList(listOfAttractions.data);
+                }
                 setLoading(false);
             } catch (error) {
                 alert('An error occur! Failed to retrieve attraction list!');
@@ -391,8 +392,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
-        fontSize: 11,
+        width: 85,
+        fontSize: 7,
         fontWeight: 'bold',
     },
     tierTag: {
@@ -401,8 +402,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 70,
-        fontSize: 11,
+        width: 50,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     locationTag: {
@@ -411,8 +412,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 120,
-        fontSize: 11,
+        width: 80,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     modalBackground: {

@@ -320,6 +320,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
             }
 
             let recoms = await getRecommendation(attraction.generic_location, attraction.listing_type, attractionId);
+            console.log('testing')
+            console.log(recoms)
             if (recoms.status) {
                 setRecommendation(recoms.data)
             }
@@ -502,8 +504,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
                     <View>
                         {formattedPriceList.map(item => (
-                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', width: 120 }}>
+                            <View key={item.ticket_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 8, marginBottom: 30 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', width: 130 }}>
                                     <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{`${item.ticket_type} TICKET @ $${item.amount}`}{'\n'}{`Tickets Available: ${item.ticket_count}`}  </Text>
                                 </View>
 
@@ -629,7 +631,7 @@ const styles = StyleSheet.create({
     },
     tagContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'left',
         marginBottom: 5,
     },
     typeTag: {
@@ -638,8 +640,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
-        fontSize: 11,
+        width: 85,
+        fontSize: 7,
         fontWeight: 'bold',
     },
     tierTag: {
@@ -648,8 +650,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 70,
-        fontSize: 11,
+        width: 50,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     locationTag: {
@@ -658,8 +660,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 120,
-        fontSize: 11,
+        width: 80,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     dropBorder: {

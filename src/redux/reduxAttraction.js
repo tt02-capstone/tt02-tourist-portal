@@ -1,12 +1,11 @@
 import axios from "axios";
 import { attractionApi } from "../helpers/api";
+import { handleApiErrors } from "../helpers/errorCatching";
 
 export async function getAttractionList() {
     try {
         const response = await attractionApi.get('/getAllPublishedAttraction')
-        if (response.data != []) {
-            return response.data;
-        }    
+        return handleApiErrors(response); 
     } catch (error) {
         console.error("Retrieve attraction list error!");
         return {status: false, data: error.message};
@@ -56,11 +55,9 @@ export async function saveAttraction(user_id,attraction_id) {
 export async function getSavedAttractionList(user_id) {
     try {
         const response = await attractionApi.get(`/getSavedAttractionListForTouristAndLocal/${user_id}`);
-        if (response.data != []) {
-            return response.data;
-        }  
+        return handleApiErrors(response);
     } catch (error) {
-        console.error("Retrieve attraction error!");
+        console.error("Retrieve saved attraction list error!");
         return {status: false, data: error.message};
     }
 }

@@ -159,6 +159,7 @@ const AccommodationScreen = ({ navigation }) => {
                                         style={[
                                             styles.tag,
                                             { backgroundColor: getColorForType(item.type) },
+                                            { textAlign: 'center' },
                                         ]}
                                     >
                                         {item.type}
@@ -167,17 +168,18 @@ const AccommodationScreen = ({ navigation }) => {
                                         style={[
                                             styles.tag,
                                             { backgroundColor: 'purple', color: 'white' },
+                                            { textAlign: 'center' },
                                         ]}
                                     >
-                                        {item.estimated_price_tier}
+                                        {item.estimated_price_tier.replace(/_/g, ' ')}
                                     </Text>
                                     <Text
                                         style={[
-                                            styles.tag,
-                                            { backgroundColor: 'green', color: 'white' },
+                                            styles.locationTag,
+                                            { backgroundColor: 'green', color: 'white', textAlign: 'center' },
                                         ]}
                                     >
-                                        {item.generic_location}
+                                        {item.generic_location.replace(/_/g, ' ')}
                                     </Text>
                                 </View>
                             </Card>
@@ -256,11 +258,13 @@ const AccommodationScreen = ({ navigation }) => {
                                     </View>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
+                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
                                             <Text style={styles.filterText}>Apply</Text>
                                         </TouchableOpacity>
+                                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                                            <Text style={styles.filterText}>Close</Text>
+                                        </TouchableOpacity>
                                     </View>
-
 
                                 </ScrollView>
                             </View>
@@ -293,7 +297,7 @@ const pickerSelectStyles = StyleSheet.create({
         borderColor: 'purple',
         borderRadius: 8,
         color: 'black',
-        paddingRight: 30, 
+        paddingRight: 30,
     },
 });
 
@@ -328,7 +332,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 100,
+        width: 80,
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    locationTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 120,
         fontSize: 11,
         fontWeight: 'bold',
     },
@@ -353,7 +367,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginLeft: 10,
         alignItems: 'center',
-        alignSelf: 'center', 
+        alignSelf: 'center',
         width: '30%',
     },
     filterText: {
@@ -365,6 +379,8 @@ const styles = StyleSheet.create({
     },
     cardImage: {
         padding: 0,
+        marginTop: 2,
+        marginBottom: 10,
     },
     cardTitle: {
         fontSize: 16,
@@ -376,6 +392,7 @@ const styles = StyleSheet.create({
     },
     tagContainer: {
         flexDirection: 'row',
+        justifyContent: 'center',
         marginBottom: 5,
     },
     modalBackground: {
@@ -384,7 +401,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-
     modalContainer: {
         backgroundColor: 'white',
         width: '80%',

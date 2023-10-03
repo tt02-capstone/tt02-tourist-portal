@@ -133,6 +133,24 @@ const DealScreen = ({ navigation }) => {
         }
     }
 
+    const getColorForType = (label) => {
+        const labelColorMap = {
+            'CHINESE_NEW_YEAR': 'firebrick',
+            'NATIONAL_DAY': 'indianred',
+            'DEEPAVALLI': 'indigo',
+            'NUS_WELLBEING_DAY': 'darkcyan',
+            'SINGLES_DAY': 'chocolate',
+            'VALENTINES': 'mediumvioletred',
+            'HARI_RAYA': 'darkolivegreen',
+            'NEW_YEAR_DAY': 'goldenrod',
+            'BLACK_FRIDAY': 'black',
+            'CHRISTMAS': 'darkred',
+            'GOVERNMENT': 'darkgray',
+        };
+
+        return labelColorMap[label] || 'gray';
+    };
+
     const formatDate = (date) => {
         let inputDate = new Date(date);
         let day = inputDate.getDate().toString().padStart(2, '0');
@@ -226,10 +244,10 @@ const DealScreen = ({ navigation }) => {
                                     </Text>
 
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                        <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', fontWeight: 'bold' }]}>
+                                        <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', fontWeight: 'bold', textAlign: 'center' }]}>
                                             {item.discount_percent} % for GRABS
                                         </Text>
-                                        <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>
+                                        <Text style={[styles.tag, { backgroundColor: getColorForType(item.deal_type), color: 'white', textAlign: 'center' }]}>
                                             {formatDealType(item.deal_type)}
                                         </Text>
                                     </View>
@@ -279,8 +297,11 @@ const DealScreen = ({ navigation }) => {
                                     </View>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
+                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
                                             <Text style={styles.filterText}>Apply</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                                            <Text style={styles.filterText}>Close</Text>
                                         </TouchableOpacity>
                                     </View>
 

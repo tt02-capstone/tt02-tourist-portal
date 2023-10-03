@@ -19,7 +19,8 @@ import moment from 'moment';
 import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
-import {timeZoneOffset} from "../../helpers/DateFormat";
+import { timeZoneOffset } from "../../helpers/DateFormat";
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -27,6 +28,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const [recommendation, setRecommendation] = useState([]);
     const [priceList, setPriceList] = useState([]);
     const [attrTicketList, setAttrTicketList] = useState([]);
+    const [imageList, setImageList] = useState([]);
+    const [imageActiveSlide, setImageActiveSlide] = useState(0);
     const [loading, setLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
     const [formattedPriceList, setFormattedPriceList] = useState([]);
@@ -263,7 +266,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
     // factor for recommendations 
     const viewRecommendedAttraction = (redirect_attraction_id) => {
-        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id }); 
+        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id });
     }
 
     const viewRecommendedRest = (redirect_rest_id) => {
@@ -308,12 +311,14 @@ const AttractionDetailsScreen = ({ navigation }) => {
             setAttraction(attraction);
             setPriceList(attraction.price_list);
             setAttrTicketList(attraction.ticket_per_day_list);
+            setImageList(attraction.attraction_image_list);
+
 
             let activity = await getSeasonalActivity(attractionId);
             if (activity !== undefined && activity.length != 0) {
                 setSeasonalActivity(activity); // get seasonal
             }
-            
+
             let recoms = await getRecommendation(attraction.generic_location, attraction.listing_type, attractionId);
             if (recoms.status) {
                 setRecommendation(recoms.data)
@@ -390,23 +395,88 @@ const AttractionDetailsScreen = ({ navigation }) => {
         navigation.navigate('TourScreen', { tours });
     };
 
+    renderCarouselItem = ({ item }) => (
+        <View>
+            <Card.Image
+                style={styles.cardImage}
+                source={{ uri: item }}
+            />
+        </View>
+    );
+
+    const getColorForType = (label) => {
+        const labelColorMap = {
+            'HISTORICAL': 'lightblue',
+            'CULTURAL': 'lightgreen',
+            'NATURE': 'orange',
+            'ADVENTURE': 'yellow',
+            'SHOPPING': 'turquoise',
+            'ENTERTAINMENT': 'lightpink'
+        };
+
+        return labelColorMap[label] || 'gray';
+    };
+
     return (
         <Background>
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
-                        {attraction.name} 
-                        <Button mode="text" style={{ marginTop: -13}} onPress={saveAttr} >
-                            <Icon name="heart" size={15} color='grey'/>
+                        {attraction.name}
+                        <Button mode="text" style={{ marginTop: -13 }} onPress={saveAttr} >
+                            <Icon name="heart" size={15} color='grey' />
                         </Button>
                     </Card.Title>
 
-                    <Text style={[styles.subtitle]}>{attraction.address}</Text>
-                    <Text style={styles.subtitle}>Operating Hours: {attraction.opening_hours}</Text>
-                    <Text style={styles.description}>{attraction.description}</Text>
-                    <Text style={styles.description}>{attraction.age_group}</Text>
+                    <View style={styles.tagContainer}>
+                        <Text style={[styles.typeTag, { backgroundColor: getColorForType(attraction.attraction_category) }, { textAlign: 'center' },]}>
+                            {attraction.attraction_category}
+                        </Text>
+                        <Text style={[styles.tierTag,{ backgroundColor: 'purple', color: 'white' },{ textAlign: 'center' },]}>
+                            {attraction.estimated_price_tier ? attraction.estimated_price_tier.replace(/_/g, ' ') : ''}
+                        </Text>
+                        <Text style={[styles.locationTag,{ backgroundColor: 'green', color: 'white' },{ textAlign: 'center' },]}>
+                            {attraction.generic_location ? attraction.generic_location.replace(/_/g, ' ') : ''}
+                        </Text>
+                    </View>
 
-                    {seasonalActivity && <View style={{ backgroundColor: '#EBFAF2', padding: 8, borderRadius: 10 }}>
+                    <View style={styles.carouselContainer}>
+                        <Carousel
+                            data={imageList}
+                            renderItem={renderCarouselItem}
+                            sliderWidth={330}
+                            itemWidth={330}
+                            layout={'default'}
+                            onSnapToItem={(index) => setImageActiveSlide(index)}
+                        />
+                        <Pagination
+                            dotsLength={imageList.length} // Total number of items
+                            activeDotIndex={imageActiveSlide} // Current active slide index
+                            containerStyle={{ paddingVertical: 10, marginTop: 5 }}
+                            dotStyle={{
+                                width: 7,
+                                height: 7,
+                                borderRadius: 5,
+                                backgroundColor: 'rgba(0, 0, 0, 0.92)',
+                            }}
+                            inactiveDotOpacity={0.4}
+                            inactiveDotScale={0.6}
+                        />
+                    </View>
+
+                    <Text style={[styles.subtitle]}>{attraction.address}</Text>
+                    <Text style={styles.description}>{attraction.description}</Text>
+
+                    <Text style={{ fontSize: 12 }}>
+                        <Text style={{ fontWeight: 'bold' }}>Operating Hours:</Text>{' '}
+                        {attraction.opening_hours}
+                    </Text>
+                    <Text style={{ fontSize: 12 }}>
+                        <Text style={{ fontWeight: 'bold' }}>Age Group:</Text>{' '}
+                        {attraction.age_group}
+                    </Text>
+
+                    {seasonalActivity && <View style={{ backgroundColor: '#EBFAF2', marginTop: 10, padding: 8, borderRadius: 10 }}>
                         <Text style={styles.activityHeader} >Special Event !!</Text>
                         <Text style={styles.activity}>{seasonalActivity.name} from {seasonalActivity.start_date} to {seasonalActivity.end_date}</Text>
                         <Text style={styles.activity}>{seasonalActivity.description}</Text>
@@ -482,33 +552,33 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     />
                 </View>
 
-                <View> 
-                    { recommendation.length > 0 && (
-                    <Card containerStyle={styles.dropBorder}>
-                        <Card.Title style={styles.header}>
-                            Nearby Recommendation
-                        </Card.Title>
+                <View>
+                    {recommendation.length > 0 && (
+                        <Card containerStyle={styles.dropBorder}>
+                            <Card.Title style={styles.header}>
+                                Nearby Recommendation
+                            </Card.Title>
 
-                        <ScrollView horizontal>
-                            <View style={{ flexDirection: 'row', height: 350 }}>
-                                {
-                                    recommendation.map((item, index) => (
-                                        <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
-                                            {item.listing_type === 'ATTRACTION' && (
-                                                <AttractionRecom item={item} />
-                                            )}
-                                            {item.listing_type === 'RESTAURANT' && (
-                                                <RestaurantRecom item={item} />
-                                            )}
-                                            {item.listing_type === 'ACCOMMODATION' && (
-                                                <AccommodationRecom item={item} />
-                                            )}
-                                        </TouchableOpacity>
-                                    ))
-                                }
-                            </View>
-                        </ScrollView>
-                    </Card>
+                            <ScrollView horizontal>
+                                <View style={{ flexDirection: 'row', height: 350 }}>
+                                    {
+                                        recommendation.map((item, index) => (
+                                            <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
+                                                {item.listing_type === 'ATTRACTION' && (
+                                                    <AttractionRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'RESTAURANT' && (
+                                                    <RestaurantRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'ACCOMMODATION' && (
+                                                    <AccommodationRecom item={item} />
+                                                )}
+                                            </TouchableOpacity>
+                                        ))
+                                    }
+                                </View>
+                            </ScrollView>
+                        </Card>
                     )}
                 </View>
             </ScrollView>
@@ -557,15 +627,40 @@ const styles = StyleSheet.create({
     recommendation: {
         marginBottom: 10, textAlign: 'center', marginTop: 10
     },
-    tag: {
+    tagContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 5,
+    },
+    typeTag: {
         color: 'black',
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
         width: 90,
-        fontSize: 7.5,
-        fontWeight: 'bold'
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    tierTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 70,
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    locationTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 120,
+        fontSize: 11,
+        fontWeight: 'bold',
     },
     dropBorder: {
         borderWidth: 0,
@@ -586,8 +681,17 @@ const styles = StyleSheet.create({
         marginTop: -5,
         width: '100%',
         alignSelf: 'center',
-    }
-
+    },
+    carouselContainer: {
+        flex: 1,
+        marginTop: 8,
+        marginBottom: 10,
+    },
+    cardImage: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'cover',
+    },
 });
 
 export default AttractionDetailsScreen

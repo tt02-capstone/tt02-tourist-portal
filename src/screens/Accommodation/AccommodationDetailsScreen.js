@@ -15,16 +15,18 @@ import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
 import { addRoomToCart } from '../../redux/cartRedux';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import {timeZoneOffset} from "../../helpers/DateFormat";
+import { timeZoneOffset } from "../../helpers/DateFormat";
 import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { getRecommendation } from '../../redux/recommendationRedux';
+import moment from 'moment';
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [accommodation, setAccommodation] = useState([]);
     const [roomList, setRoomList] = useState([]);
+    const [imageList, setImageList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [range, setRange] = useState({ startDate: undefined, endDate: undefined });
     const [open, setOpen] = useState(false);
@@ -36,6 +38,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     const { accommodationId } = route.params;
     const [activeSlide, setActiveSlide] = useState(0);
+    const [imageActiveSlide, setImageActiveSlide] = useState(0);
 
     async function fetchUser() {
         const userData = await getUser()
@@ -81,16 +84,6 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             })
         } else {
             // format date
-            // const checkInDate = new Date(range.startDate);
-            // checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
-            // const checkInDateInLocalDateTime = checkInDate.toISOString();
-
-            // const checkOutDate = new Date(range.endDate);
-            // checkOutDate.setDate(checkOutDate.getDate()); // as datepicker is giving 1 day before
-            // const checkOutDateInLocalDateTime = checkOutDate.toISOString();
-
-            // console.log("checkInDateInLocalDateTime", checkInDateInLocalDateTime);
-            // console.log("checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
 
             const checkInTime = accommodation.check_in_time.split('T')[1];
             const checkOutTime = accommodation.check_out_time.split('T')[1];
@@ -100,7 +93,6 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
             const checkInDate = new Date(range.startDate);
             checkInDate.setHours(checkInDate.getHours() + timeZoneOffset);
-            // checkInDate.setDate(checkInDate.getDate() + 1); // as datepicker is giving 1 day before
             const checkInDateInLocalDateTime = `${checkInDate.toISOString().split('T')[0]}T${checkInTime}Z`;
 
             const checkOutDate = new Date(range.endDate);
@@ -116,8 +108,6 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                 if (quantityByRoomType[roomType] > 0) {
 
-                    // removed as i don't use smthg similar to checkTicketInventory
-                    // for ticket, this was ticket type entity
                     selectedRooms.push({
                         // this is undefined
                         room_id: formattedRoomList.find(item => item.room_type === roomType).room_id,
@@ -213,7 +203,9 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         try {
             let accommodation = await getAccommodation(accommodationId);
             setAccommodation(accommodation);
+            console.log("accommodation.accommodation_image_list", accommodation.accommodation_image_list);
             setRoomList(accommodation.room_list);
+            setImageList(accommodation.accommodation_image_list);
             console.log("roomList", accommodation.room_list);
 
             // for recommendations 
@@ -338,6 +330,12 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         return dateTime.toLocaleTimeString([], timeOptions);
     }
 
+    function formatDatePicker(string) {
+        const date = new Date(string);
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString([], dateOptions);
+    }
+
     function toTitleCase(str) {
         return str ? str
             .toLowerCase()
@@ -352,7 +350,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         if (user) {
             let saved = false;
             for (var i = 0; i < user.accommodation_list.length; i++) {
-                if(user.accommodation_list[i].accommodation_id === accommodationId) {
+                if (user.accommodation_list[i].accommodation_id === accommodationId) {
                     saved = true;
                     break;
                 }
@@ -403,7 +401,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     // factor for recommendations 
     const viewRecommendedAttraction = (redirect_attraction_id) => {
-        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id }); 
+        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id });
     }
 
     const viewRecommendedRest = (redirect_rest_id) => {
@@ -424,29 +422,59 @@ const AccommodationDetailsScreen = ({ navigation }) => {
         }
     }
 
+    renderCarouselItem = ({ item }) => (
+        <View>
+            <Card.Image
+                style={styles.cardImage}
+                source={{ uri: item }}
+            />
+        </View>
+    );
+
     return (
         <Background>
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
                         {accommodation.name}
-                        <Button mode="text" style={{ marginTop: -10}} onPress={save} >
+                        <Button mode="text" style={{ marginTop: -10 }} onPress={save} >
                             {isSaved && <Icon name="heart" size={20} color='red' />}
-                            {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                            {!isSaved && <Icon name="heart" size={20} color='grey' />}
                         </Button>
                     </Card.Title>
 
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.tag, { backgroundColor: getColorForType(accommodation.type) }]}>{accommodation.type}</Text>
-                        <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>{accommodation.estimated_price_tier}</Text>
+                    <View style={styles.tagContainer}>
+                        <Text style={[styles.tag, { backgroundColor: getColorForType(accommodation.type), textAlign: 'center' }]}>{accommodation.type}</Text>
+                        <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{accommodation.estimated_price_tier ? accommodation.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
+                        <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{accommodation.generic_location ? accommodation.generic_location.replace(/_/g, ' ') : ''}</Text>
+                    </View>
+
+                    <View style={styles.carouselContainer}>
+                        <Carousel
+                            data={imageList}
+                            renderItem={renderCarouselItem}
+                            sliderWidth={330}
+                            itemWidth={330}
+                            layout={'default'}
+                            onSnapToItem={(index) => setImageActiveSlide(index)}
+                        />
+                        <Pagination
+                            dotsLength={imageList.length} // Total number of items
+                            activeDotIndex={imageActiveSlide} // Current active slide index
+                            containerStyle={{ paddingVertical: 10, marginTop: 5 }}
+                            dotStyle={{
+                                width: 7,
+                                height: 7,
+                                borderRadius: 5,
+                                backgroundColor: 'rgba(0, 0, 0, 0.92)',
+                            }}
+                            inactiveDotOpacity={0.4}
+                            inactiveDotScale={0.6}
+                        />
                     </View>
 
                     <Text style={[styles.subtitle]}>{accommodation.address}</Text>
                     <Text style={styles.description}>{accommodation.description}</Text>
-                    <Text style={styles.details}>
-                        <Text style={styles.boldText}>Area:</Text> {toTitleCase(accommodation.generic_location)}
-                    </Text>
-
                     <Text style={styles.details}>
                         <Text style={styles.boldText}>Contact Number:</Text> {accommodation.contact_num}
                     </Text>
@@ -470,8 +498,9 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                                     source={{ uri: item.room_image }}
                                     style={styles.roomImage}
                                 />
+
                                 <View style={{ flex: 1, marginLeft: 10 }}>
-                                    <Card.Title style={styles.header}>{item.room_type}</Card.Title>
+                                    <Card.Title style={styles.header}>{item.room_type.replace(/_/g, ' ')}</Card.Title>
                                     <Text style={styles.details}>
                                         <Text style={styles.boldText}>Amenities:</Text>{' '}
                                         {item.amenities_description}
@@ -499,10 +528,9 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                     activeDotIndex={activeSlide} // Current active slide index
                     containerStyle={{ paddingVertical: 10 }}
                     dotStyle={{
-                        width: 10,
-                        height: 10,
+                        width: 7,
+                        height: 7,
                         borderRadius: 5,
-                        marginHorizontal: 2,
                         backgroundColor: 'rgba(0, 0, 0, 0.92)',
                     }}
                     inactiveDotOpacity={0.4}
@@ -516,7 +544,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
                         <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
-                            Pick range
+                            {range.startDate && range.endDate ? `${formatDatePicker(range.startDate)} - ${formatDatePicker(range.endDate)}` : 'Pick range'}
                         </Button>
                         <DatePickerModal
                             locale='en-GB'
@@ -532,12 +560,13 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         />
                     </View>
 
+
                     <View>
                         {formattedRoomList.map((item) => (
                             <View key={item.room_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', width: 120 }}>
                                     <Text style={{ fontSize: 11, fontWeight: 'bold' }}>
-                                        {`${item.room_type} ROOM @ $${item.price}`}{'\n'}
+                                    {`${item.room_type.replace(/_/g, ' ')} ROOM @ $${item.price}`}{'\n'}
                                         {`Rooms Available: ${item.available_rooms || 0}`}
                                     </Text>
                                 </View>
@@ -571,35 +600,35 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 </View>
 
                 {/* to view recommendations */}
-                <View> 
-                    { recommendation.length > 0 && (
-                    <Card containerStyle={styles.dropBorder}>
-                        <Card.Title style={styles.header}>
-                            Nearby Recommendation
-                        </Card.Title>
+                <View>
+                    {recommendation.length > 0 && (
+                        <Card containerStyle={styles.dropBorder}>
+                            <Card.Title style={styles.header}>
+                                Nearby Recommendation
+                            </Card.Title>
 
-                        <ScrollView horizontal>
-                            <View style={{ flexDirection: 'row', height: 350 }}>
-                                {
-                                    recommendation.map((item, index) => (
-                                        <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
-                                            {item.listing_type === 'ATTRACTION' && (
-                                                <AttractionRecom item={item} />
-                                            )}
-                                            {item.listing_type === 'RESTAURANT' && (
-                                                <RestaurantRecom item={item} />
-                                            )}
-                                            {item.listing_type === 'ACCOMMODATION' && (
-                                                <AccommodationRecom item={item} />
-                                            )}
-                                        </TouchableOpacity>
-                                    ))
-                                }
-                            </View>
-                        </ScrollView>
-                    </Card>
+                            <ScrollView horizontal>
+                                <View style={{ flexDirection: 'row', height: 350 }}>
+                                    {
+                                        recommendation.map((item, index) => (
+                                            <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
+                                                {item.listing_type === 'ATTRACTION' && (
+                                                    <AttractionRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'RESTAURANT' && (
+                                                    <RestaurantRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'ACCOMMODATION' && (
+                                                    <AccommodationRecom item={item} />
+                                                )}
+                                            </TouchableOpacity>
+                                        ))
+                                    }
+                                </View>
+                            </ScrollView>
+                        </Card>
                     )}
-                    </View>
+                </View>
 
             </ScrollView>
         </Background>
@@ -625,6 +654,10 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 30, height: 30, marginRight: 10,
+    },
+    cardImage: {
+        padding: 0,
+        marginBottom: 10,
     },
     roomImage: {
         width: 100, height: 100, marginRight: 10,
@@ -666,6 +699,21 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold'
     },
+    locationTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 120,
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    tagContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 12,
+    },
     dropBorder: {
         borderWidth: 0,
         shadowColor: 'rgba(0,0,0, 0.0)',
@@ -692,8 +740,17 @@ const styles = StyleSheet.create({
         borderColor: '#e0e0e0',
         borderRadius: 8,
         padding: 10,
-    }
-
+    },
+    carouselContainer: {
+        flex: 1,
+        marginTop: 2,
+        marginBottom: 10,
+    },
+    cardImage: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'cover',
+    },
 });
 
 export default AccommodationDetailsScreen

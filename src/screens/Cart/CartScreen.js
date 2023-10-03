@@ -510,7 +510,7 @@ export const CartScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightgreen', padding: 10, height: 70 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#99e699', padding: 10, height: 70 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CheckBox
             left

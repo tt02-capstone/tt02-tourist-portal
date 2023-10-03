@@ -47,7 +47,7 @@ const RestaurantScreen = ({ navigation }) => {
             'KOREAN': 'lightblue',
             'MEXICAN': 'lightgreen',
             'CHINESE': 'orange',
-            'WESTERN': 'yellow',
+            'WESTERN': 'gold',
             'FAST_FOOD': 'turquoise',
             'JAPANESE': 'lightpink'
         };
@@ -155,9 +155,33 @@ const RestaurantScreen = ({ navigation }) => {
                                     }}
                                 />
                                 <Text style={styles.description}>{item.description}</Text>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[styles.tag, { backgroundColor: getColorForType(item.restaurant_type) }]}>{item.restaurant_type}</Text>
-                                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>{item.estimated_price_tier}</Text>
+                                <View style={styles.tagContainer}>
+                                    <Text
+                                        style={[
+                                            styles.tag,
+                                            { backgroundColor: getColorForType(item.restaurant_type) },
+                                            { textAlign: 'center' },
+                                        ]}
+                                    >
+                                        {item.restaurant_type}
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.tag,
+                                            { backgroundColor: 'purple', color: 'white' },
+                                            { textAlign: 'center' },
+                                        ]}
+                                    >
+                                        {item.estimated_price_tier.replace(/_/g, ' ')}
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.locationTag,
+                                            { backgroundColor: 'green', color: 'white', textAlign: 'center' },
+                                        ]}
+                                    >
+                                        {item.generic_location.replace(/_/g, ' ')}
+                                    </Text>
                                 </View>
                             </Card>
                         </TouchableOpacity>
@@ -240,8 +264,11 @@ const RestaurantScreen = ({ navigation }) => {
                                     </View>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
+                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
                                             <Text style={styles.filterText}>Apply</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                                            <Text style={styles.filterText}>Close</Text>
                                         </TouchableOpacity>
                                     </View>
 
@@ -305,9 +332,24 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 110,
+        width: 80,
         fontSize: 11,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+    },
+    locationTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 120,
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    tagContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 5,
     },
     header: {
         color: '#044537',
@@ -350,10 +392,6 @@ const styles = StyleSheet.create({
     cardDescription: {
         fontSize: 13,
         marginBottom: 10,
-    },
-    tagContainer: {
-        flexDirection: 'row',
-        marginBottom: 5,
     },
     modalBackground: {
         flex: 1,

@@ -259,12 +259,14 @@ const BookingHistoryScreen = ({ navigation }) => {
                                     </View>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
+                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
                                             <Text style={styles.filterText}>Apply</Text>
                                         </TouchableOpacity>
+                                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                                            <Text style={styles.filterText}>Close</Text>
+                                        </TouchableOpacity>
                                     </View>
-
-
+                                    
                                 </ScrollView>
                             </View>
                         </View>

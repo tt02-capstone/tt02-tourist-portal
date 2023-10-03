@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 
-export default function AccommodationRecom({item}) {
+export default function AccommodationRecom({ item }) {
     const getColorForType = (label) => {
         const labelColorMap = {
             'HOTEL': 'lightblue',
@@ -19,17 +19,17 @@ export default function AccommodationRecom({item}) {
                     {item.name}
                 </Card.Title>
                 <Card.Image
-                    style={{ padding: 0, width: 260, height: 100 }}
+                    style={{ padding: 0, width: 260, height: 120, resizeMode: 'cover', }}
                     source={{
-                        uri: item.accommodation_image_list[0] 
+                        uri: item.accommodation_image_list[0]
                     }}
                 />
-                <Text style={{ marginBottom: 15 }}></Text>
+                <Text style={{ marginBottom: 5 }}></Text>
 
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={[styles.tag, { backgroundColor: getColorForType(item.type) }]}>{item.type}</Text>
-                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>{item.estimated_price_tier}</Text>
-                    <Text style={[styles.tag, { backgroundColor: 'green', color: 'white' }]}>{item.generic_location}</Text>
+                <View style={styles.tagContainer}>
+                    <Text style={[styles.tag, { backgroundColor: getColorForType(item.type), textAlign: 'center' }]}>{item.type}</Text>
+                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{item.estimated_price_tier ? item.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
+                    <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{item.generic_location ? item.generic_location.replace(/_/g, ' ') : ''}</Text>
                 </View>
 
             </Card>
@@ -56,6 +56,11 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16, marginTop: 5,
     },
+    tagContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 12,
+    },
     tag: {
         color: 'black',
         paddingVertical: 5,
@@ -63,7 +68,17 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         margin: 5,
         width: 60,
-        fontSize: 7.5,
+        fontSize: 9,
         fontWeight: 'bold'
-    }
+    },
+    locationTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 100,
+        fontSize: 9,
+        fontWeight: 'bold',
+    },
 });

@@ -136,15 +136,15 @@ const TelecomScreen = ({ navigation }) => {
 
     function formatDurationCategory(text) {
         if (text === 'ONE_DAY') {
-            return '1 Day';
+            return '1 DAY';
         } else if (text === 'THREE_DAY') {
-            return '3 Days';
+            return '3 DAYS';
         } else if (text === 'SEVEN_DAY') {
-            return '7 Days';
+            return '7 DAYS';
         } else if (text === 'FOURTEEN_DAY') {
-            return '14 Days';
+            return '14 DAYS';
         } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
-            return '> 14 Days';
+            return '> 14 DAYS';
         } else {
             return text;
         }
@@ -200,10 +200,10 @@ const TelecomScreen = ({ navigation }) => {
                                     <Text style={{ fontWeight: 'bold' }}>Data Limit: </Text><Text>{item.data_limit}GB</Text>
                                 </Text>
                                 <Text style={styles.description}>{item.description}</Text>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white' }]}>{formatEstimatedPriceTier(item.estimated_price_tier)}</Text>
-                                    <Text style={[styles.tag, { backgroundColor: 'blue', color: 'white' }]}>{formatDurationCategory(item.plan_duration_category)}</Text>
-                                    <Text style={[styles.tag, { backgroundColor: 'green', color: 'white' }]}>{formatDataLimitCategory(item.data_limit_category)}</Text>
+                                <View style={styles.tagContainer}>
+                                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{formatEstimatedPriceTier(item.estimated_price_tier)}</Text>
+                                    <Text style={[styles.tag, { backgroundColor: 'royalblue', color: 'white', textAlign: 'center' }]}>{formatDurationCategory(item.plan_duration_category)}</Text>
+                                    <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{formatDataLimitCategory(item.data_limit_category)}</Text>
                                 </View>
                             </Card>
                         </TouchableOpacity>
@@ -289,8 +289,11 @@ const TelecomScreen = ({ navigation }) => {
                                     </View>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={styles.filterButton}>
+                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
                                             <Text style={styles.filterText}>Apply</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                                            <Text style={styles.filterText}>Close</Text>
                                         </TouchableOpacity>
                                     </View>
 

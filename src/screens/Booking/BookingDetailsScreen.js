@@ -175,7 +175,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                                             <Card.Image
                                                 style={{ padding: 0, width: 200, height: 200 }}
                                                 source={{
-                                                    uri: booking.qr_code_list[0].qr_code_link
+                                                    uri: booking.qr_code_list[index].qr_code_link
                                                 }}
                                             />
                                         </Card>

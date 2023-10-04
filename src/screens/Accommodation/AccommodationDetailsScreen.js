@@ -88,9 +88,6 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             const checkInTime = accommodation.check_in_time.split('T')[1];
             const checkOutTime = accommodation.check_out_time.split('T')[1];
 
-            console.log("checkInTime", checkInTime);
-            console.log("checkOutTime", checkOutTime);
-
             const checkInDate = new Date(range.startDate);
             checkInDate.setHours(checkInDate.getHours() + timeZoneOffset);
             const checkInDateInLocalDateTime = `${checkInDate.toISOString().split('T')[0]}T${checkInTime}Z`;
@@ -99,8 +96,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             checkOutDate.setDate(checkOutDate.getDate());
             const checkOutDateInLocalDateTime = `${checkOutDate.toISOString().split('T')[0]}T${checkOutTime}Z`;
 
-            console.log("ADDTOCART checkInDateInLocalDateTime", checkInDateInLocalDateTime);
-            console.log("ADDTOCART checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
+            const millisecondsInADay = 1000 * 60 * 60 * 24;
+            const numOfNights = Math.ceil((checkOutDate - checkInDate) / millisecondsInADay) - 1;
 
             for (const roomType in quantityByRoomType) {
 
@@ -148,6 +145,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 } else {
 
                     for (const room of selectedRooms) {
+                        console.log("price for", room.room_type, ": ", formattedRoomList.find(item => item.room_type === room.room_type).price * numOfNights);
+
                         let cartBooking = {
                             activity_name: accommodation.name,
                             start_datetime: checkInDateInLocalDateTime,
@@ -157,7 +156,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                                 type: "ACCOMMODATION",
                                 activity_selection: room.room_type,
                                 quantity: room.quantity,
-                                price: formattedRoomList.find(item => item.room_type === room.room_type).price,
+                                price: formattedRoomList.find(item => item.room_type === room.room_type).price * numOfNights,
                                 start_datetime: checkInDate,
                                 end_datetime: checkOutDate,
                             }],
@@ -231,7 +230,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
             const price = room.price;
             const roomCount = room.quantity;
 
-            let available_rooms = 0;
+            let available_rooms;
 
             console.log("accommodation.check_in_time", accommodation.check_in_time);
             const checkInTime = accommodation.check_in_time.split('T')[1];
@@ -310,18 +309,37 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     const onConfirm = useCallback(
         ({ startDate, endDate }) => {
+            const currentDate = new Date();
+
             if (startDate && endDate) {
+                if (startDate < currentDate) {
+                    setRange({ startDate: null, endDate: null });
+                    onDismiss();
+                    Toast.show({
+                        type: 'error',
+                        text1: 'You can only book for future dates.'
+                    });
+                } else {
+                    setOpen(false);
+                    setRange({ startDate, endDate });
+                    const updatedQuantity = {};
+                    formattedRoomList.forEach((item) => {
+                        updatedQuantity[item.room_type] = 0;
+                    });
+                    setQuantityByRoomType(updatedQuantity);
+                    console.log("quantityByRoomType", quantityByRoomType);
+                }
+            } else {
                 setOpen(false);
                 setRange({ startDate, endDate });
-            } else {
                 onDismiss();
                 Toast.show({
                     type: 'error',
                     text1: 'Both start and end dates must be selected.'
-                })
+                });
             }
         },
-        [setOpen, setRange]
+        [setOpen, setRange, onDismiss, quantityByRoomType]
     );
 
     function formatLocalDateTime(localDateTimeString) {
@@ -566,12 +584,53 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                             <View key={item.room_type} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', width: 120 }}>
                                     <Text style={{ fontSize: 11, fontWeight: 'bold' }}>
-                                    {`${item.room_type.replace(/_/g, ' ')} ROOM @ $${item.price}`}{'\n'}
-                                        {`Rooms Available: ${item.available_rooms || 0}`}
+                                        {`${item.room_type.replace(/_/g, ' ')} ROOM @ $${item.price}`}{'\n'}
+                                        {`Rooms Available: ${Math.max(item.available_rooms >= 0 ? item.available_rooms : 0)}`}
                                     </Text>
                                 </View>
 
-                                <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleDecrease(item.room_type)}>
+                                {/* Check for no range selected */}
+                                {range.startDate === undefined && range.endDate === undefined ? (
+                                    <View style={{ marginLeft: 45 }}>
+                                        <Text style={{ color: "#8c8c8c" }}>Select a date range</Text>
+                                    </View>
+                                ) : (
+                                    // Check for available rooms
+                                    item.available_rooms > 0 ? (
+                                        <>
+                                            <Button
+                                                mode="contained"
+                                                style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }}
+                                                onPress={() => handleDecrease(item.room_type)}
+                                                disabled={(item.available_rooms <= 0 || quantityByRoomType[item.room_type] == 0)}
+                                            >
+                                                {item.available_rooms > 0 && (quantityByRoomType[item.room_type] === 0 || !quantityByRoomType[item.room_type]) ? '\u00A0' : '-'}
+                                            </Button>
+
+                                            <Text style={{ marginLeft: 20 }}>{quantityByRoomType[item.room_type] || 0}</Text>
+
+                                            <Button
+                                                mode="contained"
+                                                style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }}
+                                                onPress={() => handleIncrease(item.room_type)}
+                                                disabled={(quantityByRoomType[item.room_type] || 0) >= (item.available_rooms || 0)}
+                                            >
+                                                +
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <View style={{ marginLeft: 45 }}>
+                                            <Text style={{ color: "#8c8c8c" }}>No rooms available</Text>
+                                        </View>
+                                    )
+                                )}
+
+                                {/* simplified code in which buttons aren't disabled, if want to align w the other pages */}
+                                {/* <Button
+                                    mode="contained"
+                                    style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }}
+                                    onPress={() => handleDecrease(item.room_type)}
+                                >
                                     -
                                 </Button>
 
@@ -579,12 +638,15 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
                                 <Button
                                     mode="contained"
-                                    style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }}
-                                    onPress={() => handleIncrease(item.room_type)}
-                                    disabled={item.available_rooms <= 0 || (quantityByRoomType[item.room_type] || 0) >= (item.available_rooms || 0)}
+                                    style={{ backgroundColor: '#044537', color: 'white', marginLeft: 20 }}
+                                    onPress={() => {
+                                        if ((quantityByRoomType[item.room_type] || 0) < (item.available_rooms || 0)) {
+                                            handleIncrease(item.room_type);
+                                        }
+                                    }}
                                 >
                                     +
-                                </Button>
+                                </Button> */}
                             </View>
                         ))}
                     </View>

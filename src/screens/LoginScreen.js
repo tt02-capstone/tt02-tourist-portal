@@ -26,7 +26,7 @@ export const LoginScreen = ({navigation}) => {
             setEmail({...email, error: emailError})
             return
         }
-        console.log('heree')
+        console.log('If you cant login, please check your IP address.')
 
         try {
             const response = await userApi.post(`/mobileLogin/${email.value}/${password.value}`)

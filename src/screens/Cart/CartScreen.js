@@ -60,16 +60,19 @@ export const CartScreen = ({ navigation }) => {
 
   const checkout = async () => {
     const booking_ids = [];
+    const priceList = [];
     const selectedCartItems = [];
     itemChecked.forEach((isChecked, index) => {
       if (isChecked) {
+        console.log(cartItems[index]);
         booking_ids.push(cartItems[index].id);
+        priceList.push(cartItems[index].price);
         selectedCartItems.push(cartItems[index]);
       }
     });
 
     if (selectedCartItems.length > 0) {
-      navigation.navigate('CheckoutScreen', { booking_ids, selectedCartItems, totalPrice });
+      navigation.navigate('CheckoutScreen', { booking_ids, priceList, selectedCartItems, totalPrice });
     } else {
       Toast.show({
         type: 'error',
@@ -107,7 +110,7 @@ export const CartScreen = ({ navigation }) => {
     } else {
       // console.log('success', response.data)
       if (response.data) {
-        setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted 
+        setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted
         setDeletion(!deletion);
         Toast.show({
           type: 'success',

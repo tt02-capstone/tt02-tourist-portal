@@ -90,7 +90,7 @@ export const Layout = () => {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{
                 headerRight: () => <Cart />,
-            }}   initialRouteName="LoginScreen">
+            }} initialRouteName="LoginScreen">
                 {authState?.authenticated? (
                     <>
                         <Stack.Screen name="Drawer" component={MyDrawer} options={{ headerShown: false }} />

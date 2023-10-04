@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
         marginTop: 30,
         marginBottom: 50,
         borderRadius: 300 / 2,
-        minWidth: 300,
-        minHeight: 300,
+        minWidth: 260,
+        minHeight: 260,
     },
     uploadButton: {
         display: 'flex',

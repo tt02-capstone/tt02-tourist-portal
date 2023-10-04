@@ -17,7 +17,7 @@ export const CheckoutScreen = ({navigation}) => {
   const [deletion, setDeletion] = useState(false);
   const [cards, setCards] = useState([]); 
   const [itemChecked, setItemChecked] = useState([false]); 
-  const { booking_ids, selectedCartItems, totalPrice} = route.params;
+  const { booking_ids, priceList, selectedCartItems, totalPrice} = route.params;
   const isFocused = useIsFocused();
 
   function formatDateAndTime(date) {
@@ -56,20 +56,25 @@ export const CheckoutScreen = ({navigation}) => {
     // console.log(booking_ids)
 
     try {
-      console.log("aa ", payment_method_id, totalPrice, booking_ids);
-      const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, booking_ids)
+      let tempObj = {
+        booking_ids: booking_ids,
+        priceList: priceList,
+      }
+      
+      const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, tempObj);
       if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
         console.log('error',response.data)
 
   } else {
       console.log('success', response.data)
       if (response.data) {
-          navigation.navigate('BookingHistoryScreen'); // Should navigate to Bookings Screen?
-          setDeletion(!deletion);
+        navigation.navigate('BookingHistoryScreen');
+
+        setDeletion(!deletion);
         Toast.show({
           type: 'success',
           text1: 'Successfully checked out cart item(s)'
-      });
+        });
     
         } else {
           Toast.show({

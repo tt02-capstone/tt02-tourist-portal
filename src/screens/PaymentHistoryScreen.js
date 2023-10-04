@@ -82,7 +82,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
                         data.map((item, index) => (
                             <Card key={index}>
                                 <Card.Title style={styles.header}>
-                                    {item.booking.attraction.name}
+                                    {item.booking.activity_name}
                                 </Card.Title>
                                 <Text style={styles.description}>
                                     Payment Amount: S${item.payment_amount}

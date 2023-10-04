@@ -7,8 +7,6 @@ import {getEmail, getUserType, getUser} from "../../helpers/LocalStorage";
 import { useRoute } from '@react-navigation/native';
 import {paymentsApi} from "../../helpers/api";
 
-
-
 export const AddCreditCardScreen = ({ navigation }) => {
   const [tourist_email, setTouristEmail] = useState('');
   const [user_type, setUserType] = useState('');
@@ -18,9 +16,6 @@ export const AddCreditCardScreen = ({ navigation }) => {
   const { previousScreen, booking_ids, selectedCartItems, totalPrice } = route.params;
 
   useEffect(() => {
-    
-    
-    
     async function onLoad() {
       try {
         const userData = await getUser();
@@ -33,9 +28,7 @@ export const AddCreditCardScreen = ({ navigation }) => {
     }
     
     onLoad();
-  }, []);
-
-  
+  }, []);  
 
   const handleSaveCard = async () => {
     const { paymentMethod, error } = await createPaymentMethod({
@@ -49,7 +42,7 @@ export const AddCreditCardScreen = ({ navigation }) => {
     } else if (paymentMethod) {
       try {
 
-        const payment_method_id = paymentMethod.id;
+      const payment_method_id = paymentMethod.id;
       const response = await paymentsApi.post(`/addPaymentMethod/${user_type}/${tourist_email}/${payment_method_id}`)
       console.log(response.data.httpStatusCode)
       console.log(response)
@@ -57,7 +50,7 @@ export const AddCreditCardScreen = ({ navigation }) => {
         Toast.show({
           type: 'error',
           text1: response.data.errorMessage
-      });
+        });
 
       } else {
           console.log('success', response.data)
@@ -70,82 +63,59 @@ export const AddCreditCardScreen = ({ navigation }) => {
 
         } else {
             Toast.show({
-              type: 'error',
-              text1: 'Unable to add card'
-          });
+                type: 'error',
+                text1: 'Unable to add card'
+            });
           }
-          
-              
-      };
-
+        };
       } catch (error) {
-
-        Toast.show({
-          type: 'error',
-          text1: error.message
-      });
-
+          Toast.show({
+            type: 'error',
+            text1: error.message
+        });
       }
-      
- 
-
-    
-      }
-    
-    
-
-
     }
+  }
   
-
-
-  return (
-
-      
+  return (    
     <View style={{flex:1}}>
-   
-    <Card>
-    <Card.Title >
-        Card Details       
-    </Card.Title>
+      <Card>
+        <Card.Title >
+            Card Details       
+        </Card.Title>
     
-    <CardForm
-
-      onFormComplete={(cardDetails) => {
-        console.log("card details", cardDetails)
-        setCardDetails(cardDetails)
-      }}
-      style={{
-        height: 200,
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-      }}
-      cardStyle={{
-        backgroundColor: "#efefefef",
-        textAlign: "center",
-        textColor: "pink",
-      }}
-    />
-    <Button title="Save Card" onPress={handleSaveCard} />
-    <Button
-        title = "Cancel"
-        style={{ marginTop: 10 }}
-        type="outline"
-        mode ="contained"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'CreditCardsScreen' }],
-          })
-        }
-      />
+        <CardForm
+          onFormComplete={(cardDetails) => {
+            console.log("card details", cardDetails)
+            setCardDetails(cardDetails)
+          }}
+          style={{
+            height: 200,
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+          }}
+          cardStyle={{
+            backgroundColor: "#efefefef",
+            textAlign: "center",
+            textColor: "pink",
+          }}
+        />
+        <Button title="Save Card" onPress={handleSaveCard} />
+        <Button
+          title = "Cancel"
+          style={{ marginTop: 10 }}
+          type="outline"
+          mode ="contained"
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'CreditCardsScreen' }],
+            })
+          }
+        />
       </Card>
-</View>
-
-    
-
-    
+    </View>
   );
 };
 

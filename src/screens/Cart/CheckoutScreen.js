@@ -68,7 +68,10 @@ export const CheckoutScreen = ({navigation}) => {
   } else {
       console.log('success', response.data)
       if (response.data) {
-        navigation.navigate('BookingHistoryScreen');
+        navigation.reset({
+          index: 1,
+          routes: [{ name: 'HomeScreen' }, { name: 'BookingHistoryScreen' }],
+        })
 
         setDeletion(!deletion);
         Toast.show({

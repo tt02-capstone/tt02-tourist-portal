@@ -69,8 +69,8 @@ export const CheckoutScreen = ({navigation}) => {
       console.log('success', response.data)
       if (response.data) {
         navigation.reset({
-          index: 1,
-          routes: [{ name: 'HomeScreen' }, { name: 'BookingHistoryScreen' }],
+          index: 2,
+          routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'BookingHistoryScreen' }],
         })
 
         setDeletion(!deletion);

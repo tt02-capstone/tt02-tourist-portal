@@ -30,7 +30,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
 
                 let listOfPayments = await getPaymentHistoryList(userId);
                 console.log(listOfPayments);
-                setData(listOfPayments.sort((a, b) => b.payment_id - a.payment_id));
+                setData(listOfPayments.sort((a, b) => b.booking.booking_id - a.booking.booking_id));
                 setLoading(false);
             } catch (error) {
                 alert('An error occur! Failed to retrieve payment list!');

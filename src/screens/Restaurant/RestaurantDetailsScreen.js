@@ -14,6 +14,7 @@ import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { getRecommendation } from '../../redux/recommendationRedux';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 const RestaurantDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -26,6 +27,7 @@ const RestaurantDetailsScreen = ({ navigation }) => {
     const route = useRoute();
     const { restId } = route.params;
     const [recommendation, setRecommendation] = useState([]);
+    const [imageActiveSlide, setImageActiveSlide] = useState(0);
 
     async function fetchUser() {
         const userData = await getUser()
@@ -182,17 +184,32 @@ const RestaurantDetailsScreen = ({ navigation }) => {
         }
     }
 
+    renderCarouselItem = ({ item }) => (
+        <View>
+            <Card.Image
+                style={styles.cardImage}
+                source={{ uri: item }}
+            />
+        </View>
+    );
+
+    const getColorForType = (label) => {
+        const labelColorMap = {
+            'KOREAN': 'lightblue',
+            'MEXICAN': 'lightgreen',
+            'CHINESE': 'orange',
+            'WESTERN': 'gold',
+            'FAST_FOOD': 'turquoise',
+            'JAPANESE': 'lightpink'
+        };
+
+        return labelColorMap[label] || 'gray';
+    };
+
     return (
         <Background>
                 <ScrollView>
                     <Card>
-                        <Card.Image
-                            style={{ padding: 0, width: 350, height: 350}}
-                            source={{
-                                uri: imgList[0] // KIV for image make it carousel if possible 
-                            }}
-                        />
-
                         <Card.Title style={styles.header}>
                             {restaurant.name} 
                             <Button mode="text" style={{ marginTop: -13}} onPress={saveRest} >
@@ -200,11 +217,56 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                                 {!isSaved && <Icon name="heart" size={15} color='grey'/>}
                             </Button>
                         </Card.Title>
+
+                        <View style={styles.tagContainer}>
+                            <Text style={[ styles.typeTag,{ backgroundColor: getColorForType(restaurant.restaurant_type)},{ textAlign: 'center' }]}>
+                                {restaurant.restaurant_type}
+                            </Text>
+                            <Text style={[styles.tierTag,{ backgroundColor: 'purple', color: 'white' },{ textAlign: 'center' },]}>
+                                {restaurant.estimated_price_tier ? restaurant.estimated_price_tier.replace(/_/g, ' ') : ''}
+                            </Text>
+                            <Text style={[ styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' },]}>
+                                {restaurant.generic_location ? restaurant.generic_location.replace(/_/g, ' ') : ''}
+                            </Text>
+                        </View>
+
+
+                        <View style={styles.carouselContainer}>
+                            <Carousel
+                                data={imgList}
+                                renderItem={renderCarouselItem}
+                                sliderWidth={330}
+                                itemWidth={330}
+                                layout={'default'}
+                                onSnapToItem={(index) => setImageActiveSlide(index)}
+                            />
+                            <Pagination
+                                dotsLength={imgList.length} // Total number of items
+                                activeDotIndex={imageActiveSlide} // Current active slide index
+                                containerStyle={{ paddingVertical: 10, marginTop: 5 }}
+                                dotStyle={{
+                                    width: 7,
+                                    height: 7,
+                                    borderRadius: 5,
+                                    backgroundColor: 'rgba(0, 0, 0, 0.92)',
+                                }}
+                                inactiveDotOpacity={0.4}
+                                inactiveDotScale={0.6}
+                            />
+                        </View>
                         
                         <Text style={[styles.subtitle]}>{restaurant.address}</Text>
-                        <Text style={styles.subtitle}>Operating Hours: {restaurant.opening_hours}</Text>
-                        <Text style={styles.subtitle}>Contact Us @ {restaurant.contact_num}</Text>
                         <Text style={styles.description}>{restaurant.description}</Text>
+
+                        <Text style={{ fontSize: 12 }}>
+                        <Text style={{ fontWeight: 'bold' }}>Operating Hours:</Text>{' '}
+                            {restaurant.opening_hours}
+                        </Text>
+
+                        <Text style={{ fontSize: 12 }}>
+                        <Text style={{ fontWeight: 'bold' }}>Contact Us @ </Text>
+                            {restaurant.contact_num}
+                        </Text>
 
                     </Card>
                     
@@ -212,7 +274,8 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                         <Card.Title style={styles.header}>
                             Menu
                         </Card.Title>
-
+                        
+                        {/* to display the menu  */}
                         <View style={{ justifyContent: 'center', flex: 1, alignItems: 'left', marginLeft: -15, marginTop: -11}}>
                             { showDishList }
                         </View>
@@ -223,7 +286,7 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                         { recommendation.length > 0 && (
                         <Card containerStyle={styles.dropBorder}>
                             <Card.Title style={styles.header}>
-                                Nearby Recommendation
+                                Nearby Recommendations
                             </Card.Title>
 
                             <ScrollView horizontal>
@@ -296,6 +359,41 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: 'bold'
     },
+    tagContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 5,
+    },
+    typeTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 85,
+        fontSize: 9,
+        fontWeight: 'bold',
+    },
+    tierTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 50,
+        fontSize: 9,
+        fontWeight: 'bold',
+    },
+    locationTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 80,
+        fontSize: 8,
+        fontWeight: 'bold',
+    },
     dropBorder: {
         borderWidth: 0, 
         shadowColor: 'rgba(0,0,0, 0.0)',
@@ -304,8 +402,17 @@ const styles = StyleSheet.create({
         shadowRadius: 0,
         elevation: 0,
         backgroundColor: theme.colors.surface,
-    }
-    
+    },
+    carouselContainer: {
+        flex: 1,
+        marginTop: 8,
+        marginBottom: 10,
+    },
+    cardImage: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'cover',
+    },
 });
 
 export default RestaurantDetailsScreen

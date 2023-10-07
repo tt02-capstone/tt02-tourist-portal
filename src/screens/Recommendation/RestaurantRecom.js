@@ -32,7 +32,7 @@ export default function RestaurantRecom({item}) {
                 <Text style={{ marginBottom: 5 }}></Text>
 
                 <View style={styles.tagContainer}>
-                    <Text style={[styles.typeTag, { backgroundColor: getColorForType(item.restaurant_type), textAlign: 'center' }]}>{item.restaurant_type}</Text>
+                    <Text style={[styles.typeTag, { backgroundColor: getColorForType(item.restaurant_type), textAlign: 'center' }]}>{item.restaurant_type ? item.restaurant_type.replace(/_/g, ' ') : ''}</Text>
                     <Text style={[styles.tierTag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{item.estimated_price_tier ? item.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
                     <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{item.generic_location ? item.generic_location.replace(/_/g, ' ') : ''}</Text>
                 </View>
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 60,
-        fontSize: 9,
+        width: 50,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     locationTag: {
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 100,
-        fontSize: 9,
+        width: 80,
+        fontSize: 8,
         fontWeight: 'bold',
     },
 });

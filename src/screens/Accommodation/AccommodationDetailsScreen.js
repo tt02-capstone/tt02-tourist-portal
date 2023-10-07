@@ -666,7 +666,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                     {recommendation.length > 0 && (
                         <Card containerStyle={styles.dropBorder}>
                             <Card.Title style={styles.header}>
-                                Nearby Recommendation
+                                Nearby Recommendations
                             </Card.Title>
 
                             <ScrollView horizontal>

@@ -156,30 +156,13 @@ const RestaurantScreen = ({ navigation }) => {
                                 />
                                 <Text style={styles.description}>{item.description}</Text>
                                 <View style={styles.tagContainer}>
-                                    <Text
-                                        style={[
-                                            styles.tag,
-                                            { backgroundColor: getColorForType(item.restaurant_type) },
-                                            { textAlign: 'center' },
-                                        ]}
-                                    >
-                                        {item.restaurant_type}
+                                    <Text style={[ styles.tag,{ backgroundColor: getColorForType(item.restaurant_type) },{ textAlign: 'center' }]}>
+                                        {item.restaurant_type.replace(/_/g, ' ')}
                                     </Text>
-                                    <Text
-                                        style={[
-                                            styles.tag,
-                                            { backgroundColor: 'purple', color: 'white' },
-                                            { textAlign: 'center' },
-                                        ]}
-                                    >
+                                    <Text style={[styles.tag,{ backgroundColor: 'purple', color: 'white' },{ textAlign: 'center' }]}>
                                         {item.estimated_price_tier.replace(/_/g, ' ')}
                                     </Text>
-                                    <Text
-                                        style={[
-                                            styles.locationTag,
-                                            { backgroundColor: 'green', color: 'white', textAlign: 'center' },
-                                        ]}
-                                    >
+                                    <Text style={[ styles.locationTag,{ backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>
                                         {item.generic_location.replace(/_/g, ' ')}
                                     </Text>
                                 </View>
@@ -199,7 +182,7 @@ const RestaurantScreen = ({ navigation }) => {
                                 <ScrollView>
                                     {/* Filter options go here */}
                                     <View style={styles.filterBox}>
-                                        {/* Accommodation Type Filter */}
+                                        {/* Restaurant Type Filter */}
                                         <RNPickerSelect
                                             placeholder={{
                                                 label: 'Select Type...',
@@ -333,7 +316,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         margin: 5,
         width: 80,
-        fontSize: 11,
+        fontSize: 9.5,
         fontWeight: 'bold',
     },
     locationTag: {
@@ -342,8 +325,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 120,
-        fontSize: 11,
+        width: 100,
+        fontSize: 10,
         fontWeight: 'bold',
     },
     tagContainer: {

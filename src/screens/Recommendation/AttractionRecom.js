@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         margin: 5,
         width: 80,
-        fontSize: 9,
+        fontSize: 6.5,
         fontWeight: 'bold',
     },
     tierTag: {
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 60,
-        fontSize: 9,
+        width: 50,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     locationTag: {
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 100,
-        fontSize: 9,
+        width: 80,
+        fontSize: 8,
         fontWeight: 'bold',
     },
 });

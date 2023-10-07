@@ -28,7 +28,7 @@ export default function AccommodationRecom({ item }) {
 
                 <View style={styles.tagContainer}>
                     <Text style={[styles.tag, { backgroundColor: getColorForType(item.type), textAlign: 'center' }]}>{item.type}</Text>
-                    <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{item.estimated_price_tier ? item.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
+                    <Text style={[styles.tierTag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{item.estimated_price_tier ? item.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
                     <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{item.generic_location ? item.generic_location.replace(/_/g, ' ') : ''}</Text>
                 </View>
 
@@ -79,6 +79,16 @@ const styles = StyleSheet.create({
         margin: 5,
         width: 100,
         fontSize: 9,
+        fontWeight: 'bold',
+    },
+    tierTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 50,
+        fontSize: 8,
         fontWeight: 'bold',
     },
 });

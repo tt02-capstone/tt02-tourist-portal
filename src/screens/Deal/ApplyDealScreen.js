@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getPublishedDealList, toggleSaveDeal } from "../../redux/dealRedux";
+import {getdDealListbyVendor, getPublishedDealList, toggleSaveDeal} from "../../redux/dealRedux";
 import { getUser, getUserType, storeUser } from "../../helpers/LocalStorage";
 import { deleteSavedAttraction } from "../../redux/reduxAttraction";
 import Toast from "react-native-toast-message";
@@ -19,10 +19,10 @@ const ApplyDealScreen = ({ route, navigation }) => {
     const [user, setUser] = useState('');
     const [fullDealList, setFullDealList] = useState([]);
     const [selectedFilters, setSelectedFilters] = useState([]);
-    const [dealTypeFilter, setDealTypeFilter] = useState(null);
+    // const [dealTypeFilter, setDealTypeFilter] = useState(null);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [currentDate, setCurrentDate] = useState(new Date());
-    const { vendorId } = route.params;
+    const { vendorId, dealId } = route.params;
 
     const isFocused = useIsFocused();
     async function fetchUser() {
@@ -35,8 +35,9 @@ const ApplyDealScreen = ({ route, navigation }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            let response = await getPublishedDealList();
+            let response = await getdDealListbyVendor(vendorId);
             if (response.status) {
+                console.log('dealId', dealId)
                 console.log("response.data", response.data)
                 setFullDealList(response.data);
                 setData(response.data);
@@ -50,44 +51,6 @@ const ApplyDealScreen = ({ route, navigation }) => {
         fetchData();
         fetchUser();
     }, [isFocused]);
-
-    // const viewDealDetails = (id) => {
-    //     navigation.navigate('DealDetailsScreen', {id: id}); // set the attraction id here
-    // }
-
-    // Function to handle filter selection
-
-    const handleFilterSelect = (filterType, filterValue) => {
-        const newSelectedFilters = [...selectedFilters];
-        const filterIndex = newSelectedFilters.findIndex(filter => filter.type === filterType);
-
-        if (filterIndex !== -1) {
-            // If the filter type already exists, update the value
-            newSelectedFilters[filterIndex].value = filterValue;
-        } else {
-            // If the filter type does not exist, add a new filter
-            newSelectedFilters.push({ type: filterType, value: filterValue });
-        }
-
-        setSelectedFilters(newSelectedFilters);
-
-        // Update individual filter states
-        switch (filterType) {
-            case 'dealType':
-                setDealTypeFilter(filterValue);
-                break;
-            default:
-                break;
-        }
-    };
-
-    const clearFilters = () => {
-        setSelectedFilters([]);
-        setDealTypeFilter(null);
-        setTimeout(() => {
-            setData(fullDealList);
-        }, 10);
-    };
 
     const toggleFilterModal = () => {
         setFilterModalVisible(!isFilterModalVisible);
@@ -213,16 +176,6 @@ const ApplyDealScreen = ({ route, navigation }) => {
             <ScrollView>
                 <View style={styles.container}>
 
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
-                            <Text style={styles.filterText}>Filter</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={clearFilters} style={styles.filterButton}>
-                            <Text style={styles.filterText}>Clear Filters</Text>
-                        </TouchableOpacity>
-                    </View>
-
                     <View>
                         <TouchableOpacity onPress={() => navigation.navigate("CartScreen", {vendorId: vendorId, dealId: 0 })} style={styles.filterButton}>
                             <Text style={styles.filterText}> Cancel Promo</Text>
@@ -233,17 +186,6 @@ const ApplyDealScreen = ({ route, navigation }) => {
                         if (((userType === 'TOURIST' && !item.is_govt_voucher) || userType === 'LOCAL') && new Date(item.end_datetime) >= currentDate && new Date(item.start_datetime) <= new Date()) {
                             return (
                                 <Card key={index}>
-                                    <View style={{ marginBottom: 20}} >
-                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                        <Text style={{ backgroundColor: 'green', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
-                                            AVAILABLE
-                                        </Text>
-                                    </View>
-                                    </View>
-                                    <Button mode="text" style={{ marginTop: -60, alignSelf: 'flex-end' }} onPress={() => save(item.deal_id)} >
-                                        {isSaved(item.deal_id) && <Icon name="heart" size={20} color='red' />}
-                                        {!isSaved(item.deal_id) && <Icon name="heart" size={20} color='grey' />}
-                                    </Button>
                                     {item.deal_image_list.length > 0 ? (
                                         <Card.Image
                                             style={{ padding: 0, height: 200 }}
@@ -270,9 +212,17 @@ const ApplyDealScreen = ({ route, navigation }) => {
                                     </View>
                                     <Button mode="text" style={{ marginTop: 10, alignSelf: 'flex-end' }}
                                             onPress={() => navigation.navigate("CartScreen", {vendorId: vendorId, dealId: item.deal_id })} >
-                                        <Text style={{ backgroundColor: 'blue', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
-                                            Apply Promo
-                                        </Text>
+                                        {dealId === item.deal_id? (
+                                            <Text style={{ backgroundColor: 'green', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                                Promo Applied
+                                            </Text>
+                                        ):(
+                                            <Text style={{ backgroundColor: 'blue', color: 'white', fontWeight: 'bold', alignSelf: 'center', padding: 10, width: '100%' }}>
+                                                Apply Promo
+                                            </Text>
+                                            )
+                                        }
+
                                     </Button>
                                 </Card>
                             );
@@ -280,59 +230,6 @@ const ApplyDealScreen = ({ route, navigation }) => {
                             return null;
                         }
                     })}
-
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={isFilterModalVisible}
-                        onRequestClose={toggleFilterModal}
-                    >
-                        <View style={styles.modalBackground}>
-                            <View style={styles.modalContainer}>
-                                <ScrollView>
-                                    {/* Filter options go here */}
-                                    <View style={styles.filterBox}>
-                                        {/* Deal Type Filter */}
-                                        <RNPickerSelect
-                                            placeholder={{
-                                                label: 'Select Type...',
-                                                value: null,
-                                            }}
-                                            onValueChange={(value) =>
-                                                handleFilterSelect('dealType', value)
-                                            }
-                                            items={[
-                                                { label: 'Chinese New Year', value: 'CHINESE_NEW_YEAR' },
-                                                { label: 'National Day', value: 'NATIONAL_DAY' },
-                                                { label: 'Deepavalli', value: 'DEEPAVALLI' },
-                                                { label: 'NUS Wellbeing Day', value: 'NUS_WELLBEING_DAY' },
-                                                { label: 'Singles Day', value: 'SINGLES_DAY' },
-                                                { label: 'Valentines', value: 'VALENTINES' },
-                                                { label: 'Hari Raya', value: 'HARI_RAYA' },
-                                                { label: 'New Year Day', value: 'NEW_YEAR_DAY' },
-                                                { label: 'Black Friday', value: 'BLACK_FRIDAY' },
-                                                { label: 'Christmas', value: 'CHRISTMAS' },
-                                                { label: 'Government', value: 'GOVERNMENT' },
-                                            ]}
-                                            value={dealTypeFilter}
-                                            style={pickerSelectStyles}
-                                        />
-                                    </View>
-
-                                    <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
-                                            <Text style={styles.filterText}>Apply</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
-                                            <Text style={styles.filterText}>Close</Text>
-                                        </TouchableOpacity>
-                                    </View>
-
-
-                                </ScrollView>
-                            </View>
-                        </View>
-                    </Modal>
                 </View>
             </ScrollView>
         </Background>
@@ -414,7 +311,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         alignItems: 'center',
         alignSelf: 'center', 
-        width: '30%',
+        width: '70%',
     },
     filterText: {
         color: 'white',

@@ -11,14 +11,13 @@ import {getDealById} from "../../redux/dealRedux";
 
 export const CartScreen = ({ route, navigation }) => {
   const [user, setUser] = useState('');
-  const [cartItems, setCartItems] = useState([]);
   const [user_type, setUserType] = useState('');
   const [deletion, setDeletion] = useState(false);
-  const [itemChecked, setItemChecked] = useState(new Map()); //Might not work since caritems have to be fetched first
+  const [itemChecked, setItemChecked] = useState(new Map()); // key: vendorId, value: Boolean list to see if an item is checked
   const [totalPrice, setTotalPrice] = useState(0);
   const [apiCallTimer, setApiCallTimer] = useState(null);
-  const [vendorCartMap, setVendorCartMap] = useState(new Map());
-  const [vendorDealMap, setVendorDealMap] = useState(new Map());
+  const [vendorCartMap, setVendorCartMap] = useState(new Map()); //key: vendorId, value: list of cartItems
+  const [vendorDealMap, setVendorDealMap] = useState(new Map()); //key: vendorId, value: dealId
   const isFocused = useIsFocused();
   const [expandedItems, setExpandedItems] = useState([true]); // Initialize with the number of items you have
 
@@ -83,10 +82,10 @@ export const CartScreen = ({ route, navigation }) => {
 
   // if there is no item in cart, set total price to 0
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (vendorCartMap.size === 0) {
       setTotalPrice(0);
     }
-  },[cartItems])
+  },[vendorCartMap])
 
   function formatDateAndTime(date) {
     const options = {
@@ -125,15 +124,18 @@ export const CartScreen = ({ route, navigation }) => {
     const booking_ids = [];
     const priceList = [];
     const selectedCartItems = [];
-    itemChecked.forEach((isChecked, index) => {
-      if (isChecked) {
-        console.log(cartItems[index]);
-        booking_ids.push(cartItems[index].id);
-        priceList.push(cartItems[index].price);
-        selectedCartItems.push(cartItems[index]);
-      }
+    itemChecked.forEach((value, key) => {
+      value.forEach((isChecked, index) => {
+        if (isChecked) {
+          console.log(vendorCartMap.get(key)[index]);
+          booking_ids.push(vendorCartMap.get(key)[index].id);
+          priceList.push(vendorCartMap.get(key)[index].price);
+          selectedCartItems.push(vendorCartMap.get(key)[index]);
+        }
+      });
     });
 
+    console.log(booking_ids, priceList, selectedCartItems)
     if (selectedCartItems.length > 0) {
       navigation.navigate('CheckoutScreen', { booking_ids, priceList, selectedCartItems, totalPrice });
     } else {
@@ -212,7 +214,7 @@ export const CartScreen = ({ route, navigation }) => {
   }
 
   const calcPrice = (vendorId) => {
-    const checkedIndices = [...itemChecked.get(vendorId)]; // Assuming itemChecked is a Map
+    const checkedIndices = itemChecked.has(vendorId) ? [...itemChecked.get(vendorId)] : [];
     let totalSum = 0.0;
 
     if (checkedIndices) {
@@ -296,9 +298,13 @@ export const CartScreen = ({ route, navigation }) => {
     }
   }, [itemChecked]);
 
-  const updateQuantity = (cartItemIndex, itemIndex, delta) => {
+  const updateQuantity = (vendorId, cartItemIndex, itemIndex, delta) => {
+    console.log('init', vendorId, cartItemIndex, itemIndex, delta)
     let tourPrice = 0
-
+    const updatedMap = new Map(vendorCartMap);
+    console.log(updatedMap, vendorCartMap)
+    let cartItems = updatedMap.get(vendorId)
+    console.log(cartItems)
     if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
       tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
       let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
@@ -318,7 +324,9 @@ export const CartScreen = ({ route, navigation }) => {
       const newTotalPrice = parseFloat(cartItems[cartItemIndex].price) + difference + parseFloat(tourDiff); // new total price for the list item 
       cartItems[cartItemIndex].price = newTotalPrice.toFixed(2).toString(); // set it back to 2 dp and set as string 
 
-      setCartItems([...cartItems]);
+      vendorCartMap.set(vendorId, [...cartItems])
+      setVendorCartMap(vendorCartMap)
+      // setCartItems([...cartItems]);
 
     }
 
@@ -340,7 +348,9 @@ export const CartScreen = ({ route, navigation }) => {
       cartItems.splice(cartItemIndex, 1);
     }
 
-    setCartItems([...cartItems]);
+    vendorCartMap.set(vendorId, [...cartItems])
+    setVendorCartMap(vendorCartMap)
+    // setCartItems([...cartItems]);
 
     const newTimer = setTimeout(async () => {
       if (quantity >= 0) {
@@ -458,7 +468,7 @@ export const CartScreen = ({ route, navigation }) => {
             }
           }));
 
-          setCartItems(extractedDetails);
+          // setCartItems(extractedDetails);
           console.log(vendorCartMap)
           if (extractedDetails.length > 0) {
             setExpandedItems(Array.from(vendorCartMap).map(() => true));
@@ -469,6 +479,7 @@ export const CartScreen = ({ route, navigation }) => {
               itemChecked.set(key, Array(value.length).fill(false))
               setItemChecked(itemChecked)
             })
+
           }
 
           console.log('item checked', itemChecked)
@@ -643,7 +654,7 @@ export const CartScreen = ({ route, navigation }) => {
                                             backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
                                             borderRadius: 15, marginLeft: 0, marginBottom: 8
                                           }}
-                                          onPress={() => updateQuantity(cartItemIndex, itemIndex, -1)}
+                                          onPress={() => updateQuantity(key, cartItemIndex, itemIndex, -1)}
                                       >
                                         {cartItem.type === 'TELECOM' && <View></View>}
                                         <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}> - </Text>
@@ -658,7 +669,7 @@ export const CartScreen = ({ route, navigation }) => {
                                             backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
                                             borderRadius: 15, marginLeft: 0, marginBottom: 8
                                           }}
-                                          onPress={() => updateQuantity(cartItemIndex, itemIndex, 1)}
+                                          onPress={() => updateQuantity(key, cartItemIndex, itemIndex, 1)}
                                       >
                                         <Text style={{ color: 'white', fontSize: 13, fontWeight: 'bold' }}> + </Text>
                                       </TouchableOpacity>
@@ -670,14 +681,17 @@ export const CartScreen = ({ route, navigation }) => {
                       </ListItem.Content>
                     </ListItem.Swipeable>
                 ))}
-                <ListItem key={key} onPress={() => { navigation.navigate('ApplyDealScreen', { vendorId: key })}} bottomDivider>
+                <ListItem key={key} onPress={() => { navigation.navigate('ApplyDealScreen', { vendorId: key, dealId: vendorDealMap.has(key)? vendorDealMap.get(key).data.deal_id : 0  })}} bottomDivider>
                     <ListItem.Content>
-                      <ListItem.Title>Promo: {
+                      <ListItem.Title style={{ color: 'purple' }}>Promo: {
                         vendorDealMap.has(key)? vendorDealMap.get(key).data.promo_code : 'None Applied'
                       }
                       </ListItem.Title>
+                      <ListItem.Subtitle>
+                        Subsection Total: {calcPrice(key)}
+                      </ListItem.Subtitle>
                     </ListItem.Content>
-                    <ListItem.Chevron />
+                    <ListItem.Chevron/>
                 </ListItem>
               </ListItem.Accordion>
           ))

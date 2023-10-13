@@ -41,6 +41,7 @@ import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
 import SupportTicketScreen from './src/screens/SupportTicket/SupportTicketScreen';
 import SupportTicketDetailsScreen from './src/screens/SupportTicket/SupportTicketDetailsScreen';
+import CreateSupportTicketScreen from './src/screens/SupportTicket/CreateSupportTicketScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -123,6 +124,7 @@ export const Layout = () => {
                         <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
                         <Stack.Screen name="SupportTicketScreen" component={SupportTicketScreen} options={{ title : 'Support Tickets' }} />
                         <Stack.Screen name="SupportTicketDetailsScreen" component={SupportTicketDetailsScreen} options={{ title : 'Support Ticket Details' }} />
+                        <Stack.Screen name="CreateSupportTicketScreen" component={CreateSupportTicketScreen} options={{ title : 'Create Support Ticket' }} />
                     </>
                 ) : (
                     <>

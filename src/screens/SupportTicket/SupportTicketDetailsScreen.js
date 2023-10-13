@@ -4,218 +4,170 @@ import Button from '../../components/Button'
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
-import { getBookingByBookingId, cancelBookingByBookingId } from '../../redux/reduxBooking';
+import { getSupportTicket } from '../../redux/supportRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
 
 const SupportTicketDetailsScreen = ({ navigation }) => {
-    // const [user, setUser] = useState('');
-    // const [booking, setBooking] = useState('');
-    // const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState('');
+    const [supportTicket, setSupportTicket] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    // const route = useRoute();
-    // const { bookingId } = route.params;
+    const route = useRoute();
+    const { supportTicketId } = route.params;
 
-    // async function fetchUser() {
-    //     const userData = await getUser()
-    //     setUser(userData)
+    async function fetchUser() {
+        const userData = await getUser();
+        setUser(userData);
 
-    //     const usertype = await getUserType()
-    // }
+        const userType = await getUserType();
+    }
 
-    // const getColorForType = (label) => {
-    //     const labelColorMap = {
-    //         'HISTORICAL': 'lightblue',
-    //         'CULTURAL': 'lightgreen',
-    //         'NATURE': 'orange',
-    //         'ADVENTURE': 'yellow',
-    //         'SHOPPING': 'turquoise',
-    //         'ENTERTAINMENT': 'lightpink'
-    //     };
+    const getColorForType = (label) => {
+        const labelColorMap = {
+            'HISTORICAL': 'lightblue',
+            'CULTURAL': 'lightgreen',
+            'NATURE': 'orange',
+            'ADVENTURE': 'yellow',
+            'SHOPPING': 'turquoise',
+            'ENTERTAINMENT': 'lightpink'
+        };
 
-    //     return labelColorMap[label] || 'gray';
-    // };
+        return labelColorMap[label] || 'gray';
+    };
 
-    // const fetchBooking = async () => {
-    //     try {
-    //         let booking = await getBookingByBookingId(bookingId);
-    //         setBooking(booking);
-    //         setLoading(false);
-    //         fetchUser();
-    //     } catch (error) {
-    //         alert('An error occur! Failed to retrieve booking details!');
-    //         setLoading(false);
-    //     }
-    // }
+    const fetchSupportTicket = async () => {
+        console.log("supportTicketId",supportTicketId);
+        try {
+            let response = await getSupportTicket(supportTicketId);
+            console.log("response",response);
+            setSupportTicket(response.data);
+            setLoading(false);
+            fetchUser();
+        } catch (error) {
+            alert('An error occur! Failed to retrieve supportTicket details!');
+            setLoading(false);
+        }
+    }
 
-    // useEffect(() => {
-    //     fetchBooking(); // when the page load the first time
-    // }, []);
+    useEffect(() => {
+        fetchSupportTicket(); // when the page load the first time
+    }, []);
 
-    // const getNameForBooking = (item) => {
-    //     if (item.attraction != null) {
-    //         return item.attraction.name;
-    //     } else if (item.room != null) {
-    //         return item.activity_name;
-    //     } else if (item.tour != null) {
-    //         return item.tour.name;
-    //     } else if (item.telecom != null) {
-    //         return item.telecom.name;
-    //     } else {
-    //         return item.deal.name;
-    //     }
-    // }
+    const getNameForSupportTicket = (item) => {
+        if (item.booking != null) {
+            if (item.booking.attraction != null) {
+                return item.booking.attraction.name;
+            } else if (item.booking.room != null) {
+                return item.booking.activity_name;
+            } else if (item.booking.tour != null) {
+                return item.booking.tour.name;
+            } else if (item.booking.telecom != null) {
+                return item.booking.telecom.name;
+            } else {
+                return item.booking.deal.name;
+            }
+        } else if (item.attraction != null) {
+            return item.attraction.name;
+        } else if (item.accommodation != null) {
+            return item.activity_name;
+        } else if (item.tour != null) {
+            return item.tour.name;
+        } else if (item.telecom != null) {
+            return item.telecom.name;
+        } else if (item.restaurant != null) {
+            return item.restaurant.name;
+        } else if (item.deal != null) {
+            return item.restaurant.name;
+        } else {
+            return 'Enquiry to Admin';
+        }
+    }
 
-    // const getImage = (item) => {
-    //     if (item.attraction != null) {
-    //         return item.attraction.attraction_image_list[0];
-    //     } else if (item.room != null) {
-    //         return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
-    //     } else if (item.tour != null) {
-    //         return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
-    //     } else if (item.telecom.name != null) {
-    //         return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
-    //     } else {
-    //         return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.png';
-    //     }
-    // }
+    const formatType = (type) => {
+        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    }
 
-    // const formatType = (type) => {
-    //     return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-    // }
+    const formatStatus = (is_resolved) => {
+        if (is_resolved) {
+            return 'Closed';
+        } else {
+            return 'Open';
+        }
+    }
 
-    // const formatDate = (date) => {
-    //     let inputDate = new Date(date);
-    //     let day = inputDate.getDate().toString().padStart(2, '0');
-    //     let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
-    //     let year = inputDate.getFullYear();
-    //     return `${day}/${month}/${year}`;
-    // }
+    const formatCategory = (ticket_category) => {
+        if (ticket_category === 'ATTRACTION') {
+            return 'Attraction';
+        } else if (ticket_category === 'TOUR') {
+            return 'Tour';
+        } else if (ticket_category === 'ACCOMMODATION') {
+            return 'Accommodation';
+        } else if (ticket_category === 'TELECOM') {
+            return 'Telecom';
+        } else if (ticket_category === 'RESTAURANT') {
+            return 'Restaurant';
+        } else if (ticket_category === 'DEAL') {
+            return 'Deal';
+        } else if (ticket_category === 'REFUND') {
+            return 'Refund';
+        } else if (ticket_category === 'CANCELLATION') {
+            return 'Cancellation';
+        } else if (ticket_category === 'GENERAL_ENQUIRY') {
+            return 'General Enquiry';
+        } else if (ticket_category === 'BOOKING') {
+            return 'Booking';
+        }
 
-    // const getCancellationDate = (date) => {
-    //     let inputDate = new Date(date);
-    //     inputDate.setDate(inputDate.getDate() - 3);
-    //     let day = inputDate.getDate().toString().padStart(2, '0');
-    //     let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
-    //     let year = inputDate.getFullYear();
-    //     return `${day}/${month}/${year}`;
-    // }
+    }
 
-    // const getColorForStatus = (label) => {
-    //     const labelColorMap = {
-    //         'UPCOMING': 'lightgreen',
-    //         'ONGOING': 'lightgreen',
-    //         'COMPLETED': 'lightblue',
-    //         'CANCELLED': 'lightpink'
-    //     };
+    function formatLocalDateTime(localDateTimeString) {
+        const dateTime = new Date(localDateTimeString);
 
-    //     return labelColorMap[label] || 'gray';
-    // };
+        const day = String(dateTime.getDate()).padStart(2, '0');
+        const month = String(dateTime.getMonth() + 1).padStart(2, '0');
+        const year = dateTime.getFullYear();
+        const hours = String(dateTime.getHours()).padStart(2, '0');
+        const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+        const period = dateTime.getHours() < 12 ? 'AM' : 'PM';
 
-    // async function cancelBooking(bookingId) {
-    //     let response = await cancelBookingByBookingId(bookingId);
-    //     if (!response.status) {
-    //         Toast.show({
-    //             type: 'success',
-    //             text1: 'Booking has been cancelled!'
-    //         });
-    //         const timer = setTimeout(() => {
-    //             fetchBooking();
-    //         }, 1000);
-    //     } else {
-    //         Toast.show({
-    //             type: 'error',
-    //             text1: response.info
-    //         })
-    //     }
-    // }
+        return `${day}/${month}/${year}, ${hours}:${minutes} ${period}`;
+    }
 
-    // return booking ? (
-    //     <Background>
-    //         <ScrollView>
-    //             <Card>
-    //                 <Card.Title style={styles.header}>
-    //                     {getNameForBooking(booking)}
-    //                 </Card.Title>
-    //                 <Card.Image
-    //                     style={{ padding: 0 }}
-    //                     source={{
-    //                         uri: getImage(booking)
-    //                     }}
-    //                 />
-    //                 <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount}</Text>
-    //                 <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
-    //                 <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>
-    //                 <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>
-    //                 <View style={{ display: 'inline-block' }}>
-    //                     <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{booking.status}</Text>
-    //                 </View>
-    //             </Card>
-    //             <Card>
-    //                 <Card.Title style={styles.header}>
-    //                     Cancellation Policy
-    //                 </Card.Title>
-    //                 <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking.start_datetime)}.</Text>
-    //                 {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
-    //             </Card>
-    //             {booking.status != 'CANCELLED' && booking.qr_code_list.length > 1 && <Card>
-    //                 <Card.Title style={styles.header}>
-    //                     Ticket Vouchers
-    //                 </Card.Title>
-    //                 <ScrollView horizontal>
-    //                     <View style={{ flexDirection: 'row', height: 350 }}>
-    //                         {
-    //                             booking.qr_code_list.map((item, index) => (
-    //                                 <View key={index} style={styles.rCard}>
-    //                                     <Card style={styles.reccom}>
-    //                                         <Card.Title style={styles.header}>
-    //                                             Voucher Code: {booking.qr_code_list[index].voucher_code}
-    //                                         </Card.Title>
-    //                                         <Card.Image
-    //                                             style={{ padding: 0, width: 200, height: 200 }}
-    //                                             source={{
-    //                                                 uri: booking.qr_code_list[index].qr_code_link
-    //                                             }}
-    //                                         />
-    //                                     </Card>
+    return supportTicket ? (
+        <Background>
+            <ScrollView>
+                <Card>
+                    <Card.Title style={styles.header}>
+                        {getNameForSupportTicket(supportTicket)}
+                    </Card.Title>
 
-    //                                     <Text style={{ marginBottom: 15 }}></Text>
-    //                                 </View>
-    //                             ))
-    //                         }
-    //                     </View>
-    //                 </ScrollView>
-    //             </Card>}
-    //             {booking.status != 'CANCELLED' && booking.qr_code_list.length == 1 && <Card>
-    //                 <Card.Title style={styles.header}>
-    //                     Ticket Voucher
-    //                 </Card.Title>
-    //                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-    //                     {
-    //                         booking.qr_code_list.map((item, index) => (
-    //                             <View key={index} style={styles.rCard}>
-    //                                 <Card style={styles.reccom}>
-    //                                     <Card.Title style={styles.header}>
-    //                                         Voucher Code: {booking.qr_code_list[index].voucher_code}
-    //                                     </Card.Title>
-    //                                     <Card.Image
-    //                                         style={{ padding: 0, width: 200, height: 200 }}
-    //                                         source={{
-    //                                             uri: booking.qr_code_list[index].qr_code_link
-    //                                         }}
-    //                                     />
-    //                                 </Card>
-    //                                 <Text style={{ marginBottom: 15 }}></Text>
-    //                             </View>
-    //                         ))
-    //                     }
-    //                 </View>
-    //             </Card>}
-    //         </ScrollView>
-    //     </Background>
-    // ) : ''
-    return <Text>test</Text>;
+                    <Text style={styles.description}>{supportTicket.description}</Text>
+                    <Text style={styles.details}>
+                        <Text style={styles.boldText}>Category:</Text> {formatCategory(supportTicket.ticket_category)}
+                    </Text>
+                    <Text style={styles.details}>
+                        <Text style={styles.boldText}>Status:</Text> {formatStatus(supportTicket.is_resolved)}
+                    </Text>
+                    <Text style={styles.details}>
+                        <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(supportTicket.created_time)}
+                    </Text>
+                    <Text style={styles.details}>
+                        <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(supportTicket.updated_time)}
+                    </Text>
+
+                </Card>
+                {/* <Card>
+                    <Card.Title style={styles.header}>
+                        Cancellation Policy
+                    </Card.Title>
+                    <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(supportTicket.start_datetime)}.</Text>
+                    {supportTicket.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel SupportTicket" mode="contained" onPress={() => cancelSupportTicket(supportTicket.supportTicket_id)} />}
+                </Card> */}
+            </ScrollView>
+        </Background>
+    ) : ''
 }
 
 const styles = StyleSheet.create({
@@ -251,6 +203,13 @@ const styles = StyleSheet.create({
         shadowRadius: 0,
         elevation: 0,
         backgroundColor: theme.colors.surface,
+    },
+    details: {
+        fontSize: 12,
+        marginBottom: 5
+    },
+    boldText: {
+        fontWeight: 'bold',
     },
 });
 

@@ -3,11 +3,12 @@ import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getAllSupportTicketsByUser } from '../../redux/supportRedux';
+import { getAllSupportTicketsByUser, createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking } from '../../redux/supportRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useIsFocused } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
+import CreateSupportTicketScreen from './CreateSupportTicketScreen';
 
 const SupportTicketScreen = ({ navigation }) => {
 
@@ -103,7 +104,6 @@ const SupportTicketScreen = ({ navigation }) => {
         toggleFilterModal();
     };
 
-
     const getColorForStatus = (label) => {
         const labelColorMap = {
             'Closed': 'lightgreen',
@@ -127,17 +127,17 @@ const SupportTicketScreen = ({ navigation }) => {
                 return item.booking.deal.name;
             }
         } else if (item.attraction != null) {
-            return item.attraction.name;
+            return 'Enquiry to ' + item.attraction.name;
         } else if (item.accommodation != null) {
-            return item.activity_name;
+            return 'Enquiry to ' + item.activity_name;
         } else if (item.tour != null) {
-            return item.tour.name;
+            return 'Enquiry to ' + item.tour.name;
         } else if (item.telecom != null) {
-            return item.telecom.name;
+            return 'Enquiry to ' + item.telecom.name;
         } else if (item.restaurant != null) {
-            return item.restaurant.name;
+            return 'Enquiry to ' + item.restaurant.name;
         } else if (item.deal != null) {
-            return item.restaurant.name;
+            return 'Enquiry to ' + item.restaurant.name;
         } else {
             return 'Enquiry to Admin';
         }
@@ -177,7 +177,6 @@ const SupportTicketScreen = ({ navigation }) => {
         } else if (ticket_category === 'BOOKING') {
             return 'Booking';
         }
-
     }
 
     function formatLocalDateTime(localDateTimeString) {
@@ -193,8 +192,9 @@ const SupportTicketScreen = ({ navigation }) => {
         return `${day}/${month}/${year}, ${hours}:${minutes} ${period}`;
     }
 
-    const viewSupportTicket = (supportTicket_id) => {
-        navigation.navigate('SupportTicketDetailsScreen', { supportTicketId: supportTicket_id });
+    const viewSupportTicket = (support_ticket_id) => {
+        console.log("support_ticket_id", support_ticket_id);
+        navigation.navigate('SupportTicketDetailsScreen', { supportTicketId: support_ticket_id });
     }
 
     return data.length !== 0 ? (
@@ -212,10 +212,10 @@ const SupportTicketScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* add buttons to create */}
+                    <Button text="Create Ticket" style={styles.button} onPress={() => navigation.navigate('CreateSupportTicketScreen')} />
 
                     {data.map((item, index) => (
-                        <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.supportTicket_id)}>
+                        <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
                             <Card>
                                 <Card.Title style={styles.header}>
                                     {getNameForSupportTicket(item)}
@@ -235,11 +235,11 @@ const SupportTicketScreen = ({ navigation }) => {
                                     <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(item.updated_time)}
                                 </Text>
 
-                                <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewSupportTicket(item.supportTicket_id)} />
+                                <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewSupportTicket(item.support_ticket_id)} />
                             </Card>
                         </TouchableOpacity>
                     ))
-                    }
+                    }   
 
                     <Modal
                         animationType="slide"

@@ -6,7 +6,7 @@ import InputValidator from '../../helpers/InputValidator';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
-import { getSupportTicket, updateSupportTicket, deleteSupportTicket, getAllRepliesBySupportTicket, createReply, updateReply, deleteReply } from '../../redux/supportRedux';
+import { getSupportTicket, deleteSupportTicket, getAllRepliesBySupportTicket, createReply, updateReply, deleteReply } from '../../redux/supportRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
@@ -16,6 +16,7 @@ import RNPickerSelect from 'react-native-picker-select';
 const SupportTicketDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [supportTicket, setSupportTicket] = useState('');
+    const [replyList, setReplyList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [mode, setMode] = useState('view');
     const [values, setValues] = useState({
@@ -54,8 +55,22 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         }
     }
 
+    const fetchReplyList = async () => {
+        try {
+            let response = await getAllRepliesBySupportTicket(supportTicketId);
+            console.log("reply list", response.data);
+            setReplyList(response.data);
+            setLoading(false);
+
+        } catch (error) {
+            alert('An error occur! Failed to retrieve reply list!');
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchSupportTicket(); // when the page load the first time
+        fetchReplyList();
     }, []);
 
     const handleDeletePress = (ticketId) => {
@@ -101,70 +116,50 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         }
     }
 
-    function handleEditClick() {
-        setMode('edit');
-    }
-
-    function handleViewClick() {
-        setMode('view');
-        fetchSupportTicket();
-    }
-
-    async function handleEdit(ticketId) {
-
-        let supportTicketObj = {
-            description: values.description,
-            ticket_category: values.ticket_category,
-        }
-
-        console.log("supportTicketObj", supportTicketObj);
-        console.log("supportTicketId", supportTicketId);
-
-        let response = await updateSupportTicket(supportTicketId, supportTicketObj);
-        if (response.status) {
-            handleViewClick();
-            Toast.show({
-                type: 'success',
-                text1: 'Support ticket edited!'
-            })
-
-        } else {
-            console.log("Support ticket edit failed!");
-            console.log(response.data);
-            Toast.show({
-                type: 'error',
-                text1: response.data.errorMessage
-            })
-        }
-    }
-
     const getNameForSupportTicket = (item) => {
         if (item.booking != null) {
+            console.log("item.booking", item.booking)
             if (item.booking.attraction != null) {
-                return item.booking.attraction.name;
+                return 'Enquiry to ' + item.booking.attraction.name;
             } else if (item.booking.room != null) {
-                return item.booking.accommodation.name;
+                return 'Enquiry to ' + item.booking.activity_name;
             } else if (item.booking.tour != null) {
-                return item.booking.tour.name;
+                return 'Enquiry to ' + item.booking.tour.name;
             } else if (item.booking.telecom != null) {
-                return item.booking.telecom.name;
+                return 'Enquiry to ' + item.booking.telecom.name;
+            } else if (item.booking.deal != null) {
+                return 'Enquiry to ' + item.booking.deal.name;
             } else {
-                return item.booking.deal.name;
+                return 'Booking not linked';
             }
         } else if (item.attraction != null) {
-            return item.attraction.name;
+            return 'Enquiry to ' + item.attraction.name;
         } else if (item.accommodation != null) {
-            return item.accommodation.name;
+            return 'Enquiry to ' + item.accommodation.name;
         } else if (item.tour != null) {
-            return item.tour.name;
+            return 'Enquiry to ' + item.tour.name;
         } else if (item.telecom != null) {
-            return item.telecom.name;
+            return 'Enquiry to ' + item.telecom.name;
         } else if (item.restaurant != null) {
-            return item.restaurant.name;
+            return 'Enquiry to ' + item.restaurant.name;
         } else if (item.deal != null) {
-            return item.restaurant.name;
+            return 'Enquiry to ' + item.restaurant.name;
         } else {
             return 'Enquiry to Admin';
+        }
+    }
+
+    const getReplyUser = (item) => {
+        if (item.tourist_user != null) {
+            return item.tourist_user.name;
+        } else if (item.local_user != null) {
+            return item.local_user.name;
+        } else if (item.vendor_staff_user != null) {
+            return item.vendor_staff_user.name;
+        } else if (item.internal_staff_user != null) {
+            return item.internal_staff_user.name;
+        } else {
+            return 'Error';
         }
     }
 
@@ -219,83 +214,67 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
     }
 
     return (
-        <Card>
-            {mode === 'view' ? (
-                <>
-                    <View style={styles.headerContainer}>
-                        <Card.Title style={styles.header}>
-                            {getNameForSupportTicket(supportTicket)}
-                        </Card.Title>
-                        <IconButton
-                            icon="pencil"
-                            size={20}
-                            style={{ alignSelf: 'flex-start' }}
-                            onPress={handleEditClick}
-                        />
-                        <IconButton
-                            icon="delete"
-                            size={20}
-                            style={{ alignSelf: 'flex-start' }}
-                            onPress={() => handleDeletePress(supportTicketId)}
-                        />
-                    </View>
-                    <Text style={styles.description}>{supportTicket.description}</Text>
-                    <Text style={styles.details}>
-                        <Text style={styles.boldText}>Category:</Text> {formatCategory(supportTicket.ticket_category)}
-                    </Text>
-                    <Text style={styles.details}>
-                        <Text style={styles.boldText}>Status:</Text> {formatStatus(supportTicket.is_resolved)}
-                    </Text>
-                    <Text style={styles.details}>
-                        <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(supportTicket.created_time)}
-                    </Text>
-                    <Text style={styles.details}>
-                        <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(supportTicket.updated_time)}
-                    </Text>
-                </>
+        <View>
+            <Card>
+                <View style={styles.headerContainer}>
+                    <Card.Title style={styles.header}>
+                        {getNameForSupportTicket(supportTicket)}
+                    </Card.Title>
+                    <IconButton
+                        icon="pencil"
+                        size={20}
+                        style={{ alignSelf: 'flex-start' }}
+                        onPress={() => navigation.navigate('EditSupportTicketScreen', { supportTicketId: supportTicket.support_ticket_id })}
+                    />
+                    <IconButton
+                        icon="delete"
+                        size={20}
+                        style={{ alignSelf: 'flex-start' }}
+                        onPress={() => handleDeletePress(supportTicketId)}
+                    />
+                </View>
+                <Text style={styles.description}>{supportTicket.description}</Text>
+                <Text style={styles.details}>
+                    <Text style={styles.boldText}>Category:</Text> {formatCategory(supportTicket.ticket_category)}
+                </Text>
+                <Text style={styles.details}>
+                    <Text style={styles.boldText}>Status:</Text> {formatStatus(supportTicket.is_resolved)}
+                </Text>
+                <Text style={styles.details}>
+                    <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(supportTicket.created_time)}
+                </Text>
+                <Text style={styles.details}>
+                    <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(supportTicket.updated_time)}
+                </Text>
+            </Card>
+
+            {replyList.length > 0 ? (
+                replyList.map((item, index) => (
+                    <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
+                        <Card>
+                            <Text style={styles.replyUser}>
+                                {getReplyUser(item)}
+                            </Text>
+
+                            <Text style={styles.description}>{item.message}</Text>
+                            <Text style={styles.details}>
+                                <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(item.created_time)}
+                            </Text>
+                            <Text style={styles.details}>
+                                <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(item.updated_time)}
+                            </Text>
+
+                        </Card>
+                    </TouchableOpacity>
+                ))
             ) : (
-                <>
-                    <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                        <RNPickerSelect
-                            placeholder={{
-                                label: 'Select Category...',
-                                value: null,
-                            }}
-                            onValueChange={(value) => setValues({ ...values, ticket_category: value })}
-                            items={[
-                                { label: 'General Enquiry', value: 'GENERAL_ENQUIRY' },
-                                { label: 'General Booking', value: 'BOOKING' },
-                                { label: 'Refund', value: 'REFUND' },
-                                { label: 'Cancellation', value: 'CANCELLATION' },
-                                { label: 'Attraction', value: 'ATTRACTION' },
-                                { label: 'Accommodation', value: 'ACCOMMODATION' },
-                                { label: 'Restaurant', value: 'RESTAURANT' },
-                                { label: 'Telecom', value: 'TELECOM' },
-                                { label: 'Deal', value: 'DEAL' },
-                                { label: 'Tour', value: 'TOUR' },
-                            ]}
-                            value={values.ticket_category}
-                            style={pickerSelectStyles}
-                        />
-                        <TextInput
-                            style={styles.description}
-                            label="Write your message here"
-                            multiline={true}
-                            value={values.description}
-                            onChangeText={(description) => setValues({ ...values, description })}
-                            errorText={values.description ? InputValidator.text(values.description) : ''}
-                        />
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <Button
-                                mode="contained"
-                                text={"Submit"}
-                                onPress={handleEdit}
-                            />
-                        </View>
-                    </View>
-                </>
+                <Card>
+                    <Text style={styles.header}>
+                        No replies yet!
+                    </Text>
+                </Card>
             )}
-        </Card>
+        </View>
     );
 }
 
@@ -309,6 +288,11 @@ const styles = StyleSheet.create({
     },
     header: {
         textAlign: 'center',
+        fontSize: 15,
+        color: '#044537',
+        marginTop: 18,
+    },
+    replyUser: {
         fontSize: 15,
         color: '#044537',
         marginTop: 18,

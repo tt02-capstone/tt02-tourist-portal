@@ -2,7 +2,7 @@ import axios from "axios";
 import {TOKEN_KEY} from "./AuthContext";
 import * as SecureStore from "expo-secure-store";
 
-const HOST = '192.168.86.138'
+const HOST = '192.168.1.4'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -66,7 +66,11 @@ export const recommendationApi = axios.create({
     baseURL: HOST_WITH_PORT + '/recommendation'
 })
 
-const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, recommendationApi]
+export const supportApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/supportTicket'
+})
+
+const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, recommendationApi, supportApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( async (config) => {

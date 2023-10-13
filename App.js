@@ -39,6 +39,8 @@ import TourDetailsScreen from './src/screens/Attraction/TourDetailsScreen';
 import DealScreen from "./src/screens/Deal/DealScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
+import SupportTicketScreen from './src/screens/SupportTicket/SupportTicketScreen';
+import SupportTicketDetailsScreen from './src/screens/SupportTicket/SupportTicketDetailsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -74,6 +76,7 @@ function MyDrawer() {
         <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
         <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
+        <Drawer.Screen name="Support Tickets" component={SupportTicketScreen} />
       </Drawer.Navigator>
     );
 }
@@ -118,6 +121,8 @@ export const Layout = () => {
                         <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
                         <Stack.Screen name="TourScreen" component={TourScreen} options={{ title : 'Tours' }} />
                         <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
+                        <Stack.Screen name="SupportTicketScreen" component={SupportTicketScreen} options={{ title : 'Support Tickets' }} />
+                        <Stack.Screen name="SupportTicketDetailsScreen" component={SupportTicketDetailsScreen} options={{ title : 'Support Ticket Details' }} />
                     </>
                 ) : (
                     <>

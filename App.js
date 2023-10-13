@@ -39,6 +39,12 @@ import TourDetailsScreen from './src/screens/Attraction/TourDetailsScreen';
 import DealScreen from "./src/screens/Deal/DealScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
+import CategoryScreen from './src/screens/Forum/CategoryScreen';
+import CategoryItemScreen from './src/screens/Forum/CategoryItemScreen';
+import PostListScreen from './src/screens/Forum/PostListScreen';
+import { CreatePostScreen } from './src/screens/Forum/CreatePostScreen';
+import { UpdatePostScreen } from './src/screens/Forum/UpdatePostScreen';
+import PostScreen from './src/screens/Forum/PostScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -74,6 +80,7 @@ function MyDrawer() {
         <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
         <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
+        <Drawer.Screen name="Forum" component={CategoryScreen} />
       </Drawer.Navigator>
     );
 }
@@ -118,6 +125,12 @@ export const Layout = () => {
                         <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
                         <Stack.Screen name="TourScreen" component={TourScreen} options={{ title : 'Tours' }} />
                         <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
+                        <Stack.Screen name="CategoryScreen" component={CategoryScreen} options={{ title : 'Forum' }} />
+                        <Stack.Screen name="CategoryItemScreen" component={CategoryItemScreen} options={{ title : 'Forum' }} />
+                        <Stack.Screen name="PostListScreen" component={PostListScreen} options={{ title : 'Posts' }} />
+                        <Stack.Screen name="CreatePostScreen" component={CreatePostScreen} options={{ title : 'Create Post' }} />
+                        <Stack.Screen name="UpdatePostScreen" component={UpdatePostScreen} options={{ title : 'Update Post' }} />
+                        <Stack.Screen name="PostScreen" component={PostScreen} options={{ title : 'Post' }} />
                     </>
                 ) : (
                     <>

@@ -25,18 +25,21 @@ const SupportTicketScreen = ({ navigation }) => {
     useEffect(() => {
         async function onLoad() {
             try {
+                console.log("trying to load")
                 const userData = await getUser();
                 setUser(userData);
                 const userId = userData.user_id;
 
+                console.log("before retrieving support tickets")
                 let response = await getAllSupportTicketsByUser(userId);
+                console.log("response.data", response.data)
                 setData(response.data);
                 setFullSupportTicketList(response.data);
                 console.log("fullSupportTicketList", fullSupportTicketList);
                 setLoading(false);
             } catch (error) {
-                alert('An error occur! Failed to retrieve supportTicket list!');
-                setLoading(false);
+                alert('An error occurred! Failed to retrieve supportTicket list!');
+                setLoading(false); 
             }
         }
         onLoad();
@@ -115,21 +118,24 @@ const SupportTicketScreen = ({ navigation }) => {
 
     const getNameForSupportTicket = (item) => {
         if (item.booking != null) {
+            console.log("item.booking", item.booking)
             if (item.booking.attraction != null) {
-                return item.booking.attraction.name;
+                return 'Enquiry to ' + item.booking.attraction.name;
             } else if (item.booking.room != null) {
-                return item.booking.activity_name;
+                return 'Enquiry to ' + item.booking.activity_name;
             } else if (item.booking.tour != null) {
-                return item.booking.tour.name;
+                return 'Enquiry to ' + item.booking.tour.name;
             } else if (item.booking.telecom != null) {
-                return item.booking.telecom.name;
+                return 'Enquiry to ' + item.booking.telecom.name;
+            } else if (item.booking.deal != null) {
+                return 'Enquiry to ' + item.booking.deal.name;
             } else {
-                return item.booking.deal.name;
+                return 'Booking not linked';
             }
         } else if (item.attraction != null) {
             return 'Enquiry to ' + item.attraction.name;
         } else if (item.accommodation != null) {
-            return 'Enquiry to ' + item.activity_name;
+            return 'Enquiry to ' + item.accommodation.name;
         } else if (item.tour != null) {
             return 'Enquiry to ' + item.tour.name;
         } else if (item.telecom != null) {

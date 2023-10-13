@@ -77,4 +77,12 @@ const dob = (date) => {
     return '';
 }
 
-export default {password, email, name, passport, countryCode, mobileNo, nric, confirmPassword, dob}
+const text = (text) => {
+
+    if (!text) {
+        return text + " can't be empty!";
+    }
+    return '';
+}
+
+export default {password, email, name, passport, countryCode, mobileNo, nric, confirmPassword, dob, text}

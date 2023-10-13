@@ -14,14 +14,13 @@ export const CartScreen = ({ route, navigation }) => {
   const [cartItems, setCartItems] = useState([]);
   const [user_type, setUserType] = useState('');
   const [deletion, setDeletion] = useState(false);
-  const [vendorChecked, setVendorChecked] = useState(new Map());
-  const [itemChecked, setItemChecked] = useState([false]); //Might not work since caritems have to be fetched first
+  const [itemChecked, setItemChecked] = useState(new Map()); //Might not work since caritems have to be fetched first
   const [totalPrice, setTotalPrice] = useState(0);
   const [apiCallTimer, setApiCallTimer] = useState(null);
   const [vendorCartMap, setVendorCartMap] = useState(new Map());
   const [vendorDealMap, setVendorDealMap] = useState(new Map());
   const isFocused = useIsFocused();
-  const [expandedItems, setExpandedItems] = useState([false]); // Initialize with the number of items you have
+  const [expandedItems, setExpandedItems] = useState([true]); // Initialize with the number of items you have
 
   const handleAccordionPress = (index) => {
     const newExpandedItems = [...expandedItems];
@@ -63,10 +62,14 @@ export const CartScreen = ({ route, navigation }) => {
 
   const reCalculateTotalPrice = () => {
     let totalSum = parseFloat(0);
-    vendorChecked.forEach((value, key) => {
+    itemChecked.forEach((value, key) => {
       let curr = 0;
-      value.forEach((item, index) => {
-        curr += parseFloat(cartItems[index].price);
+      value.forEach((isChecked, index) => {
+        console.log('hereee',key, isChecked, index)
+        if(isChecked) {
+          console.log('price', vendorCartMap.get(key)[index].price)
+          curr += parseFloat(vendorCartMap.get(key)[index].price);
+        }
       });
       if (vendorDealMap.has(key)) {
         totalSum += curr * (100 - vendorDealMap.get(key).data.discount_percent) / 100;
@@ -74,6 +77,7 @@ export const CartScreen = ({ route, navigation }) => {
         totalSum += curr;
       }
     });
+    console.log('reCalculateTotalPrice',totalSum)
     return totalSum;
   };
 
@@ -156,11 +160,12 @@ export const CartScreen = ({ route, navigation }) => {
     console.log("hereee", user, itemChecked)
     const tourist_email = user.email;
     const booking_ids = [];
-    itemChecked.forEach((isChecked, index) => {
-      if (isChecked) {
-        booking_ids.push(cartItems[index].id);
-
-      }
+    itemChecked.forEach((value, key) => {
+      value.forEach((isChecked, index) => {
+        if (isChecked) {
+          booking_ids.push(vendorCartMap.get(key)[index].id);
+        }
+      });
     });
 
     const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`, booking_ids)
@@ -170,12 +175,14 @@ export const CartScreen = ({ route, navigation }) => {
     } else {
       // console.log('success', response.data)
       if (response.data) {
+
         setTotalPrice(0); // set it to 0 to ensure when the all checkbox is checked it return 0 when deleted
         setDeletion(!deletion);
-        vendorChecked.clear()
-        setVendorChecked(vendorChecked)
         vendorCartMap.clear()
         setVendorCartMap(vendorCartMap)
+        itemChecked.clear()
+        setItemChecked(itemChecked)
+
         Toast.show({
           type: 'success',
           text1: 'Successfully deleted cart item(s)'
@@ -205,33 +212,36 @@ export const CartScreen = ({ route, navigation }) => {
   }
 
   const calcPrice = (vendorId) => {
-    const totalSum =  vendorChecked.get(vendorId).reduce((accumulator, index) => accumulator + parseFloat(cartItems[index].price), 0.0);
-    if (vendorDealMap.has(vendorId)) {
-      return totalSum* (100 - vendorDealMap.get(vendorId).data.discount_percent)/100
+    const checkedIndices = [...itemChecked.get(vendorId)]; // Assuming itemChecked is a Map
+    let totalSum = 0.0;
+
+    if (checkedIndices) {
+      checkedIndices.forEach((isChecked, index) => {
+        if (isChecked) {
+          totalSum += parseFloat(vendorCartMap.get(vendorId)[index].price);
+        }
+      });
     }
-    return totalSum
+
+    if (vendorDealMap.has(vendorId)) {
+      totalSum = totalSum * (100 - vendorDealMap.get(vendorId).data.discount_percent) / 100;
+    }
+    console.log(totalSum)
+    return totalSum;
   }
 
   const handleCheckBoxToggle = (vendorId, index) => {
-    const updatedChecked = [...itemChecked];
+    const updatedChecked = [...itemChecked.get(vendorId)];
     if (vendorId === undefined || index === undefined){
       return
     }
-    console.log(updatedChecked, vendorChecked)
-
-    if(!vendorChecked.has(vendorId)){
-      vendorChecked.set(vendorId, [])
-      setVendorChecked(vendorChecked)
-    }
-
-
     const oldPrice = calcPrice(vendorId)
-    console.log(updatedChecked, oldPrice, vendorChecked)
+    console.log(updatedChecked, oldPrice)
 
     if (updatedChecked[index]) {
-      const vendorCheckedUpdate = vendorChecked.set(vendorId, vendorChecked.get(vendorId).filter(number => number !== index));
-      console.log(vendorCheckedUpdate)
-      setVendorChecked(vendorCheckedUpdate)
+      updatedChecked[index] = !updatedChecked[index];
+      itemChecked.set(vendorId, updatedChecked)
+      setItemChecked(itemChecked)
 
       const newPrice = calcPrice(vendorId)
       const finalPrice = totalPrice - parseFloat(oldPrice) + parseFloat(newPrice);
@@ -239,41 +249,52 @@ export const CartScreen = ({ route, navigation }) => {
       setTotalPrice(finalPrice);
 
     } else {
-      vendorChecked.get(vendorId).push(index)
-      setVendorChecked(vendorChecked)
+      updatedChecked[index] = !updatedChecked[index];
+      itemChecked.set(vendorId, updatedChecked)
+      setItemChecked(itemChecked)
 
       const newPrice = calcPrice(vendorId)
       const finalPrice = totalPrice - parseFloat(oldPrice) + parseFloat(newPrice);
       console.log('else', finalPrice)
       setTotalPrice(finalPrice);
     }
-
-    console.log(totalPrice)
-    updatedChecked[index] = !updatedChecked[index];
-    setItemChecked(updatedChecked);
   };
 
   const isAllChecked = () => {
-    return itemChecked.every((isChecked) => isChecked);
+    if (itemChecked.size === 0) {
+      return false
+    }
+    let checkAll = true
+    itemChecked.forEach((value, key) => {
+      checkAll = checkAll && value.every((isChecked) => isChecked);
+    })
+
+    return checkAll
+
   };
 
   const handleCheckAllToggle = () => {
-    const updatedChecked = itemChecked.map(() => !isAllChecked());
+    const isAllCheck = isAllChecked();
+    console.log('isAllChecked', isAllCheck);
 
-    if (isAllChecked()) {
-      setTotalPrice(0);
+    const updatedItemChecked = new Map(itemChecked);
+    itemChecked.forEach((value, key) => {
+      const list = Array(value.length).fill(!isAllCheck);
+      updatedItemChecked.set(key, list);
+    });
 
-    } else {
-      let newPrice = 0;
-      cartItems.forEach((cartItem) => {
-        newPrice += parseFloat(cartItem.price);
-      });
-
-      setTotalPrice(newPrice);
-    }
-
-    setItemChecked(updatedChecked);
+    setItemChecked(updatedItemChecked);
+    console.log(updatedItemChecked);
   };
+
+  useEffect(() => {
+    if (isAllChecked()) {
+      let newPrice = reCalculateTotalPrice();
+      setTotalPrice(newPrice);
+    } else {
+      setTotalPrice(0);
+    }
+  }, [itemChecked]);
 
   const updateQuantity = (cartItemIndex, itemIndex, delta) => {
     let tourPrice = 0
@@ -362,10 +383,10 @@ export const CartScreen = ({ route, navigation }) => {
           console.log("cartDetails", cartDetails);
           setDeletion(false)
           const extractedDetails = await Promise.all(cartDetails.map(async (detail) => {
-            const { subtotal, selections, quantities } = getFields(detail.cart_item_list);
+            const {subtotal, selections, quantities} = getFields(detail.cart_item_list);
 
             if (detail.type === 'ATTRACTION') {
-              const attr =  {
+              const attr = {
                 id: parseInt(detail.cart_booking_id),
                 type: detail.type,
                 attraction_id: detail.attraction.attraction_id,
@@ -376,7 +397,7 @@ export const CartScreen = ({ route, navigation }) => {
                 endTime: formatDateAndTime(detail.end_datetime),
                 items: detail.cart_item_list.filter(item => item.type === "ATTRACTION"), // get activity selection
                 tour: detail.cart_item_list.filter(item => item.type === "TOUR").length != 0
-                  ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
+                    ? detail.cart_item_list.filter(item => item.type === "TOUR") : null, // get tour selection
                 price: subtotal.toFixed(2),
                 quantity: quantities,
                 selections: selections
@@ -384,7 +405,7 @@ export const CartScreen = ({ route, navigation }) => {
               setVendorCartMapping(detail.vendor.vendor_id, attr)
               return attr
             } else if (detail.type === 'TELECOM') {
-              const attr =  {
+              const attr = {
                 id: parseInt(detail.cart_booking_id),
                 type: detail.type,
                 telecom_id: detail.telecom.telecom_id,
@@ -440,11 +461,18 @@ export const CartScreen = ({ route, navigation }) => {
           setCartItems(extractedDetails);
           console.log(vendorCartMap)
           if (extractedDetails.length > 0) {
-            setItemChecked(Array(extractedDetails.length).fill(false));
-            setExpandedItems(Array.from(vendorCartMap).map(() => false));
+            setExpandedItems(Array.from(vendorCartMap).map(() => true));
           }
-        }
 
+          if (vendorCartMap.size > 0) {
+            vendorCartMap.forEach((value, key) => {
+              itemChecked.set(key, Array(value.length).fill(false))
+              setItemChecked(itemChecked)
+            })
+          }
+
+          console.log('item checked', itemChecked)
+        }
 
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -528,7 +556,7 @@ export const CartScreen = ({ route, navigation }) => {
                                 checkedIcon="checkbox-outline"
                                 uncheckedIcon={'checkbox-blank-outline'}
                                 containerStyle={{ marginLeft: -5, marginRight: -10, padding: 0 }}
-                                checked={itemChecked[cartItemIndex]}
+                                checked={itemChecked.has(key) && itemChecked.get(key)[cartItemIndex]}
                                 onPress={() => handleCheckBoxToggle(key, cartItemIndex)}
                       />
 

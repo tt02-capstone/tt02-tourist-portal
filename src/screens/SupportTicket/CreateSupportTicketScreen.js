@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
+import Header from '../../components/Header';
+import TextInput from '../../components/TextInput';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Card, CheckBox } from '@rneui/themed';
-import TextInput from '../../components/TextInput';
+import { Text, Card, CheckBox, Tab, TabView } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
 import { createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking } from '../../redux/supportRedux';
 import { useRoute } from '@react-navigation/native';
@@ -22,7 +23,6 @@ const CreateSupportTicketScreen = ({ navigation }) => {
         description: '',
         ticket_category: '',
     });
-    const [index, setIndex] = React.useState(0);
 
     const route = useRoute();
 
@@ -229,63 +229,34 @@ const CreateSupportTicketScreen = ({ navigation }) => {
         return `${day}/${month}/${year}, ${hours}:${minutes} ${period}`;
     }
 
-    const FirstRoute = () => (
-        <ScrollView>
-            <TextInput
-                label="Ticket Type"
-                onChangeText={(text) => setValues({ ...values, ticket_type: text })}
-                placeholder="Ticket Type"
-            />
-            <TextInput
-                label="Description"
-                onChangeText={(text) => setValues({ ...values, description: text })}
-                placeholder="Description"
-                multiline={true}
-                numberOfLines={4}
-            />
-            <Button
-                text="Submit"
-                mode="contained"
-                onPress={onSubmit}
-                style={styles.button}
-            />
-        </ScrollView>
-    );
-
-    const SecondRoute = () => (
-        <ScrollView>
-            {/* Add fields for the "To Vendor" tab here */}
-        </ScrollView>
-    );
-
-    const renderScene = SceneMap({
-        first: FirstRoute,
-        second: SecondRoute,
-    });
-
-
     return (
         <Background>
-            test
+            <Header>
+                Create Support Ticket
+            </Header>
+            
+            <View>
+                <TextInput
+                    label="Old Password"
+                    returnKeyType="next"
+                    style={{minWidth: '80%'}}
+                    secureTextEntry={true}
+                    onChangeText={(oldPassword) => setValues({...values, ticket_category})}
+                />
+
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <Button
+                        mode="contained"
+                        text={"Submit"}
+                        onPress={onSubmit}
+                    />
+                </View>
+            </View>
         </Background>
     )
 }
 
 const styles = StyleSheet.create({
-    header: {
-        textAlign: 'center',
-        fontSize: 15,
-        color: '#044537'
-    },
-    image: {
-        width: 30, height: 30, marginRight: 10,
-    },
-    name: {
-        fontSize: 16, marginTop: 5,
-    },
-    description: {
-        marginBottom: 10, fontSize: 13, marginTop: 10
-    },
     tag: {
         color: 'black',
         paddingVertical: 5,
@@ -295,19 +266,6 @@ const styles = StyleSheet.create({
         width: 90,
         fontSize: 10,
         fontWeight: 'bold'
-    },
-    dropBorder: {
-        borderWidth: 0,
-        shadowColor: 'rgba(0,0,0, 0.0)',
-        shadowOffset: { height: 0, width: 0 },
-        shadowOpacity: 0,
-        shadowRadius: 0,
-        elevation: 0,
-        backgroundColor: theme.colors.surface,
-    },
-    details: {
-        fontSize: 12,
-        marginBottom: 5
     },
     boldText: {
         fontWeight: 'bold',

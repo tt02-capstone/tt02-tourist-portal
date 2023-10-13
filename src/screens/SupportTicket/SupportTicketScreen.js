@@ -235,7 +235,7 @@ const SupportTicketScreen = ({ navigation }) => {
                                     <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(item.updated_time)}
                                 </Text>
 
-                                <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewSupportTicket(item.support_ticket_id)} />
+                                <Button style={styles.cardButton} text="View Details" mode="contained" onPress={() => viewSupportTicket(item.support_ticket_id)} />
                             </Card>
                         </TouchableOpacity>
                     ))
@@ -395,8 +395,13 @@ const styles = StyleSheet.create({
         color: 'gray',
         textAlign: 'center'
     },
+    cardButton: {
+        width: '100%',
+    },
     button: {
-        width: '100%'
+        width: '50%',
+        marginLeft: '25%',
+        marginRight: '25%',
     },
     details: {
         fontSize: 12,

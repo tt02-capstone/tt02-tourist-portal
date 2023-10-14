@@ -54,6 +54,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     }, []);
 
     const getNameForBooking = (item) => {
+        console.log("item", item);
         if (item.attraction != null) {
             return item.attraction.name;
         } else if (item.room != null) {

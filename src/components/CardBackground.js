@@ -2,9 +2,9 @@ import React from 'react'
 import { StyleSheet, KeyboardAvoidingView, View } from 'react-native'
 import { theme } from '../core/theme'
 
-const Background = ({ children }) => {
+const Background = ({ children, style }) => {
   return (
-    <View style={styles.background}>
+    <View style={[styles.background, style]}>
       {/* children = all the other components between the opening and closing component */}
       <View style={styles.container} behavior="padding">
         {children}

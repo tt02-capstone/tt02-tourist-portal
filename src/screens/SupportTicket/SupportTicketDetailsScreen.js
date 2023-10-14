@@ -194,6 +194,34 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         }
     }
 
+    const getReplyUserType = (item) => {
+        if (item.tourist_user != null) {
+            return 'Tourist';
+        } else if (item.local_user != null) {
+            return 'Local';
+        } else if (item.vendor_staff_user != null) {
+            if (supportTicket.attraction != null) {
+                return 'Vendor' + ' - ' + supportTicket.attraction.name;
+            } else if (supportTicket.accommodation != null) {
+                return 'Vendor' + ' - ' + supportTicket.accommodation.name;
+            } else if (supportTicket.tour != null) {
+                return 'Vendor' + ' - ' + supportTicket.tour.name;
+            } else if (supportTicket.telecom != null) {
+                return 'Vendor' + ' - ' + supportTicket.telecom.name;
+            } else if (supportTicket.restaurant != null) {
+                return 'Vendor' + ' - ' + supportTicket.restaurant.name;
+            } else if (supportTicket.deal != null) {
+                return 'Vendor' + ' - ' + supportTicket.deal.name;
+            } else {
+                return 'Vendor';
+            }
+        } else if (item.internal_staff_user != null) {
+            return 'Admin';
+        } else {
+            return 'Error';
+        }
+    }
+
     const getReplyUser = (item) => {
         if (item.tourist_user != null) {
             return item.tourist_user.name;
@@ -247,7 +275,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
             Toast.show({
                 type: 'success',
                 text1: 'Support ticket marked as ' + (supportTicket.is_resolved ? 'resolved' : 'unresolved') + '!'
-              });              
+            });
 
             fetchSupportTicket();
 
@@ -286,13 +314,13 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         } else if (ticket_category === 'DEAL') {
             return 'Deal';
         } else if (ticket_category === 'REFUND') {
-            return 'Refund';
+            return 'Booking - Refund';
         } else if (ticket_category === 'CANCELLATION') {
-            return 'Cancellation';
+            return 'Booking - Cancellation';
         } else if (ticket_category === 'GENERAL_ENQUIRY') {
             return 'General Enquiry';
         } else if (ticket_category === 'BOOKING') {
-            return 'Booking';
+            return 'Booking - General';
         }
 
     }
@@ -314,21 +342,29 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <Card>
                 <View style={styles.headerContainer}>
-                    <Card.Title style={styles.header}>
+                    <Card.Title style={[styles.header, replyList.length === 0 ? {} : { maxWidth: '100%' }]}>
                         {getNameForSupportTicket(supportTicket)}
                     </Card.Title>
-                    <IconButton
-                        icon="pencil"
-                        size={20}
-                        style={{ alignSelf: 'flex-start' }}
-                        onPress={() => navigation.navigate('EditSupportTicketScreen', { supportTicketId: supportTicket.support_ticket_id })}
-                    />
-                    <IconButton
-                        icon="delete"
-                        size={20}
-                        style={{ alignSelf: 'flex-start' }}
-                        onPress={() => handleDeleteSupportTicketPress(supportTicketId)}
-                    />
+
+                    <View style={styles.iconContainer}>
+                        {replyList.length === 0 ? (
+                            <>
+                                <IconButton
+                                    icon="pencil"
+                                    size={20}
+                                    style={styles.icon}
+                                    onPress={() => navigation.navigate('EditSupportTicketScreen', { supportTicketId: supportTicket.support_ticket_id })}
+                                />
+                                <IconButton
+                                    icon="delete"
+                                    size={20}
+                                    style={styles.icon}
+                                    onPress={() => handleDeleteSupportTicketPress(supportTicketId)}
+                                /></>
+                        ) : (
+                        <></>
+                        )}
+                    </View>
                 </View>
                 <Text style={styles.description}>{supportTicket.description}</Text>
                 <Text style={styles.details}>
@@ -350,27 +386,32 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                     {replyList.map((item, index) => (
                         <View key={index}>
                             <Card>
-                                <Text style={styles.replyUser}>{getReplyUser(item)}</Text>
-
-                                {/* display edit and delete icons only if it is a reply from current user + there are no replies after it */}
-                                {((item.local_user != null && item.local_user.user_id == user.user_id)
-                                    || (item.tourist_user != null && item.tourist_user.user_id == user.user_id))
-                                    && index === replyList.length - 1 ? (
+                                <View style={styles.headerContainer}>
                                     <View>
-                                        <IconButton
-                                            icon="pencil"
-                                            size={20}
-                                            style={{ alignSelf: 'flex-start' }}
-                                            onPress={() => navigation.navigate('EditReplyScreen', { replyId: item.reply_id, replySupportTicketId: supportTicketId })}
-                                        />
-                                        <IconButton
-                                            icon="delete"
-                                            size={20}
-                                            style={{ alignSelf: 'flex-start' }}
-                                            onPress={() => handleDeleteReplyPress(item.reply_id)}
-                                        />
+                                        <Text style={styles.replyUserType}>{getReplyUserType(item)}</Text>
+                                        <Text style={styles.replyUser}>{getReplyUser(item)}</Text>
                                     </View>
-                                ) : (<></>)}
+
+                                    {/* display edit and delete icons only if it is a reply from current user + there are no replies after it */}
+                                    {((item.local_user != null && item.local_user.user_id == user.user_id)
+                                        || (item.tourist_user != null && item.tourist_user.user_id == user.user_id))
+                                        && index === replyList.length - 1 ? (
+                                        <View style={styles.iconContainer}>
+                                            <IconButton
+                                                icon="pencil"
+                                                size={20}
+                                                style={styles.icon}
+                                                onPress={() => navigation.navigate('EditReplyScreen', { replyId: item.reply_id, replySupportTicketId: supportTicketId })}
+                                            />
+                                            <IconButton
+                                                icon="delete"
+                                                size={20}
+                                                style={styles.icon}
+                                                onPress={() => handleDeleteReplyPress(item.reply_id)}
+                                            />
+                                        </View>
+                                    ) : (<></>)}
+                                </View>
 
                                 <Text style={styles.description}>{item.message}</Text>
                                 <Text style={styles.details}>
@@ -385,37 +426,43 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                     ))}
 
                     {supportTicket.is_resolved ? (
-                        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20}}>
-                            <Text style={{marginBottom: 10}}>Ticket has been resolved</Text>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+                            <View style={styles.lineContainer}>
+                                <View style={styles.line}></View>
+                                <Text>Ticket is closed</Text>
+                                <View style={styles.line}></View>
+                            </View>
                             <Button
                                 mode="contained"
-                                text={"Mark as Unresolved"}
-                                style={{width: '50%'}}
+                                text={"Reopen Ticket"}
+                                style={{ width: '40%' }}
                                 onPress={handleTicketStatus}
                             />
                         </View>
                     ) : (
                         <View>
-                            <TextInput
-                                style={styles.newReply}
-                                label="Write your reply here"
-                                multiline={true}
-                                value={newReply}
-                                onChangeText={(value) => setNewReply(value)}
-                                errorText={newReply ? InputValidator.text(newReply) : ''}
-                            />
-                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={styles.newReplyContainer}>
+                                <TextInput
+                                    style={styles.newReply}
+                                    label="Write your reply here"
+                                    multiline={true}
+                                    value={newReply}
+                                    onChangeText={(value) => setNewReply(value)}
+                                    errorText={newReply ? InputValidator.text(newReply) : ''}
+                                />
                                 <Button
                                     mode="contained"
                                     text={"Submit"}
+                                    style={styles.button}
+                                    labelStyle={styles.buttonText}
                                     onPress={handleReplySubmit}
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                                 <Button
                                     mode="contained"
-                                    text={"Mark as Resolved"}
-                                    style={{width: '50%'}}
+                                    text={"Close Ticket"}
+                                    style={{ width: '40%' }}
                                     onPress={handleTicketStatus}
                                 />
                             </View>
@@ -425,7 +472,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                 </>
             ) : (
                 <Card>
-                    <Text style={styles.header}>
+                    <Text style={styles.noReplies}>
                         No replies yet!
                     </Text>
                 </Card>
@@ -438,20 +485,36 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        position: 'relative',
         alignItems: 'center',
-        paddingHorizontal: 30,
+    },
+    iconContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    icon: {
+        marginLeft: -5,
+        marginTop: -5,
+        marginRight: 3,
     },
     header: {
-        textAlign: 'center',
+        flexWrap: 'wrap',
+        textAlign: 'left',
         fontSize: 15,
         color: '#044537',
-        marginTop: 18,
+        marginTop: 10,
+        marginLeft: 10,
+    },
+    replyUserType: {
+        fontSize: 13,
+        color: 'gray',
+        marginTop: 5,
+        marginLeft: 5,
     },
     replyUser: {
         fontSize: 15,
         color: '#044537',
-        marginTop: 18,
+        marginTop: 5,
+        marginLeft: 5,
     },
     deleteIcon: {
         position: 'absolute',
@@ -466,7 +529,7 @@ const styles = StyleSheet.create({
         fontSize: 16, marginTop: 5,
     },
     description: {
-        marginBottom: 10, fontSize: 13, marginTop: 10
+        marginBottom: 10, fontSize: 13, marginTop: 10, marginLeft: 5,
     },
     tag: {
         color: 'black',
@@ -489,15 +552,54 @@ const styles = StyleSheet.create({
     },
     details: {
         fontSize: 12,
-        marginBottom: 5
+        marginBottom: 5,
+        marginLeft: 5,
     },
     boldText: {
         fontWeight: 'bold',
     },
     newReply: {
-        width: '80%',
-        marginLeft: 30,
-    }
+        width: '60%',
+        marginLeft: 170,
+    },
+    noReplies: {
+        textAlign: 'center',
+        fontSize: 15,
+        color: '#044537',
+    },
+    newReplyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 5,
+        marginBottom: 5,
+    },
+    button: {
+        width: '24%',
+        marginLeft: 20,
+        marginRight: 170,
+        backgroundColor: 'slategray',
+        borderRadius: 5,
+        marginBottom: 3,
+    },
+    buttonText: {
+        fontWeight: 'bold',
+        fontSize: 12,
+        color: 'white',
+        lineHeight: 26,
+    },
+    lineContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    line: {
+        flex: 1,
+        height: 1,
+        backgroundColor: 'darkgray',
+        width: '100%',
+        marginHorizontal: '5%',
+    },
 });
 
 const pickerSelectStyles = StyleSheet.create({

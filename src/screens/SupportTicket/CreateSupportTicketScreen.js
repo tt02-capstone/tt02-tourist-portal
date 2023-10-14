@@ -8,7 +8,7 @@ import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card, CheckBox, Tab, TabView } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
-import { createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking } from '../../redux/supportRedux';
+import { createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking, getBookingHistoryList } from '../../redux/supportRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
@@ -18,7 +18,6 @@ import { getPublishedTelecomList } from "../../redux/telecomRedux";
 import { getRestaurantList } from "../../redux/restaurantRedux";
 import { getAccommodationList } from "../../redux/reduxAccommodation";
 import { getAttractionList } from "../../redux/reduxAttraction";
-import { getBookingHistoryList } from '../../redux/reduxBooking';
 
 const CreateSupportTicketScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -290,93 +289,13 @@ const CreateSupportTicketScreen = ({ navigation }) => {
         }
     }
 
-    const getNameForSupportTicket = (item) => {
-        if (item.booking != null) {
-            if (item.booking.attraction != null) {
-                return item.booking.attraction.name;
-            } else if (item.booking.room != null) {
-                return item.booking.activity_name;
-            } else if (item.booking.tour != null) {
-                return item.booking.tour.name;
-            } else if (item.booking.telecom != null) {
-                return item.booking.telecom.name;
-            } else {
-                return item.booking.deal.name;
-            }
-        } else if (item.attraction != null) {
-            return item.attraction.name;
-        } else if (item.accommodation != null) {
-            return item.activity_name;
-        } else if (item.tour != null) {
-            return item.tour.name;
-        } else if (item.telecom != null) {
-            return item.telecom.name;
-        } else if (item.restaurant != null) {
-            return item.restaurant.name;
-        } else if (item.deal != null) {
-            return item.restaurant.name;
-        } else {
-            return 'Enquiry to Admin';
-        }
-    }
-
-    const formatType = (type) => {
-        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-    }
-
-    const formatStatus = (is_resolved) => {
-        if (is_resolved) {
-            return 'Closed';
-        } else {
-            return 'Open';
-        }
-    }
-
-    const formatCategory = (ticket_category) => {
-        if (ticket_category === 'ATTRACTION') {
-            return 'Attraction';
-        } else if (ticket_category === 'TOUR') {
-            return 'Tour';
-        } else if (ticket_category === 'ACCOMMODATION') {
-            return 'Accommodation';
-        } else if (ticket_category === 'TELECOM') {
-            return 'Telecom';
-        } else if (ticket_category === 'RESTAURANT') {
-            return 'Restaurant';
-        } else if (ticket_category === 'DEAL') {
-            return 'Deal';
-        } else if (ticket_category === 'REFUND') {
-            return 'Refund';
-        } else if (ticket_category === 'CANCELLATION') {
-            return 'Cancellation';
-        } else if (ticket_category === 'GENERAL_ENQUIRY') {
-            return 'General Enquiry';
-        } else if (ticket_category === 'BOOKING') {
-            return 'Booking';
-        }
-
-    }
-
-    function formatLocalDateTime(localDateTimeString) {
-        const dateTime = new Date(localDateTimeString);
-
-        const day = String(dateTime.getDate()).padStart(2, '0');
-        const month = String(dateTime.getMonth() + 1).padStart(2, '0');
-        const year = dateTime.getFullYear();
-        const hours = String(dateTime.getHours()).padStart(2, '0');
-        const minutes = String(dateTime.getMinutes()).padStart(2, '0');
-        const period = dateTime.getHours() < 12 ? 'AM' : 'PM';
-
-        return `${day}/${month}/${year}, ${hours}:${minutes} ${period}`;
-    }
-
     return (
-        <Background>
+        <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.header}>
                 Create Support Ticket
             </Text>
 
-            <ScrollView automaticallyAdjustKeyboardInsets={true} style={{ flexDirection: 'row', maxWidth: '100%', height: 700 }}>
+            <ScrollView automaticallyAdjustKeyboardInsets={true}>
                 <View style={{ alignItems: 'center', minHeight: '100%' }}>
                     <RNPickerSelect
                         placeholder={{
@@ -399,9 +318,9 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         onValueChange={(value) => setValues({ ...values, ticket_category: value })}
                         items={[
                             { label: 'General Enquiry', value: 'GENERAL_ENQUIRY' },
-                            { label: 'General Booking', value: 'BOOKING' },
-                            { label: 'Refund', value: 'REFUND' },
-                            { label: 'Cancellation', value: 'CANCELLATION' },
+                            { label: 'Booking - General', value: 'BOOKING' },
+                            { label: 'Booking - Refund', value: 'REFUND' },
+                            { label: 'Booking - Cancellation', value: 'CANCELLATION' },
                             { label: 'Attraction', value: 'ATTRACTION' },
                             { label: 'Accommodation', value: 'ACCOMMODATION' },
                             { label: 'Restaurant', value: 'RESTAURANT' },
@@ -436,7 +355,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                             style={pickerSelectStyles}
                         />
                     )}
-                    {values.ticket_type === 'VENDOR' && values.ticket_category === 'ACCOMMODATION' && (
+                    {(values.ticket_type === 'VENDOR') && values.ticket_category === 'ACCOMMODATION' && (
                         <RNPickerSelect
                             placeholder={{
                                 label: 'Choose Accommodation...',

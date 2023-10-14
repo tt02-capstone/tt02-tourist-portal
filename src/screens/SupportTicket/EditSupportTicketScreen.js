@@ -69,11 +69,15 @@ const EditSupportTicketScreen = ({ navigation }) => {
 
         let response = await updateSupportTicket(supportTicketId, supportTicketObj);
         if (response.status) {
-            handleViewClick();
             Toast.show({
                 type: 'success',
                 text1: 'Support ticket edited!'
             })
+
+            navigation.reset({
+                index: 3,
+                routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'SupportTicketScreen' }, { name: 'SupportTicketDetailsScreen', params: { supportTicketId: supportTicketId } }],
+            });
 
         } else {
             console.log("Support ticket edit failed!");
@@ -86,49 +90,51 @@ const EditSupportTicketScreen = ({ navigation }) => {
     }
 
     return (
-        <Background>
+        <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.header}>
                 Edit Support Ticket
             </Text>
 
-            <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                <RNPickerSelect
-                    placeholder={{
-                        label: 'Select Category...',
-                        value: null,
-                    }}
-                    onValueChange={(value) => setValues({ ...values, ticket_category: value })}
-                    items={[
-                        { label: 'General Enquiry', value: 'GENERAL_ENQUIRY' },
-                        { label: 'General Booking', value: 'BOOKING' },
-                        { label: 'Refund', value: 'REFUND' },
-                        { label: 'Cancellation', value: 'CANCELLATION' },
-                        { label: 'Attraction', value: 'ATTRACTION' },
-                        { label: 'Accommodation', value: 'ACCOMMODATION' },
-                        { label: 'Restaurant', value: 'RESTAURANT' },
-                        { label: 'Telecom', value: 'TELECOM' },
-                        { label: 'Deal', value: 'DEAL' },
-                        { label: 'Tour', value: 'TOUR' },
-                    ]}
-                    value={values.ticket_category}
-                    style={pickerSelectStyles}
-                />
-                <TextInput
-                    style={styles.description}
-                    label="Write your message here"
-                    multiline={true}
-                    value={values.description}
-                    onChangeText={(description) => setValues({ ...values, description })}
-                    errorText={values.description ? InputValidator.text(values.description) : ''}
-                />
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Button
-                        mode="contained"
-                        text={"Submit"}
-                        onPress={handleEdit}
+            <ScrollView automaticallyAdjustKeyboardInsets={true}>
+                <View style={{ alignItems: 'center', minHeight: '100%' }}>
+                    <RNPickerSelect
+                        placeholder={{
+                            label: 'Select Category...',
+                            value: null,
+                        }}
+                        onValueChange={(value) => setValues({ ...values, ticket_category: value })}
+                        items={[
+                            { label: 'General Enquiry', value: 'GENERAL_ENQUIRY' },
+                            { label: 'General Booking', value: 'BOOKING' },
+                            { label: 'Refund', value: 'REFUND' },
+                            { label: 'Cancellation', value: 'CANCELLATION' },
+                            { label: 'Attraction', value: 'ATTRACTION' },
+                            { label: 'Accommodation', value: 'ACCOMMODATION' },
+                            { label: 'Restaurant', value: 'RESTAURANT' },
+                            { label: 'Telecom', value: 'TELECOM' },
+                            { label: 'Deal', value: 'DEAL' },
+                            { label: 'Tour', value: 'TOUR' },
+                        ]}
+                        value={values.ticket_category}
+                        style={pickerSelectStyles}
                     />
+                    <TextInput
+                        style={styles.description}
+                        label="Write your message here"
+                        multiline={true}
+                        value={values.description}
+                        onChangeText={(description) => setValues({ ...values, description })}
+                        errorText={values.description ? InputValidator.text(values.description) : ''}
+                    />
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Button
+                            mode="contained"
+                            text={"Submit"}
+                            onPress={handleEdit}
+                        />
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </Background>
     )
 }

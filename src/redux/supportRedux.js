@@ -41,6 +41,18 @@ export async function createSupportTicketToVendor(userId, activityId, supportTic
   };
 }
 
+export async function getBookingHistoryList(userId) {
+  try {
+      const response = await supportApi.get(`/getAllBookingsByUser/${userId}`)
+      if (response.data != []) {
+          return response.data;
+      }    
+  } catch (error) {
+      console.error("Retrieve booking history list error!");
+      return {status: false, data: error.message};
+  }
+}
+
 export async function createSupportTicketForBooking(userId, bookingId, supportTicketObj) {
   try {
     const response = await supportApi.post(`/createSupportTicketForBooking/${userId}/${bookingId}`, supportTicketObj);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { Badge } from 'react-native-elements'
 import { Text, Card } from '@rneui/themed';
 import { getAllSupportTicketsByUser, createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking } from '../../redux/supportRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
@@ -180,13 +181,13 @@ const SupportTicketScreen = ({ navigation }) => {
         } else if (ticket_category === 'DEAL') {
             return 'Deal';
         } else if (ticket_category === 'REFUND') {
-            return 'Refund';
+            return 'Booking - Refund';
         } else if (ticket_category === 'CANCELLATION') {
-            return 'Cancellation';
+            return 'Booking - Cancellation';
         } else if (ticket_category === 'GENERAL_ENQUIRY') {
             return 'General Enquiry';
         } else if (ticket_category === 'BOOKING') {
-            return 'Booking';
+            return 'Booking - General';
         }
     }
 
@@ -223,7 +224,7 @@ const SupportTicketScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    <Button text="Create Ticket" style={styles.button} onPress={() => navigation.navigate('CreateSupportTicketScreen')} />
+                    <Button text="+ Create Ticket" style={styles.button} onPress={() => navigation.navigate('CreateSupportTicketScreen')} />
 
                     {data.map((item, index) => (
                         <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
@@ -331,6 +332,8 @@ const SupportTicketScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
 
+                    <Button text="+ Create Ticket" style={styles.button} onPress={() => navigation.navigate('CreateSupportTicketScreen')} />
+
                     <Text style={styles.emptyMessage}>No support tickets made</Text>
                 </View>
             </ScrollView>
@@ -387,7 +390,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
+        width: 120,
         fontSize: 11,
         fontWeight: 'bold'
     },
@@ -404,15 +407,17 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: 'gray',
-        textAlign: 'center'
+        textAlign: 'center',
+        marginTop: 10,
     },
     cardButton: {
         width: '100%',
     },
     button: {
-        width: '50%',
-        marginLeft: '25%',
-        marginRight: '25%',
+        width: '40%',
+        marginLeft: '30%',
+        marginRight: '30%',
+        backgroundColor: '#5f80e3'
     },
     details: {
         fontSize: 12,

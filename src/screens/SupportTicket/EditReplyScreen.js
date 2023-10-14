@@ -86,28 +86,30 @@ const EditReplyScreen = ({ navigation }) => {
     }
 
     return (
-        <Background>
+        <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.header}>
                 Edit Support Ticket
             </Text>
 
-            <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                <TextInput
-                    style={styles.message}
-                    label="Write your message here"
-                    multiline={true}
-                    value={values.message}
-                    onChangeText={(message) => setValues({ ...values, message })}
-                    errorText={values.message ? InputValidator.text(values.message) : ''}
-                />
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Button
-                        mode="contained"
-                        text={"Submit"}
-                        onPress={handleEdit}
+            <ScrollView automaticallyAdjustKeyboardInsets={true}>
+                <View style={{ alignItems: 'center', minHeight: '100%' }}>
+                    <TextInput
+                        style={styles.message}
+                        label="Write your message here"
+                        multiline={true}
+                        value={values.message}
+                        onChangeText={(message) => setValues({ ...values, message })}
+                        errorText={values.message ? InputValidator.text(values.message) : ''}
                     />
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Button
+                            mode="contained"
+                            text={"Submit"}
+                            onPress={handleEdit}
+                        />
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </Background>
     )
 }

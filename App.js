@@ -125,9 +125,9 @@ export const Layout = () => {
                         <Stack.Screen name="TourScreen" component={TourScreen} options={{ title : 'Tours' }} />
                         <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
                         <Stack.Screen name="SupportTicketScreen" component={SupportTicketScreen} options={{ title : 'Support Tickets' }} />
-                        <Stack.Screen name="SupportTicketDetailsScreen" component={SupportTicketDetailsScreen} options={{ title : 'Support Ticket Details' }} />
+                        <Stack.Screen name="SupportTicketDetailsScreen" component={SupportTicketDetailsScreen} options={{ title : 'Ticket Details' }} />
                         <Stack.Screen name="CreateSupportTicketScreen" component={CreateSupportTicketScreen} options={{ title : 'Create Support Ticket' }} />
-                        <Stack.Screen name="EditSupportTicketScreen" component={EditSupportTicketScreen} options={{ title : 'Edit Support Ticket' }} />
+                        <Stack.Screen name="EditSupportTicketScreen" component={EditSupportTicketScreen} options={{ title : 'Edit Ticket' }} />
                         <Stack.Screen name="EditReplyScreen" component={EditReplyScreen} options={{ title : 'Edit Reply' }} />
                     </>
                 ) : (

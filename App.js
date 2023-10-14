@@ -39,6 +39,7 @@ import TourDetailsScreen from './src/screens/Attraction/TourDetailsScreen';
 import DealScreen from "./src/screens/Deal/DealScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
+import ApplyDealScreen from "./src/screens/Deal/ApplyDealScreen";
 import CategoryScreen from './src/screens/Forum/CategoryScreen';
 import CategoryItemScreen from './src/screens/Forum/CategoryItemScreen';
 import PostListScreen from './src/screens/Forum/PostListScreen';
@@ -112,6 +113,7 @@ export const Layout = () => {
                         <Stack.Screen name="TelecomScreen" component={TelecomScreen} options={{ title : 'Telecoms' }} />
                         <Stack.Screen name="TelecomDetailsScreen" component={TelecomDetailsScreen} options={{ title : 'Telecoms' }} />
                         <Stack.Screen name="DealScreen" component={DealScreen} options={{ title : 'Deals' }} />
+                        <Stack.Screen name="ApplyDealScreen" component={ApplyDealScreen} options={{ title : 'Apply Deal Screen' }} />
                         <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />

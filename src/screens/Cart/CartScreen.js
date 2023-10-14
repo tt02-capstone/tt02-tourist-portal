@@ -125,11 +125,18 @@ export const CartScreen = ({ route, navigation }) => {
     const priceList = [];
     const selectedCartItems = [];
     itemChecked.forEach((value, key) => {
+      const items_for_vendor = value.filter(value => value === true).length;
+      let discount_per_item = 0;
+      if (vendorDealMap.has(key)) {
+        let totalDiscount = calcRawPrice(key) * calcuDiscountByVendor(key)
+        discount_per_item = totalDiscount/items_for_vendor
+      }
+      console.log('Discount per item', discount_per_item)
       value.forEach((isChecked, index) => {
         if (isChecked) {
           console.log(vendorCartMap.get(key)[index]);
           booking_ids.push(vendorCartMap.get(key)[index].id);
-          priceList.push(vendorCartMap.get(key)[index].price);
+          priceList.push(vendorCartMap.get(key)[index].price - discount_per_item);
           selectedCartItems.push(vendorCartMap.get(key)[index]);
         }
       });
@@ -213,7 +220,7 @@ export const CartScreen = ({ route, navigation }) => {
     return { subtotal, selections, quantities };
   }
 
-  const calcPrice = (vendorId) => {
+  const calcRawPrice = (vendorId) => {
     const checkedIndices = itemChecked.has(vendorId) ? [...itemChecked.get(vendorId)] : [];
     let totalSum = 0.0;
 
@@ -224,12 +231,16 @@ export const CartScreen = ({ route, navigation }) => {
         }
       });
     }
-
-    if (vendorDealMap.has(vendorId)) {
-      totalSum = totalSum * (100 - vendorDealMap.get(vendorId).data.discount_percent) / 100;
-    }
-    console.log(totalSum)
     return totalSum;
+  }
+
+  const calcuDiscountByVendor = (vendorId) => {
+    let discount = 0
+    if (vendorDealMap.has(vendorId)) {
+      discount = (vendorDealMap.get(vendorId).data.discount_percent) / 100;
+    }
+    // console.log('calcuDiscountByVendor', discount)
+    return discount
   }
 
   const handleCheckBoxToggle = (vendorId, index) => {
@@ -238,7 +249,8 @@ export const CartScreen = ({ route, navigation }) => {
     }
     const updatedChecked = [...itemChecked.get(vendorId)];
 
-    const oldPrice = calcPrice(vendorId)
+    let oldPrice = calcRawPrice(vendorId) * (1- calcuDiscountByVendor(vendorId))
+
     console.log(updatedChecked, oldPrice)
 
     if (updatedChecked[index]) {
@@ -246,9 +258,9 @@ export const CartScreen = ({ route, navigation }) => {
       itemChecked.set(vendorId, updatedChecked)
       setItemChecked(itemChecked)
 
-      const newPrice = calcPrice(vendorId)
+      let newPrice = calcRawPrice(vendorId) * (1- calcuDiscountByVendor(vendorId))
       const finalPrice = totalPrice - parseFloat(oldPrice) + parseFloat(newPrice);
-      console.log('if',finalPrice)
+      // console.log('if',finalPrice)
       setTotalPrice(finalPrice);
 
     } else {
@@ -256,9 +268,9 @@ export const CartScreen = ({ route, navigation }) => {
       itemChecked.set(vendorId, updatedChecked)
       setItemChecked(itemChecked)
 
-      const newPrice = calcPrice(vendorId)
+      let newPrice = calcRawPrice(vendorId) * (1- calcuDiscountByVendor(vendorId))
       const finalPrice = totalPrice - parseFloat(oldPrice) + parseFloat(newPrice);
-      console.log('else', finalPrice)
+      // console.log('else', finalPrice)
       setTotalPrice(finalPrice);
     }
   };
@@ -689,7 +701,7 @@ export const CartScreen = ({ route, navigation }) => {
                       }
                       </ListItem.Title>
                       <ListItem.Subtitle>
-                        Subsection Total: {calcPrice(key)}
+                        Subsection Total: {calcRawPrice(key) * (1- calcuDiscountByVendor(key))}
                       </ListItem.Subtitle>
                     </ListItem.Content>
                     <ListItem.Chevron/>

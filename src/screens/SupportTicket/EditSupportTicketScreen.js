@@ -97,7 +97,7 @@ const EditSupportTicketScreen = ({ navigation }) => {
 
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
                 <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                    <RNPickerSelect
+                    {/* <RNPickerSelect
                         placeholder={{
                             label: 'Select Category...',
                             value: null,
@@ -117,7 +117,7 @@ const EditSupportTicketScreen = ({ navigation }) => {
                         ]}
                         value={values.ticket_category}
                         style={pickerSelectStyles}
-                    />
+                    /> */}
                     <TextInput
                         style={styles.description}
                         label="Write your message here"
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
         height: 200,
         marginTop: -15,
         textAlignVertical: 'top'
-    }
+    },
 });
 
 const pickerSelectStyles = StyleSheet.create({

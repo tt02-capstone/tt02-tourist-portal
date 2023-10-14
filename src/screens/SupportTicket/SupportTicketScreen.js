@@ -24,6 +24,7 @@ const SupportTicketScreen = ({ navigation }) => {
 
     useEffect(() => {
         async function onLoad() {
+            console.log("back here after updating status")
             try {
                 console.log("trying to load")
                 const userData = await getUser();
@@ -44,7 +45,11 @@ const SupportTicketScreen = ({ navigation }) => {
         }
         onLoad();
 
-    }, []);
+        if (isFocused) {
+            onLoad();
+        }
+
+    }, [isFocused]);
 
     // Function to handle filter selection
     const handleFilterSelect = (filterType, filterValue) => {

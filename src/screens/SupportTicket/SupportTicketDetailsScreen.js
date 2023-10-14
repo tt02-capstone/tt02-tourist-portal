@@ -6,7 +6,7 @@ import InputValidator from '../../helpers/InputValidator';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
-import { getSupportTicket, deleteSupportTicket, getAllRepliesBySupportTicket, createReply, updateReply, deleteReply } from '../../redux/supportRedux';
+import { getSupportTicket, updateSupportTicketStatus, deleteSupportTicket, getAllRepliesBySupportTicket, createReply, deleteReply } from '../../redux/supportRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
@@ -61,7 +61,6 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
     const fetchReplyList = async () => {
         try {
             let response = await getAllRepliesBySupportTicket(supportTicketId);
-            console.log("reply list", response.data);
             setReplyList(response.data);
             setLoading(false);
 
@@ -76,7 +75,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         fetchReplyList();
     }, []);
 
-    const handleDeletePress = (ticketId) => {
+    const handleDeleteSupportTicketPress = (ticketId) => {
         Alert.alert(
             "Delete Confirmation",
             "Are you sure you want to delete this ticket?",
@@ -88,14 +87,14 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                 },
                 {
                     text: "OK",
-                    onPress: () => handleDelete(ticketId)
+                    onPress: () => handleDeleteSupportTicket(ticketId)
                 }
             ],
             { cancelable: false }
         );
     };
 
-    async function handleDelete(supportTicketId) {
+    async function handleDeleteSupportTicket(supportTicketId) {
         let response = await deleteSupportTicket(supportTicketId);
         if (response.status) {
             navigation.reset({
@@ -119,9 +118,52 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         }
     }
 
+    const handleDeleteReplyPress = (replyId) => {
+
+        Alert.alert(
+            "Delete Confirmation",
+            "Are you sure you want to delete this reply?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Delete Cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handleDeleteReply(supportTicketId, replyId)
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    async function handleDeleteReply(replySupportTicketId, replyId) {
+
+        let response = await deleteReply(replySupportTicketId, replyId);
+
+        if (response.status) {
+
+            Toast.show({
+                type: 'success',
+                text1: 'Reply deleted!'
+            })
+
+            fetchReplyList();
+
+        } else {
+            console.log("Reply deletion failed!");
+            console.log(response.data);
+            Toast.show({
+                type: 'error',
+                text1: response.data.errorMessage
+            })
+        }
+    }
+
+
     const getNameForSupportTicket = (item) => {
         if (item.booking != null) {
-            console.log("item.booking", item.booking)
             if (item.booking.attraction != null) {
                 return 'Enquiry to ' + item.booking.attraction.name;
             } else if (item.booking.room != null) {
@@ -187,6 +229,27 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
             setNewReply('');
 
             fetchReplyList();
+
+        } else {
+            console.log('error')
+            Toast.show({
+                type: 'error',
+                text1: response.data.errorMessage
+            })
+        }
+    }
+
+    async function handleTicketStatus() {
+
+        let response = await updateSupportTicketStatus(supportTicketId);
+        if (response.status) {
+            console.log("updateSupportTicketStatus response", response.status)
+            Toast.show({
+                type: 'success',
+                text1: 'Support ticket marked as ' + (supportTicket.is_resolved ? 'resolved' : 'unresolved') + '!'
+              });              
+
+            fetchSupportTicket();
 
         } else {
             console.log('error')
@@ -264,7 +327,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                         icon="delete"
                         size={20}
                         style={{ alignSelf: 'flex-start' }}
-                        onPress={() => handleDeletePress(supportTicketId)}
+                        onPress={() => handleDeleteSupportTicketPress(supportTicketId)}
                     />
                 </View>
                 <Text style={styles.description}>{supportTicket.description}</Text>
@@ -289,16 +352,24 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                             <Card>
                                 <Text style={styles.replyUser}>{getReplyUser(item)}</Text>
 
-                                {/* display edit pencil icon for the reply only if it is a reply from current user + there are no replies after it */}
-                                {((item.local_user != null && item.local_user.user_id == user.user_id) 
-                                    || (item.tourist_user != null && item.tourist_user.user_id == user.user_id)) 
-                                        && index === replyList.length - 1 ? (
-                                    <IconButton
-                                        icon="pencil"
-                                        size={20}
-                                        style={{ alignSelf: 'flex-start' }}
-                                        onPress={() => navigation.navigate('EditReplyScreen', { replyId: item.reply_id, replySupportTicketId: supportTicketId })}
-                                    />
+                                {/* display edit and delete icons only if it is a reply from current user + there are no replies after it */}
+                                {((item.local_user != null && item.local_user.user_id == user.user_id)
+                                    || (item.tourist_user != null && item.tourist_user.user_id == user.user_id))
+                                    && index === replyList.length - 1 ? (
+                                    <View>
+                                        <IconButton
+                                            icon="pencil"
+                                            size={20}
+                                            style={{ alignSelf: 'flex-start' }}
+                                            onPress={() => navigation.navigate('EditReplyScreen', { replyId: item.reply_id, replySupportTicketId: supportTicketId })}
+                                        />
+                                        <IconButton
+                                            icon="delete"
+                                            size={20}
+                                            style={{ alignSelf: 'flex-start' }}
+                                            onPress={() => handleDeleteReplyPress(item.reply_id)}
+                                        />
+                                    </View>
                                 ) : (<></>)}
 
                                 <Text style={styles.description}>{item.message}</Text>
@@ -312,21 +383,45 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                             </Card>
                         </View>
                     ))}
-                    <TextInput
-                        style={styles.newReply}
-                        label="Write your reply here"
-                        multiline={true}
-                        value={newReply}
-                        onChangeText={(value) => setNewReply(value)}
-                        errorText={newReply ? InputValidator.text(newReply) : ''}
-                    />
-                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <Button
-                            mode="contained"
-                            text={"Submit"}
-                            onPress={handleReplySubmit}
-                        />
-                    </View>
+
+                    {supportTicket.is_resolved ? (
+                        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20}}>
+                            <Text style={{marginBottom: 10}}>Ticket has been resolved</Text>
+                            <Button
+                                mode="contained"
+                                text={"Mark as Unresolved"}
+                                style={{width: '50%'}}
+                                onPress={handleTicketStatus}
+                            />
+                        </View>
+                    ) : (
+                        <View>
+                            <TextInput
+                                style={styles.newReply}
+                                label="Write your reply here"
+                                multiline={true}
+                                value={newReply}
+                                onChangeText={(value) => setNewReply(value)}
+                                errorText={newReply ? InputValidator.text(newReply) : ''}
+                            />
+                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                <Button
+                                    mode="contained"
+                                    text={"Submit"}
+                                    onPress={handleReplySubmit}
+                                />
+                            </View>
+                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                <Button
+                                    mode="contained"
+                                    text={"Mark as Resolved"}
+                                    style={{width: '50%'}}
+                                    onPress={handleTicketStatus}
+                                />
+                            </View>
+                        </View>
+                    )}
+
                 </>
             ) : (
                 <Card>

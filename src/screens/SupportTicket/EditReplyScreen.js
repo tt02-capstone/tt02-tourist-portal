@@ -71,7 +71,7 @@ const EditReplyScreen = ({ navigation }) => {
             })
 
             navigation.reset({
-                index: 2,
+                index: 3,
                 routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'SupportTicketScreen' }, { name: 'SupportTicketDetailsScreen', params: { supportTicketId: replySupportTicketId } }],
             });
 

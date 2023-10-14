@@ -61,6 +61,16 @@ export async function updateSupportTicket(supportTicketId, supportTicketObj) {
   };
 }
 
+export async function updateSupportTicketStatus(supportTicketId) {
+  try {
+    const response = await supportApi.put(`/updateSupportTicketStatus/${supportTicketId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("supportRedux updateSupportTicketStatus Error : ", error);
+    return {status: false, data: error.message};
+  };
+}
+
 export async function deleteSupportTicket(supportTicketId) {
   try {
     const response = await supportApi.delete(`/deleteSupportTicket/${supportTicketId}`);
@@ -113,7 +123,7 @@ export async function updateReply(replyId, replyObj) {
 
 export async function deleteReply(supportTicketId, replyId) {
   try {
-    const response = await supportApi.delete(`/deleteReply/${supportTicketId}/${replyId}}`);
+    const response = await supportApi.delete(`/deleteReply/${supportTicketId}/${replyId}`);
     return handleApiErrors(response);
   } catch (error) {
     console.error("supportRedux deleteReply Error : ", error);

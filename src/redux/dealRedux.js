@@ -14,7 +14,7 @@ export async function getPublishedDealList() {
 export async function getdDealListbyVendor(vendorId) {
     try {
         const response = await dealsApi.get(`/getVendorDealList/${vendorId}`);
-        console.log(response)
+        // console.log(response)
         return handleApiErrors(response);
     } catch (error) {
         console.error("dealRedux getAssociatedDealList Error : ", error);

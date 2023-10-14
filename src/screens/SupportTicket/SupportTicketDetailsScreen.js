@@ -24,6 +24,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         description: '',
         ticket_category: '',
     });
+    const [newReply, setNewReply] = useState('');
 
     const route = useRoute();
     const { supportTicketId } = route.params;
@@ -163,6 +164,37 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         }
     }
 
+    async function handleReplySubmit() {
+
+        let replyObj;
+
+        console.log("user.user_id", user.user_id)
+
+        replyObj = {
+            message: newReply,   
+        }
+
+        let response = await createReply(user.user_id, supportTicketId, replyObj);
+        if (response.status) {
+            console.log("createReply response", response.status)
+            Toast.show({
+                type: 'success',
+                text1: 'Reply created!'
+            })
+
+            setNewReply('');
+
+            fetchReplyList();
+
+        } else {
+            console.log('error')
+            Toast.show({
+                type: 'error',
+                text1: response.data.errorMessage
+            })
+        }
+    }
+
     const formatType = (type) => {
         return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
     }
@@ -214,7 +246,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
     }
 
     return (
-        <View>
+        <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <Card>
                 <View style={styles.headerContainer}>
                     <Card.Title style={styles.header}>
@@ -249,24 +281,38 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
             </Card>
 
             {replyList.length > 0 ? (
-                replyList.map((item, index) => (
-                    <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
-                        <Card>
-                            <Text style={styles.replyUser}>
-                                {getReplyUser(item)}
-                            </Text>
-
-                            <Text style={styles.description}>{item.message}</Text>
-                            <Text style={styles.details}>
-                                <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(item.created_time)}
-                            </Text>
-                            <Text style={styles.details}>
-                                <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(item.updated_time)}
-                            </Text>
-
-                        </Card>
-                    </TouchableOpacity>
-                ))
+                // Render the list of replies if replyList has items
+                <>
+                    {replyList.map((item, index) => (
+                        <View key={index}>
+                            <Card>
+                                <Text style={styles.replyUser}>{getReplyUser(item)}</Text>
+                                <Text style={styles.description}>{item.message}</Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(item.created_time)}
+                                </Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(item.updated_time)}
+                                </Text>
+                            </Card>
+                        </View>
+                    ))}
+                    <TextInput
+                        style={styles.newReply}
+                        label="Write your reply here"
+                        multiline={true}
+                        value={newReply}
+                        onChangeText={(value) => setNewReply(value)}
+                        errorText={newReply ? InputValidator.text(newReply) : ''}
+                    />
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Button
+                            mode="contained"
+                            text={"Submit"}
+                            onPress={handleReplySubmit}
+                        />
+                    </View>
+                </>
             ) : (
                 <Card>
                     <Text style={styles.header}>
@@ -274,7 +320,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                     </Text>
                 </Card>
             )}
-        </View>
+        </ScrollView>
     );
 }
 
@@ -338,6 +384,10 @@ const styles = StyleSheet.create({
     boldText: {
         fontWeight: 'bold',
     },
+    newReply: {
+        width: '80%',
+        marginLeft: 30,
+    }
 });
 
 const pickerSelectStyles = StyleSheet.create({

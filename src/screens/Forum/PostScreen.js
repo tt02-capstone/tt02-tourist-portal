@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, Image } from 'react-native';
+import { Button } from 'react-native-paper';
 import { Text, Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
 import { useRoute } from '@react-navigation/native';
-import Button from '../../components/Button';
-import { downvote, getAllPostByCategoryItemId, getPost, upvote } from '../../redux/postRedux';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { downvote, getPost, upvote } from '../../redux/postRedux';
+import { useIsFocused } from "@react-navigation/native";
 
 const PostScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [post, setPost] = useState();
+    const isFocused = useIsFocused();
 
     const route = useRoute();
-    const { postId } = route.params; // category id
+    const { postId, catId } = route.params;
     
     const [fetchPost, setFetchPost] = useState(true);
 
@@ -31,12 +34,12 @@ const PostScreen = ({ navigation }) => {
             }
         };
 
-        if (postId && fetchPost) {
+        if ((postId && fetchPost) || isFocused) {
             fetchUser();
             fetchData(postId);
             setFetchPost(false);
         }
-    }, [postId, fetchPost]);
+    }, [postId, fetchPost, isFocused]);
 
     const onUpvotePressed = async () => {
         if (!user.upvoted_user_id_list || !user.upvoted_user_id_list.includes(user.user_id)) {
@@ -72,26 +75,46 @@ const PostScreen = ({ navigation }) => {
         }
     }
 
+    const updatePost = (post, postImageList) => {
+        if (postImageList.length > 0) {
+            navigation.navigate('UpdatePostScreen', { post: post, catId: catId, imageURL: postImageList[0] });
+        } else {
+            navigation.navigate('UpdatePostScreen', { post: post, catId, catId, imageURL: null });
+        }
+    }
+
+
     return post ? (
         <Background>
-            <View>
-                <Text>{post.title}</Text>
-                {post.post_image_list.length === 1 && <Text>{post.post_image_list[0]}</Text>}
-                <Text>{post.content}</Text>
-                <Text>{post.upvoted_user_id_list.length - post.downvoted_user_id_list.length}</Text>
-            </View>
-            <Button
-                mode="contained"
-                text={"Upvote"}
-                onPress={onUpvotePressed}
-            />
-            <Button
-                mode="contained"
-                text={"Downvote"}
-                onPress={onDownvotePressed}
-            />
-            <ScrollView>
-                {/* Comments */}
+            <ScrollView style={{height: 750}}>
+                <Card>
+                    <Card.Title style={styles.header}>
+                        {post.title}
+                    </Card.Title>
+
+                    {post.post_image_list.length > 0 && <Image
+                        style={styles.image}
+                        source={{uri: post.post_image_list[0]}}
+                    />}
+                    <Text style={{textAlign: 'justify', marginBottom: 15}} >{post.content}</Text>
+                    <Card.Divider />
+
+                    <View style={{flexDirection: 'row'}}>
+                        <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
+                        <Text style={{marginLeft: 10, marginRight: 15}} >{post.upvoted_user_id_list.length - post.downvoted_user_id_list.length}</Text>
+                        <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
+                        {post.local_user && <Text style={{marginLeft: 20}}>Posted by {post.local_user.name}</Text>}
+                        {post.tourist_user && <Text style={{marginLeft: 20}}>Posted by {post.tourist_user.name}</Text>}
+                        {post.internal_staff_user && <Text style={{marginLeft: 20}}>Posted by {post.internal_staff_user.name}</Text>}
+                        {post.vendor_staff_user && <Text style={{marginLeft: 20}}>Posted by {post.vendor_staff_user.name}</Text>}
+
+                        {post.local_user && post.local_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Update</Button>}
+                    </View>
+
+                </Card>
+                <ScrollView style={{marginTop: 20, marginLeft: 20, marginRight: 20}}>
+                    <Text style={{ textAlign: 'center', fontSize: 20}} >No Comments Written</Text>
+                </ScrollView>
             </ScrollView>
         </Background>
     ) : (
@@ -102,6 +125,25 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
+    },
+    button: {
+        marginBottom: -8,
+        marginTop: -8,
+        marginLeft: 20,
+        backgroundColor: '#044537',
+        width: 100,
+        height: 40,
+    },
+    image: {
+        marginTop: 0,
+        marginBottom: 10,
+        minWidth: 200,
+        minHeight: 200,
+    },
+    icon: {
+        marginLeft: -5,
+        marginTop: -2,
+        marginBottom: -10,
     },
     header: {
         color: '#044537',

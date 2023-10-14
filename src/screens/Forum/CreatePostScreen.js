@@ -1,16 +1,13 @@
-import React, {useContext, useEffect, useState} from 'react'
-import {Pressable, StyleSheet, Switch, TextComponent, View, ScrollView} from 'react-native'
-import {List, Paragraph, RadioButton, Text, ToggleButton} from 'react-native-paper'
+import React, {useEffect, useState} from 'react'
+import {StyleSheet, View, ScrollView} from 'react-native'
 import { useRoute } from '@react-navigation/native';
 import Background from '../../components/Background'
-import Header from '../../components/Header'
 import Button from '../../components/Button'
 import TextInput from '../../components/TextInput'
 import {theme} from '../../core/theme'
 import { getUser } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import InputValidator from "../../helpers/InputValidator";
-import CustomButton from "../../components/CustomButton";
 import { createPost } from '../../redux/postRedux';
 import * as ImagePicker from 'expo-image-picker';
 import { S3 } from 'aws-sdk';
@@ -61,6 +58,15 @@ export const CreatePostScreen = ({navigation}) => {
             })
             console.log("xxx:" + result);
         }
+    };
+
+    const onImageClear = () => {
+        setFinalURL(null);
+        setFile(null);
+        Toast.show({
+            type: 'success',
+            text1: 'Image removed!'
+        })
     };
 
     const onCreatePressed = async () => {
@@ -135,12 +141,7 @@ export const CreatePostScreen = ({navigation}) => {
                     text1: 'Post created!'
                 })
 
-                setTimeout(() => {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: 'PostListScreen'}],
-                    })
-                }, 700);
+                navigation.navigate('PostListScreen', { id: categoryItemId }); // item.category_item_id
             } else {
                 console.log('error')
                 Toast.show({
@@ -175,7 +176,6 @@ export const CreatePostScreen = ({navigation}) => {
                     text1: 'Post created!'
                 })
 
-                console.log("create", categoryItemId);
                 navigation.navigate('PostListScreen', { id: categoryItemId }); // item.category_item_id
 
             } else {
@@ -214,6 +214,7 @@ export const CreatePostScreen = ({navigation}) => {
                         errorText={formData.content ? InputValidator.text(formData.content) : ''}
                     />
                     <Button text="Add Image" style={styles.button} onPress={onImagePicker} />
+                    <Button text="Clear Image" style={styles.button} onPress={onImageClear} />
                     <Button
                         mode="contained"
                         text={"Create"}

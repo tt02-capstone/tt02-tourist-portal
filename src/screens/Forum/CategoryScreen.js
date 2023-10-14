@@ -43,7 +43,6 @@ const CategoryScreen = ({ navigation }) => {
                             <Card>
                                 <Card.Title style={styles.header}>
                                     <Text>{item.name}</Text>
-                                    <List.Icon style={styles.icon} icon="arrow-right" />
                                 </Card.Title>
                             </Card>
                         </TouchableOpacity>
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
         textAlign: 'left'
     },
     icon: {
-
+        
     }
 });
 

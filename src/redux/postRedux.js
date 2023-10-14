@@ -41,6 +41,16 @@ export async function updatePost(post) {
     }
 }
 
+export async function deletePost(postId) {
+    try {
+        const response = await postApi.delete(`/deletePost/${postId}`,);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("postRedux deletePost Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
 export async function upvote(userId, postId) {
     try {
         const response = await postApi.put(`/upvote/${userId}/${postId}`);

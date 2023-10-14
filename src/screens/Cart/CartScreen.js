@@ -159,7 +159,7 @@ export const CartScreen = ({ route, navigation }) => {
   }, [navigation, user, itemChecked]);
 
   const handleDeleteCartItem = async (user, itemChecked) => {
-    console.log("hereee", user, itemChecked)
+    console.log("hereee delete", user.user_type, itemChecked)
     const tourist_email = user.email;
     const booking_ids = [];
     itemChecked.forEach((value, key) => {
@@ -170,7 +170,7 @@ export const CartScreen = ({ route, navigation }) => {
       });
     });
 
-    const response = await cartApi.put(`/deleteCartItems/${user_type}/${tourist_email}`, booking_ids)
+    const response = await cartApi.put(`/deleteCartItems/${user.user_type}/${tourist_email}`, booking_ids)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
       console.log('error', response.data)
 
@@ -233,10 +233,11 @@ export const CartScreen = ({ route, navigation }) => {
   }
 
   const handleCheckBoxToggle = (vendorId, index) => {
-    const updatedChecked = [...itemChecked.get(vendorId)];
     if (vendorId === undefined || index === undefined){
       return
     }
+    const updatedChecked = [...itemChecked.get(vendorId)];
+
     const oldPrice = calcPrice(vendorId)
     console.log(updatedChecked, oldPrice)
 

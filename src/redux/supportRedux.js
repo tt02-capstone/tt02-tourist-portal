@@ -81,6 +81,16 @@ export async function getAllRepliesBySupportTicket(supportTicketId) {
   }
 }
 
+export async function getReplyById(replyId) {
+  try {
+    const response = await supportApi.get(`/getReplyById/${replyId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("supportRedux getReplyById Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
 export async function createReply(userId, supportTicketId, replyObj) {
   try {
     const response = await supportApi.post(`/createReply/${userId}/${supportTicketId}`, replyObj);

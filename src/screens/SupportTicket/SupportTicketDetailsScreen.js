@@ -25,6 +25,8 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         ticket_category: '',
     });
     const [newReply, setNewReply] = useState('');
+    const [editedReply, setEditedReply] = useState('');
+    const [replyIdToEdit, setReplyIdToEdit] = useState('');
 
     const route = useRoute();
     const { supportTicketId } = route.params;
@@ -171,7 +173,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         console.log("user.user_id", user.user_id)
 
         replyObj = {
-            message: newReply,   
+            message: newReply,
         }
 
         let response = await createReply(user.user_id, supportTicketId, replyObj);
@@ -281,12 +283,24 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
             </Card>
 
             {replyList.length > 0 ? (
-                // Render the list of replies if replyList has items
                 <>
                     {replyList.map((item, index) => (
                         <View key={index}>
                             <Card>
                                 <Text style={styles.replyUser}>{getReplyUser(item)}</Text>
+
+                                {/* display edit pencil icon for the reply only if it is a reply from current user + there are no replies after it */}
+                                {((item.local_user != null && item.local_user.user_id == user.user_id) 
+                                    || (item.tourist_user != null && item.tourist_user.user_id == user.user_id)) 
+                                        && index === replyList.length - 1 ? (
+                                    <IconButton
+                                        icon="pencil"
+                                        size={20}
+                                        style={{ alignSelf: 'flex-start' }}
+                                        onPress={() => navigation.navigate('EditReplyScreen', { replyId: item.reply_id, replySupportTicketId: supportTicketId })}
+                                    />
+                                ) : (<></>)}
+
                                 <Text style={styles.description}>{item.message}</Text>
                                 <Text style={styles.details}>
                                     <Text style={styles.boldText}>Created:</Text> {formatLocalDateTime(item.created_time)}
@@ -294,6 +308,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                                 <Text style={styles.details}>
                                     <Text style={styles.boldText}>Updated:</Text> {formatLocalDateTime(item.updated_time)}
                                 </Text>
+
                             </Card>
                         </View>
                     ))}

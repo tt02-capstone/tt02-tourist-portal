@@ -43,6 +43,7 @@ import SupportTicketScreen from './src/screens/SupportTicket/SupportTicketScreen
 import SupportTicketDetailsScreen from './src/screens/SupportTicket/SupportTicketDetailsScreen';
 import CreateSupportTicketScreen from './src/screens/SupportTicket/CreateSupportTicketScreen';
 import EditSupportTicketScreen from './src/screens/SupportTicket/EditSupportTicketScreen';
+import EditReplyScreen from './src/screens/SupportTicket/EditReplyScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -127,6 +128,7 @@ export const Layout = () => {
                         <Stack.Screen name="SupportTicketDetailsScreen" component={SupportTicketDetailsScreen} options={{ title : 'Support Ticket Details' }} />
                         <Stack.Screen name="CreateSupportTicketScreen" component={CreateSupportTicketScreen} options={{ title : 'Create Support Ticket' }} />
                         <Stack.Screen name="EditSupportTicketScreen" component={EditSupportTicketScreen} options={{ title : 'Edit Support Ticket' }} />
+                        <Stack.Screen name="EditReplyScreen" component={EditReplyScreen} options={{ title : 'Edit Reply' }} />
                     </>
                 ) : (
                     <>

@@ -122,7 +122,7 @@ const BookingHistoryScreen = ({ navigation }) => {
         } else if (item.room != null) {
             return item.activity_name;
         } else if (item.tour != null) {
-            return item.tour.name;
+            return item.booking_item_list[0].activity_selection;
         } else if (item.telecom.name != null) {
             return item.telecom.name;
         } else {
@@ -152,7 +152,7 @@ const BookingHistoryScreen = ({ navigation }) => {
         } else if (item.room != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
+            return 'https://tt02.s3.ap-southeast-1.amazonaws.com/static/mobile/tour.png';
         } else if (item.telecom.name != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
         } else {

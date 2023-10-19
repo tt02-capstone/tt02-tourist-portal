@@ -92,7 +92,7 @@ const PostScreen = ({ navigation }) => {
                         {post.title}
                     </Card.Title>
 
-                    {post.post_image_list.length > 0 && <Image
+                    {post.post_image_list && post.post_image_list.length > 0 && <Image
                         style={styles.image}
                         source={{uri: post.post_image_list[0]}}
                     />}
@@ -101,7 +101,7 @@ const PostScreen = ({ navigation }) => {
 
                     <View style={{flexDirection: 'row'}}>
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
-                        <Text style={{marginLeft: 10, marginRight: 15}} >{post.upvoted_user_id_list.length - post.downvoted_user_id_list.length}</Text>
+                        <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list.length}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
                         {post.local_user && <Text style={{marginLeft: 20}}>Posted by {post.local_user.name}</Text>}
                         {post.tourist_user && <Text style={{marginLeft: 20}}>Posted by {post.tourist_user.name}</Text>}

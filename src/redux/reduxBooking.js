@@ -50,3 +50,17 @@ export async function getPaymentHistoryList(userId) {
         return {status: false, data: error.message};
     }
 }
+
+export async function getTourImage(tourId) {
+    try {
+        const response = await bookingApi.get(`/getTourImageByTourId/${tourId}`);
+        if (response.data.httpStatusCode == 400 || response.data.httpStatusCode == 404 || response.data.httpStatusCode == 422) {
+            return {status:true, info:response.data.errorMessage};
+        } else {
+            return {status:false, info:response.data};
+        }    
+    } catch (error) {
+        console.error("Retrieve tour image error!");
+        return {status: false, data: error.message};
+    }
+}

@@ -73,6 +73,8 @@ function MyDrawer() {
       <Drawer.Navigator screenOptions={{ headerRight: () => <Cart /> }}>
         <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Profile" component={ViewProfileScreen} />
+        <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
+        <Drawer.Screen name="Forum" component={CategoryScreen} />
         <Drawer.Screen name="Attractions" component={AttractionScreen} />
         <Drawer.Screen name="Accommodations" component={AccommodationScreen} />
         <Drawer.Screen name="Telecoms" component={TelecomScreen} />
@@ -80,8 +82,6 @@ function MyDrawer() {
         <Drawer.Screen name="Deals" component={DealScreen} />
         <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
-        <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
-        <Drawer.Screen name="Forum" component={CategoryScreen} />
       </Drawer.Navigator>
     );
 }

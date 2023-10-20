@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
-import { View, ScrollView, StyleSheet, Image } from 'react-native';
+import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Text, Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
@@ -88,8 +88,7 @@ const PostScreen = ({ navigation }) => {
         <Background>
             <ScrollView style={{height: 750}}>
                 <Card>
-
-                    {post.local_user && 
+                {post.local_user && 
                         <View style={{flexDirection: 'row'}}>
                             <Image
                                 style={styles.profileImage}
@@ -129,7 +128,6 @@ const PostScreen = ({ navigation }) => {
                         </View>
                     }
                     <Card.Divider />
-                    
                     <Card.Title style={styles.header}>
                         {post.title}
                     </Card.Title>
@@ -145,9 +143,14 @@ const PostScreen = ({ navigation }) => {
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
                         <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list.length}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
+                        
+                        {post.local_user && post.local_user.user_id === user.user_id && <TouchableOpacity style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                            <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
+                        </TouchableOpacity>}
 
-                        {post.local_user && post.local_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>}
-                        {post.tourist_user && post.tourist_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>}
+                        {post.tourist_user && post.tourist_user.user_id === user.user_id && <TouchableOpacity style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                            <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
+                        </TouchableOpacity>}
                     </View>
 
                 </Card>
@@ -168,10 +171,8 @@ const styles = StyleSheet.create({
     button: {
         marginBottom: -8,
         marginTop: -8,
-        marginLeft: 160,
-        backgroundColor: '#044537',
-        width: 100,
-        height: 40,
+        marginLeft: 240,
+        width: 80,
     },
     profileImage: {
         marginTop: 0,
@@ -185,6 +186,13 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         minWidth: 200,
         minHeight: 200,
+    },
+    profileImage: {
+        marginTop: 0,
+        marginBottom: 10,
+        borderRadius: 300 / 2,
+        width: 30,
+        height: 30,
     },
     icon: {
         marginLeft: -5,

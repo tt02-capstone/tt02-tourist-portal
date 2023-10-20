@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
-import { View, ScrollView, StyleSheet, Image } from 'react-native';
+import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Text, Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
@@ -88,6 +88,47 @@ const PostScreen = ({ navigation }) => {
         <Background>
             <ScrollView style={{height: 750}}>
                 <Card>
+                {post.local_user && 
+                        <View style={{flexDirection: 'row'}}>
+                            <Image
+                                style={styles.profileImage}
+                                source={{uri: post.local_user.profile_pic ? post.local_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                            />
+                            <Text style={{marginLeft: 10, marginTop: 3, fontSize: 20}}>{post.local_user.name}</Text>
+                        </View>
+                    }
+
+                    {post.tourist_user && 
+                        <View style={{flexDirection: 'row'}}>
+                            <Image
+                                style={styles.profileImage}
+                                source={{uri: post.tourist_user.profile_pic ? post.tourist_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                            />
+                            <Text style={{marginLeft: 10, marginTop: 3, fontSize: 20}}>{post.tourist_user.name}</Text>
+                        </View>
+                    }
+
+                    {post.internal_staff_user && 
+                        <View style={{flexDirection: 'row'}}>
+                            <Image
+                                style={styles.profileImage}
+                                source={{uri: post.internal_staff_user.profile_pic ? post.internal_staff_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                            />
+                            <Text style={{marginLeft: 10, marginTop: 3, fontSize: 20}}>{post.internal_staff_user.name}</Text>
+                        </View>
+                    }
+
+                    {post.vendor_staff_user && 
+                        <View style={{flexDirection: 'row'}}>
+                            <Image
+                                style={styles.profileImage}
+                                source={{uri: post.vendor_staff_user.profile_pic ? post.vendor_staff_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                            />
+                            <Text style={{marginLeft: 10, marginTop: 3, fontSize: 20}}>{post.vendor_staff_user.name}</Text>
+                        </View>
+                    }
+                    <Card.Divider />
+
                     <Card.Title style={styles.header}>
                         {post.title}
                     </Card.Title>
@@ -103,19 +144,14 @@ const PostScreen = ({ navigation }) => {
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
                         <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list.length}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
-                        {post.local_user && <Text style={{marginLeft: 20}}>Posted by {post.local_user.name}</Text>}
-                        {post.tourist_user && <Text style={{marginLeft: 20}}>Posted by {post.tourist_user.name}</Text>}
-                        {post.internal_staff_user && <Text style={{marginLeft: 20}}>Posted by {post.internal_staff_user.name}</Text>}
-                        {post.vendor_staff_user && <Text style={{marginLeft: 20}}>Posted by {post.vendor_staff_user.name}</Text>}
-
-                        {post.local_user && post.local_user.user_id === user.user_id && <Button style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                        
+                        {post.local_user && post.local_user.user_id === user.user_id && <TouchableOpacity style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
                             <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
-                        </Button>}
+                        </TouchableOpacity>}
 
-                        {post.tourist_user && post.tourist_user.user_id === user.user_id && <Button style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                        {post.tourist_user && post.tourist_user.user_id === user.user_id && <TouchableOpacity style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
                             <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
-                        </Button>}
-
+                        </TouchableOpacity>}
                     </View>
 
                 </Card>
@@ -135,16 +171,22 @@ const styles = StyleSheet.create({
     },
     button: {
         marginBottom: -8,
-        marginTop: -12,
-        marginLeft: 45,
-        width: 85,
-        height: 40,
+        marginTop: -8,
+        marginLeft: 240,
+        width: 80,
     },
     image: {
         marginTop: 0,
         marginBottom: 10,
         minWidth: 200,
         minHeight: 200,
+    },
+    profileImage: {
+        marginTop: 0,
+        marginBottom: 10,
+        borderRadius: 300 / 2,
+        width: 30,
+        height: 30,
     },
     icon: {
         marginLeft: -5,

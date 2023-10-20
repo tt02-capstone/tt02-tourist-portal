@@ -128,7 +128,6 @@ const PostScreen = ({ navigation }) => {
                         </View>
                     }
                     <Card.Divider />
-
                     <Card.Title style={styles.header}>
                         {post.title}
                     </Card.Title>
@@ -174,6 +173,13 @@ const styles = StyleSheet.create({
         marginTop: -8,
         marginLeft: 240,
         width: 80,
+    },
+    profileImage: {
+        marginTop: 0,
+        marginBottom: 10,
+        borderRadius: 300 / 2,
+        width: 30,
+        height: 30,
     },
     image: {
         marginTop: 0,

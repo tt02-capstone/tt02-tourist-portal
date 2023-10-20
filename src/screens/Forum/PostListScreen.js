@@ -5,9 +5,10 @@ import TextInput from '../../components/TextInput'
 import { Text, Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
 import { useRoute } from '@react-navigation/native';
-import Button from '../../components/Button';
+import { Button } from 'react-native-paper';
 import { getAllPostByCategoryItemId } from '../../redux/postRedux';
 import { useIsFocused } from "@react-navigation/native";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const PostListScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -68,18 +69,24 @@ const PostListScreen = ({ navigation }) => {
             <ScrollView>
                 <View style={styles.container}>
 
-                    <Button mode="contained" text={"Create"} onPress={createPost} />
-
                     <View style={{flexDirection: 'row'}}>
-                        <TextInput
-                            style={{width: 250, marginLeft: 10}}
-                            label="Search title..."
-                            returnKeyType="next"
-                            value={formData.searchVal}
-                            onChangeText={(searchVal) => setFormData({...formData, searchVal})}
-                        />
+                        <View style={{flexDirection: 'row'}}>
+                            <TextInput
+                                style={{width: 285, marginLeft: 10}}
+                                label="Search title..."
+                                returnKeyType="next"
+                                value={formData.searchVal}
+                                onChangeText={(searchVal) => setFormData({...formData, searchVal})}
+                            />
 
-                        <Button mode="contained" text={"Search"} style={{marginLeft: -120, marginTop: 15, paddingTop: 5, width: 100}} onPress={onSearchPressed} />
+                            <TouchableOpacity style={{marginLeft: -80, marginTop: 30}} onPress={onSearchPressed} >
+                                <Ionicons name="search-outline" style={{ color: 'black'}} size={20}/> 
+                            </TouchableOpacity>
+                        </View>
+                    
+                        <Button mode="contained" style={{height:50, marginLeft: -23, marginTop:18, backgroundColor: '#044537'}} onPress={createPost}>
+                            <Ionicons name="add-outline" style={{ color: 'white', paddingTop:7, backgroundColor: '#044537'}} size={24}/> 
+                        </Button>
                     </View>
 
                     {data.map((item, index) => (

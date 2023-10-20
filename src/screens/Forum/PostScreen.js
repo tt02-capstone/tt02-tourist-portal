@@ -108,7 +108,14 @@ const PostScreen = ({ navigation }) => {
                         {post.internal_staff_user && <Text style={{marginLeft: 20}}>Posted by {post.internal_staff_user.name}</Text>}
                         {post.vendor_staff_user && <Text style={{marginLeft: 20}}>Posted by {post.vendor_staff_user.name}</Text>}
 
-                        {post.local_user && post.local_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Update</Button>}
+                        {post.local_user && post.local_user.user_id === user.user_id && <Button style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                            <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
+                        </Button>}
+
+                        {post.tourist_user && post.tourist_user.user_id === user.user_id && <Button style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                            <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
+                        </Button>}
+
                     </View>
 
                 </Card>
@@ -128,10 +135,9 @@ const styles = StyleSheet.create({
     },
     button: {
         marginBottom: -8,
-        marginTop: -8,
-        marginLeft: 20,
-        backgroundColor: '#044537',
-        width: 100,
+        marginTop: -12,
+        marginLeft: 45,
+        width: 85,
         height: 40,
     },
     image: {

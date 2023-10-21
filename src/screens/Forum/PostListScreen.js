@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import TextInput from '../../components/TextInput'
-import { Text, Card } from '@rneui/themed';
+import { Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
 import { useRoute } from '@react-navigation/native';
 import Button from '../../components/Button';

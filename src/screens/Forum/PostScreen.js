@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Background from '../../components/CardBackground';
-import { View, StyleSheet, Image, Text, TouchableOpacity, Alert, Modal, Pressable } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
@@ -635,8 +635,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 22,
-      },
-      modalView: {
+    },
+    modalView: {
         margin: 20,
         backgroundColor: 'white',
         borderRadius: 20,
@@ -644,8 +644,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
-          width: 0,
-          height: 2,
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
@@ -653,30 +653,30 @@ const styles = StyleSheet.create({
         height: 250,
         width: 300,
         marginTop: -100
-      },
-      modalButton: {
+    },
+    modalButton: {
         borderRadius: 20,
         padding: 10,
         elevation: 2,
         marginLeft: 10,
         marginRight: 10,
         backgroundColor: '#044537',
-      },
-      buttonOpen: {
+    },
+    buttonOpen: {
         backgroundColor: '#044537',
-      },
-      buttonClose: {
+    },
+    buttonClose: {
         backgroundColor: '#044537',
-      },
-      textStyle: {
+    },
+    textStyle: {
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
-      },
-      modalText: {
+    },
+    modalText: {
         marginBottom: 15,
         textAlign: 'center',
-      },
+    },
 });
 
 export default PostScreen

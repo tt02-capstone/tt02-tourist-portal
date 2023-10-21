@@ -39,13 +39,11 @@ import TourDetailsScreen from './src/screens/Attraction/TourDetailsScreen';
 import DealScreen from "./src/screens/Deal/DealScreen";
 import RestaurantScreen from './src/screens/Restaurant/RestaurantScreen';
 import RestaurantDetailsScreen from './src/screens/Restaurant/RestaurantDetailsScreen';
-<<<<<<< HEAD
 import SupportTicketScreen from './src/screens/SupportTicket/SupportTicketScreen';
 import SupportTicketDetailsScreen from './src/screens/SupportTicket/SupportTicketDetailsScreen';
 import CreateSupportTicketScreen from './src/screens/SupportTicket/CreateSupportTicketScreen';
 import EditSupportTicketScreen from './src/screens/SupportTicket/EditSupportTicketScreen';
 import EditReplyScreen from './src/screens/SupportTicket/EditReplyScreen';
-=======
 import ApplyDealScreen from "./src/screens/Deal/ApplyDealScreen";
 import CategoryScreen from './src/screens/Forum/CategoryScreen';
 import CategoryItemScreen from './src/screens/Forum/CategoryItemScreen';
@@ -53,7 +51,6 @@ import PostListScreen from './src/screens/Forum/PostListScreen';
 import { CreatePostScreen } from './src/screens/Forum/CreatePostScreen';
 import { UpdatePostScreen } from './src/screens/Forum/UpdatePostScreen';
 import PostScreen from './src/screens/Forum/PostScreen';
->>>>>>> d7b3d29882e8fca3201e465918688c1e43d36c7e
 
 LogBox.ignoreAllLogs(true)
 
@@ -90,11 +87,7 @@ function MyDrawer() {
         <Drawer.Screen name="Deals" component={DealScreen} />
         <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
-<<<<<<< HEAD
-        <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
         <Drawer.Screen name="Support Tickets" component={SupportTicketScreen} />
-=======
->>>>>>> d7b3d29882e8fca3201e465918688c1e43d36c7e
       </Drawer.Navigator>
     );
 }
@@ -140,20 +133,17 @@ export const Layout = () => {
                         <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ title : 'Book Now' }} />
                         <Stack.Screen name="TourScreen" component={TourScreen} options={{ title : 'Tours' }} />
                         <Stack.Screen name="TourDetailsScreen" component={TourDetailsScreen} options={{ title : 'Tour Details' }} />
-<<<<<<< HEAD
                         <Stack.Screen name="SupportTicketScreen" component={SupportTicketScreen} options={{ title : 'Support Tickets' }} />
                         <Stack.Screen name="SupportTicketDetailsScreen" component={SupportTicketDetailsScreen} options={{ title : 'Ticket Details' }} />
                         <Stack.Screen name="CreateSupportTicketScreen" component={CreateSupportTicketScreen} options={{ title : 'Create Support Ticket' }} />
                         <Stack.Screen name="EditSupportTicketScreen" component={EditSupportTicketScreen} options={{ title : 'Edit Ticket' }} />
                         <Stack.Screen name="EditReplyScreen" component={EditReplyScreen} options={{ title : 'Edit Reply' }} />
-=======
                         <Stack.Screen name="CategoryScreen" component={CategoryScreen} options={{ title : 'Forum' }} />
                         <Stack.Screen name="CategoryItemScreen" component={CategoryItemScreen} options={{ title : 'Forum' }} />
                         <Stack.Screen name="PostListScreen" component={PostListScreen} options={{ title : 'Posts' }} />
                         <Stack.Screen name="CreatePostScreen" component={CreatePostScreen} options={{ title : 'Create Post' }} />
                         <Stack.Screen name="UpdatePostScreen" component={UpdatePostScreen} options={{ title : 'Update Post' }} />
                         <Stack.Screen name="PostScreen" component={PostScreen} options={{ title : 'Post' }} />
->>>>>>> d7b3d29882e8fca3201e465918688c1e43d36c7e
                     </>
                 ) : (
                     <>

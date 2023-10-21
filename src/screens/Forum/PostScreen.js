@@ -113,8 +113,7 @@ const PostScreen = ({ navigation }) => {
         const fetchData = async (id) => {
             let response = await getAllPostComment(id);
             if (response.status) {
-                console.log(response.data);
-                console.log("comments refreshed!");
+                setComments([]);
                 setComments(response.data);
             } else {
                 console.log("Comments not fetch!");
@@ -276,6 +275,10 @@ const PostScreen = ({ navigation }) => {
                 setShowUpdateCommentModal(false);
                 setOriginalComment(null);
                 setFormUpdateComment('');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Comment Editted!'
+                })
                 console.log('success');
     
             } else {
@@ -288,18 +291,40 @@ const PostScreen = ({ navigation }) => {
         }
     }
 
-    const onDeleteCommentPressed = async (commentId) => {
-        const response = await deleteComment(commentId);
+    const onDeleteCommentPressed = async (comment) => {
+        const response = await deleteComment(comment.comment_id);
         if (response.status) {
             setFetchComment(true);
+            Toast.show({
+                type: 'success',
+                text1: 'Comment Deleted!'
+            })
             console.log('success');
 
-        } else {
-            console.log('error')
-            Toast.show({
-                type: 'error',
-                text1: response.data.errorMessage
-            })
+        } else { // cannot be deleted, so we delete content via update
+            let tempComment = {
+                comment_id: comment.comment_id,
+                upvoted_user_id_list: comment.upvoted_user_id_list,
+                downvoted_user_id_list: comment.downvoted_user_id_list,
+                published_time: comment.published_time,
+                content: '[deleted]', // changed
+                updated_time: new Date(), // changed
+            };
+
+            const response = await updateComment(tempComment);
+            if (response.status) {
+                setFetchComment(true);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Comment cannot be deleted, but is modified!'
+                })
+            } else { // update failed
+                console.log('error')
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage
+                })
+            }
         }
     }
 
@@ -322,7 +347,7 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
                             </TouchableOpacity>
-                            <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>
+                            {post.local_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>}
                         </View>
                     }
 
@@ -335,7 +360,7 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.tourist_user.name}</Text>
                             </TouchableOpacity>
-                            <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>
+                            {post.tourist_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>}
                         </View>
                     }
 
@@ -377,7 +402,7 @@ const PostScreen = ({ navigation }) => {
 
                     <View style={{flexDirection: 'row'}}>
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
-                        <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list.length}</Text>
+                        <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list ? post.upvoted_user_id_list.length : 0}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
 
                         <Button style={{marginLeft: 20, height: 40, width: 130, marginBottom: -8, marginTop: -8, marginRight: 0, backgroundColor: '#044537'}} mode="contained" onPress={onNewParentCommentPressed}>Comment</Button>
@@ -394,12 +419,14 @@ const PostScreen = ({ navigation }) => {
                             <TextInput
                                 label="Add New Comment"
                                 returnKeyType="next"
-                                style={{width: 270, height: 30}}
+                                style={{width: 270, height: 30, marginLeft: 15}}
                                 value={formData.parentComment}
                                 onChangeText={(parentComment) => setFormData({...formData, parentComment })}
                                 autoCapitalize="none"
                             />
-                            <Button style={{marginLeft: -80, marginTop: 15}} onPress={() => onAddNewParentComment()}>Submit</Button>
+                            <Button style={{marginLeft: -70, marginTop: 15}} onPress={() => onAddNewParentComment()}>
+                                <Text style={{color: '#044537', fontWeight: 'bold'}}>Submit</Text>
+                            </Button>
                         </View>
                     }
 
@@ -409,6 +436,7 @@ const PostScreen = ({ navigation }) => {
                     {comments && comments.length > 0 && 
                         <CheckboxTree
                             ref={ref}
+                            clear
                             data={comments}
                             textField="content"
                             childField="child_comment_list"
@@ -433,14 +461,14 @@ const PostScreen = ({ navigation }) => {
                                             <Text style={{marginLeft: 5, marginRight: 10, marginTop: 2}}>{item.child_comment_list ? item.child_comment_list.length : 0} Replies</Text>
                                             <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => addChildComment(item)}>Reply</Text>
 
-                                            {item.local_user && post.local_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
-                                            {item.tourist_user && post.tourist_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
 
-                                            {item.local_user && post.local_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item.comment_id)}>Delete</Text>}
-                                            {item.tourist_user && post.tourist_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item.comment_id)}>Delete</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
 
-                                            {item.local_user && post.local_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.tourist_user && post.tourist_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.local_user && item.local_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -660,6 +688,7 @@ const styles = StyleSheet.create({
         elevation: 2,
         marginLeft: 10,
         marginRight: 10,
+        width: 100,
         backgroundColor: '#044537',
     },
     buttonOpen: {

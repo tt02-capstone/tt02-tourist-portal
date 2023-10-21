@@ -53,7 +53,7 @@ const CategoryScreen = ({ navigation }) => {
 
             let tempCategory = {
                 name: formData,
-                isPublished: false
+                is_published: false
             };
 
             const response = await createCategory(tempCategory);

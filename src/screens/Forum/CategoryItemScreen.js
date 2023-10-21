@@ -57,7 +57,7 @@ const CategoryItemScreen = ({ navigation }) => {
 
             let tempCategoryItem = {
                 name: formData,
-                isPublished: false
+                is_published: false
             };
 
             const response = await createCategoryItem(id, tempCategoryItem);

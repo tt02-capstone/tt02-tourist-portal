@@ -51,6 +51,9 @@ import PostListScreen from './src/screens/Forum/PostListScreen';
 import { CreatePostScreen } from './src/screens/Forum/CreatePostScreen';
 import { UpdatePostScreen } from './src/screens/Forum/UpdatePostScreen';
 import PostScreen from './src/screens/Forum/PostScreen';
+import { ReportPostScreen } from './src/screens/Forum/ReportPostScreen';
+import { ForumProfileScreen } from './src/screens/Forum/ForumProfileScreen';
+import { ReportCommentScreen } from './src/screens/Forum/ReportCommentScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -144,6 +147,9 @@ export const Layout = () => {
                         <Stack.Screen name="CreatePostScreen" component={CreatePostScreen} options={{ title : 'Create Post' }} />
                         <Stack.Screen name="UpdatePostScreen" component={UpdatePostScreen} options={{ title : 'Update Post' }} />
                         <Stack.Screen name="PostScreen" component={PostScreen} options={{ title : 'Post' }} />
+                        <Stack.Screen name="ForumProfileScreen" component={ForumProfileScreen} options={{ title : 'User Forum P Post' }} />
+                        <Stack.Screen name="ReportPostScreen" component={ReportPostScreen} options={{ title : 'Report Post' }} />
+                        <Stack.Screen name="ReportCommentScreen" component={ReportCommentScreen} options={{ title : 'Report Comment' }} />
                     </>
                 ) : (
                     <>

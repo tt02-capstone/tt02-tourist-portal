@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Text, Card } from '@rneui/themed';
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
+import TextInput from "../../components/TextInput";
+import Toast from "react-native-toast-message";
+import { Card } from '@rneui/themed';
+import { Button } from 'react-native-paper';
 import { getUser } from '../../helpers/LocalStorage';
 import { useRoute } from '@react-navigation/native';
-import { getAllByCategoryId } from '../../redux/categoryItemRedux';
+import { createCategoryItem, getAllByCategoryId } from '../../redux/categoryItemRedux';
 
 const CategoryItemScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -36,10 +39,53 @@ const CategoryItemScreen = ({ navigation }) => {
         navigation.navigate('PostListScreen', { id: id }); // item.category_item_id
     }
 
+    // show request modal
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState('');
+
+    const onOpenModal = () => {
+        setShowModal(true);
+    }
+
+    const onRequestPressed = async () => {
+        if (formData.length <= 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Request cannot be empty!'
+            })
+        } else {
+
+            let tempCategoryItem = {
+                name: formData,
+                is_published: false
+            };
+
+            const response = await createCategoryItem(id, tempCategoryItem);
+            if (response.status) {
+                setShowModal(false);
+                setFormData('')
+                Toast.show({
+                    type: 'success',
+                    text1: 'Category Item Requested Made!'
+                })
+    
+            } else {
+                console.log('error')
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage
+                })
+            }
+        }
+    }
+
     return (
         <Background>
             <ScrollView>
-                <View style={styles.container}>
+                <View>
+                    <View style={styles.container}>
+                        <Button style={styles.button} mode="contained" onPress={onOpenModal}>Request For New Category Items</Button>
+                    </View>
 
                     {data.map((item, index) => (
                         <TouchableOpacity key={index} onPress={() => viewPostList(item.category_item_id)}>
@@ -58,104 +104,118 @@ const CategoryItemScreen = ({ navigation }) => {
                     ))
                     }
                 </View>
+
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={showModal}
+                        onRequestClose={() => {
+                            setShowModal(false);
+                        }}
+                    >
+
+                    <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>Enter New Category Item</Text>
+
+                                <TextInput
+                                    returnKeyType="next"
+                                    style={{width: 260, marginLeft: -10, marginTop: -15, marginBottom: 10}}
+                                    value={formData}
+                                    onChangeText={(formData) => setFormData(formData)}
+                                    autoCapitalize="none"
+                                />
+                                
+                                <View style={{flexDirection: 'row'}}>
+                                    {/* submit modal button */}
+                                    <Pressable
+                                        style={[styles.modalButton, styles.buttonClose]}
+                                        onPress={() => onRequestPressed()}>
+                                        <Text style={styles.textStyle}>Request</Text>
+                                    </Pressable>
+
+                                    {/* close modal button */}
+                                    <Pressable
+                                        style={[styles.modalButton, styles.buttonClose]}
+                                        onPress={() => {
+                                            setShowModal(false);
+                                            setFormData('')
+                                        }}>
+                                        <Text style={styles.textStyle}>Cancel</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
             </ScrollView>
         </Background>
     )
 }
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
-    fonts: {
-        marginBottom: 8,
-    },
-    user: {
-        flexDirection: 'row', marginBottom: 6,
-    },
-    image: {
-        width: 30, height: 30, marginRight: 10,
-    },
-    name: {
-        fontSize: 16, marginTop: 5,
-    },
-    description: {
-        marginBottom: 20, fontSize: 13, marginTop: 10
-    },
-    tag: {
-        color: 'black',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        margin: 5,
-        width: 100,
-        fontSize: 11,
-        fontWeight: 'bold'
+        alignItems: 'center',
     },
     header: {
         color: '#044537',
         fontSize: 15
     },
-    filterContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    filterBox: {
-        flex: 1,
-        margin: 8,
-    },
-    filterButton: {
-        backgroundColor: '#eb8810',
-        padding: 10,
-        borderRadius: 8,
-        marginTop: 10,
-        marginLeft: 10,
-        alignItems: 'center',
-        alignSelf: 'center', 
-        width: '30%',
-    },
-    filterText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    card: {
-        marginBottom: 16,
-    },
-    cardImage: {
-        padding: 0,
-    },
-    cardTitle: {
-        fontSize: 16,
-        marginBottom: 10,
-    },
-    cardDescription: {
-        fontSize: 13,
-        marginBottom: 10,
-    },
-    tagContainer: {
-        flexDirection: 'row',
-        marginBottom: 5,
-    },
-    modalBackground: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
+    button: {
+        marginTop: 20,
+        marginBottom: 0,
+        marginLeft: 0,
+        backgroundColor: '#044537',
+        width: 300,
+        height: 40,
     },
 
-    modalContainer: {
-        backgroundColor: 'white',
-        width: '80%',
-        borderRadius: 10,
-        padding: 16,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
+    centeredView: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 10,
-        width: '100%',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 250,
+        width: 300,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 10,
+        marginRight: 10,
+        backgroundColor: '#044537',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    buttonClose: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
     },
 });
 

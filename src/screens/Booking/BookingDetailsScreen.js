@@ -4,7 +4,7 @@ import Button from '../../components/Button'
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
-import { getBookingByBookingId, cancelBookingByBookingId } from '../../redux/reduxBooking';
+import { getBookingByBookingId, cancelBookingByBookingId, getTourImage } from '../../redux/reduxBooking';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
@@ -13,6 +13,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [booking, setBooking] = useState('');
     const [loading, setLoading] = useState(false);
+    const [tourImage, setTourImage] = useState('');
 
     const route = useRoute();
     const { bookingId } = route.params;
@@ -41,6 +42,16 @@ const BookingDetailsScreen = ({ navigation }) => {
         try {
             let booking = await getBookingByBookingId(bookingId);
             setBooking(booking);
+
+            if (booking.tour) {
+                try {
+                    let tourImg = await getTourImage(booking.tour.tour_id);
+                    setTourImage(tourImg.info);
+                } catch(error) {
+                    setTourImage('https://tt02.s3.ap-southeast-1.amazonaws.com/static/mobile/tour2.png');
+                }                
+            }
+
             setLoading(false);
             fetchUser();
         } catch (error) {
@@ -60,7 +71,7 @@ const BookingDetailsScreen = ({ navigation }) => {
         } else if (item.room != null) {
             return item.activity_name;
         } else if (item.tour != null) {
-            return item.tour.name;
+            return item.booking_item_list[0].activity_selection;
         } else if (item.telecom != null) {
             return item.telecom.name;
         } else {
@@ -74,7 +85,7 @@ const BookingDetailsScreen = ({ navigation }) => {
         } else if (item.room != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg';
+            return tourImage;
         } else if (item.telecom.name != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
         } else {
@@ -92,6 +103,23 @@ const BookingDetailsScreen = ({ navigation }) => {
         let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
         let year = inputDate.getFullYear();
         return `${day}/${month}/${year}`;
+    }
+
+    const formatDateTime = (dateTime) => {
+        const date = new Date(dateTime);
+
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+        };
+
+        const formattedDateTime = date.toLocaleString('en-US', options);
+
+        return formattedDateTime;
     }
 
     const getCancellationDate = (date) => {
@@ -147,8 +175,10 @@ const BookingDetailsScreen = ({ navigation }) => {
                     />
                     <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount}</Text>
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
-                    <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>
-                    <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>
+                    {!booking.tour && <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>}
+                    {booking.tour && <Text style={styles.description}>Start Date: {formatDateTime(booking.start_datetime)}</Text>}
+                    {!booking.tour && <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>}
+                    {booking.tour && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
                     <View style={{ display: 'inline-block' }}>
                         <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{booking.status}</Text>
                     </View>

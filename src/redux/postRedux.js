@@ -32,6 +32,7 @@ export async function getPost(postId) {
 }
 
 export async function updatePost(post) {
+    console.log("redux ", post);
     try {
         const response = await postApi.put(`/updatePost`, post);
         return handleApiErrors(response);

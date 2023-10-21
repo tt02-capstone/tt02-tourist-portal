@@ -83,9 +83,9 @@ const CategoryItemScreen = ({ navigation }) => {
         <Background>
             <ScrollView>
                 <View>
-                    <View style={styles.container}>
+                    {/* <View style={styles.container}>
                         <Button style={styles.button} mode="contained" onPress={onOpenModal}>Request For New Category Items</Button>
-                    </View>
+                    </View> */}
 
                     {data.map((item, index) => (
                         <TouchableOpacity key={index} onPress={() => viewPostList(item.category_item_id)}>

@@ -19,6 +19,7 @@ export const UpdatePostScreen = ({navigation}) => {
     const { post, catId, imageURL } = route.params;
     const [originalImage, setOriginalImage] = useState(imageURL);
     const [image, setImage] = useState(imageURL);
+    const [lastReset, setLastReset] = useState(false);
 
     const [formData, setFormData] = useState({ // form input fields
         title: post.title,
@@ -54,6 +55,7 @@ export const UpdatePostScreen = ({navigation}) => {
     
         if (!result.canceled) {
             setFile(result);
+            setLastReset(false);
             Toast.show({
                 type: 'success',
                 text1: 'Image uploaded!'
@@ -66,6 +68,7 @@ export const UpdatePostScreen = ({navigation}) => {
         setFinalURL(null);
         setFile(null);
         setImage(null);
+        setLastReset(false);
         Toast.show({
             type: 'success',
             text1: 'Image removed!'
@@ -74,6 +77,7 @@ export const UpdatePostScreen = ({navigation}) => {
 
     const onImageReset = () => {
         setImage(originalImage);
+        setLastReset(true);
         Toast.show({
             type: 'success',
             text1: 'Image reset!'
@@ -101,7 +105,7 @@ export const UpdatePostScreen = ({navigation}) => {
         }
 
         var imageURL = undefined;
-        if (file) { // user uploads a new file
+        if (file && !lastReset) { // user uploads a new file
             const s3 = new S3({
                 accessKeyId: ACCESS_KEY,
                 secretAccessKey: SECRET_ACCESS_KEY,
@@ -133,7 +137,7 @@ export const UpdatePostScreen = ({navigation}) => {
             uploadImage(file.assets[0].uri);
 
         } else if (!image) { // no image
-
+            console.log("update without image");
             let obj = {
                 ...post,
                 title: formData.title,
@@ -160,8 +164,8 @@ export const UpdatePostScreen = ({navigation}) => {
                     text1: response.data.errorMessage
                 })
             }
-        } else if (image) { // previous image
-            
+        } else if (image && lastReset) { // previous image
+            console.log("update with reset image");
             let obj = {
                 ...post,
                 title: formData.title,
@@ -225,6 +229,7 @@ export const UpdatePostScreen = ({navigation}) => {
         }
 
         if (finalURL) {
+            console.log("update with new image");
             addPostFunction();
         }
 

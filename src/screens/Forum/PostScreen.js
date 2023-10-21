@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Background from '../../components/CardBackground';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
@@ -346,7 +346,11 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
                             </TouchableOpacity>
-                            {post.local_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>}
+                            {post.local_user.user_id === user.user_id && 
+                                <TouchableOpacity style={{marginLeft: 160}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
+                                </TouchableOpacity>
+                            }
                         </View>
                     }
 
@@ -359,7 +363,12 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.tourist_user.name}</Text>
                             </TouchableOpacity>
-                            {post.tourist_user.user_id === user.user_id && <Button style={styles.button} mode="contained" onPress={() => updatePost(post, post.post_image_list)}>Edit</Button>}
+
+                            {post.tourist_user.user_id === user.user_id && 
+                                <TouchableOpacity style={{marginLeft: 160}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
+                                </TouchableOpacity>
+                            }
                         </View>
                     }
 
@@ -402,20 +411,15 @@ const PostScreen = ({ navigation }) => {
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
                         <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list ? post.upvoted_user_id_list.length : 0}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
-                        
-                        {post.local_user && post.local_user.user_id === user.user_id && <TouchableOpacity style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
-                            <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
-                        </TouchableOpacity>}
 
-                        {post.tourist_user && post.tourist_user.user_id === user.user_id && <TouchableOpacity style={styles.button} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
-                            <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
-                        </TouchableOpacity>}
+                        {/* <Button style={{marginLeft: 20, height: 40, width: 130, marginBottom: -8, marginTop: -8, marginRight: 0, backgroundColor: '#044537'}} mode="contained" onPress={onNewParentCommentPressed}>Comment</Button>
+                        <Button style={{marginLeft: 10, height: 40, width: 110, marginBottom: -8, marginTop: -8, backgroundColor: '#044537'}} mode="contained" onPress={onReportPostPressed}>Report</Button> */}
                     </View>
 
                 </Card>
 
                 {/* Comments from here onwards */}
-                <Text style={{marginLeft: 20, marginTop: 10, fontSize: 15, fontWeight: 'bold'}}>Comments</Text>
+                {comments && comments.length > 0 && <Text style={{marginLeft: 20, marginTop: 10, fontSize: 15, fontWeight: 'bold'}}>Comments</Text>}
                 <View style={{height: 370, width: 360, marginLeft: 5}}>
                     {showParentCommentTextInput &&
                         <View style={{flexDirection: 'row'}}>
@@ -433,7 +437,7 @@ const PostScreen = ({ navigation }) => {
                         </View>
                     }
 
-                    {(!comments || (comments && comments.length === 0)) && <Text style={{ textAlign: 'center', fontSize: 20}} >No Comments Written</Text>}
+                    {(!comments || (comments && comments.length === 0)) && <Text style={{ textAlign: 'center', fontSize: 20, marginTop: 20}} >No Comments Written</Text>}
 
                     <View style={styles.container}>
                     {comments && comments.length > 0 && 
@@ -590,8 +594,10 @@ const styles = StyleSheet.create({
     button: {
         marginBottom: -8,
         marginTop: -8,
-        marginLeft: 240,
+        marginLeft: 130,
+        backgroundColor: '#044537',
         width: 80,
+        height: 40,
     },
     profileImage: {
         marginTop: 0,

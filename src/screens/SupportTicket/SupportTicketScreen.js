@@ -41,7 +41,7 @@ const SupportTicketScreen = ({ navigation }) => {
                 setLoading(false);
             } catch (error) {
                 alert('An error occurred! Failed to retrieve supportTicket list!');
-                setLoading(false); 
+                setLoading(false);
             }
         }
         onLoad();
@@ -230,7 +230,7 @@ const SupportTicketScreen = ({ navigation }) => {
                         <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
                             <Card>
                                 <Card.Title style={styles.header}>
-                                    {getNameForSupportTicket(item)}
+                                    #{item.support_ticket_id} - {getNameForSupportTicket(item)}
                                 </Card.Title>
 
                                 <Text style={styles.description}>{item.description}</Text>
@@ -251,7 +251,7 @@ const SupportTicketScreen = ({ navigation }) => {
                             </Card>
                         </TouchableOpacity>
                     ))
-                    }   
+                    }
 
                     <Modal
                         animationType="slide"

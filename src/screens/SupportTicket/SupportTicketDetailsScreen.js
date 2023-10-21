@@ -274,7 +274,7 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
             console.log("updateSupportTicketStatus response", response.status)
             Toast.show({
                 type: 'success',
-                text1: 'Support ticket marked as ' + (supportTicket.is_resolved ? 'resolved' : 'unresolved') + '!'
+                text1: 'Support ticket is now ' + (supportTicket.is_resolved ? 'open' : 'closed') + '!'
             });
 
             fetchSupportTicket();
@@ -367,6 +367,9 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                     </View>
                 </View>
                 <Text style={styles.description}>{supportTicket.description}</Text>
+                <Text style={styles.details}>
+                    <Text style={styles.boldText}>Ticket ID:</Text> #{supportTicket.support_ticket_id}
+                </Text>
                 <Text style={styles.details}>
                     <Text style={styles.boldText}>Category:</Text> {formatCategory(supportTicket.ticket_category)}
                 </Text>

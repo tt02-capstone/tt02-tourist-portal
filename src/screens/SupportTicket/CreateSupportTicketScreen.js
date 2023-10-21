@@ -148,7 +148,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                 ticket_category: values.ticket_category,
                 ticket_type: values.ticket_type,
             }
-
+            
             let response = await createSupportTicketForBooking(user.user_id, values.booking_id, supportTicketObj);
             if (response.status) {
                 console.log("createSupportTicket response", response.status)
@@ -338,7 +338,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                                 value: null,
                             }}
                             onValueChange={(value) => setValues({ ...values, booking_id: value })}
-                            items={bookingsList.map(booking => ({ label: booking.activity_name, value: booking.booking_id }))}
+                            items={bookingsList.map(booking => ({ label: `${booking.activity_name} (ID: #${booking.booking_id})`, value: booking.booking_id }))}
                             value={values.booking_id}
                             style={pickerSelectStyles}
                         />

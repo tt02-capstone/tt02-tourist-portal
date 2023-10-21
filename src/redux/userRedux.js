@@ -21,3 +21,13 @@ export async function uploadNewProfilePic(user) {
     return {status: false, data: error.message};
   };
 }
+
+export async function viewUserProfile(userId) {
+  try {
+    const response = await userApi.get(`/viewUserProfile/${userId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("userRedux viewUserProfile Error : ", error);
+    return {status: false, data: error.message};
+  };
+}

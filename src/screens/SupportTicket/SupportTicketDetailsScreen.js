@@ -42,16 +42,20 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         console.log("supportTicketId", supportTicketId);
         try {
             let response = await getSupportTicket(supportTicketId);
-            console.log("response", response);
-            setSupportTicket(response.data);
-            setLoading(false);
-            fetchUser();
-
-            setValues({
-                ticket_type: response.data.ticket_type,
-                description: response.data.description,
-                ticket_category: response.data.ticket_category,
-            })
+            if (response.status) {
+                console.log("response", response.data);
+                setSupportTicket(response.data);
+                setLoading(false);
+                fetchUser();
+    
+                setValues({
+                    ticket_type: response.data.ticket_type,
+                    description: response.data.description,
+                    ticket_category: response.data.ticket_category,
+                })
+            } else {
+                console.log("Support ticket not fetched!");
+            }
         } catch (error) {
             alert('An error occur! Failed to retrieve supportTicket details!');
             setLoading(false);

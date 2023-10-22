@@ -6,6 +6,7 @@ import Header from '../../components/Header';
 import TextInput from '../../components/TextInput';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { Text, Card, CheckBox, Tab, TabView } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
 import { createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking, getBookingHistoryList } from '../../redux/supportRedux';
@@ -143,7 +144,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
 
         let supportTicketObj;
 
-        console.log("values", values)
+        // console.log("values", values)
 
         if (values.booking_id != null) {
 
@@ -156,7 +157,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
             let response = await createSupportTicketForBooking(user.user_id, values.booking_id, supportTicketObj);
             if (response.status) {
                 setIsSubmit(false);
-                console.log("createSupportTicket response", response.status)
+                // console.log("createSupportTicket response", response.status)
                 Toast.show({
                     type: 'success',
                     text1: 'Support ticket created!'
@@ -185,11 +186,11 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                     ticket_category: values.ticket_category,
                 }
 
-                console.log("user.user_id", user.user_id)
+                // console.log("user.user_id", user.user_id)
 
                 let response = await createSupportTicketToAdmin(user.user_id, supportTicketObj);
                 if (response.status) {
-                    console.log("createSupportTicket response", response.status)
+                    // console.log("createSupportTicket response", response.status)
                     Toast.show({
                         type: 'success',
                         text1: 'Support ticket created!'
@@ -235,7 +236,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         ticket_type: values.ticket_type,
                     }
 
-                    console.log("supportTicketObj", supportTicketObj)
+                    // console.log("supportTicketObj", supportTicketObj)
 
                     activityId = values.accommodation_id;
 
@@ -271,9 +272,9 @@ const CreateSupportTicketScreen = ({ navigation }) => {
 
                 } // and tour if adding
 
-                console.log("user.user_id", user.user_id)
-                console.log("activityId", activityId)
-                console.log("supportTicketObj", supportTicketObj)
+                // console.log("user.user_id", user.user_id)
+                // console.log("activityId", activityId)
+                // console.log("supportTicketObj", supportTicketObj)
 
                 let response = await createSupportTicketToVendor(user.user_id, activityId, supportTicketObj);
                 if (response.status) {

@@ -192,6 +192,32 @@ export const UpdatePostScreen = ({navigation}) => {
                     text1: response.data.errorMessage
                 })
             }
+        } else { // image untouched
+            let obj = {
+                ...post,
+                title: formData.title,
+                content: formData.content,
+                updated_time: new Date(),
+            };
+
+            const response = await updatePost(obj);
+            if (response.status) {
+                console.log('success');
+                setFile(null);
+                setFinalURL(null);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Post updated!'
+                })
+
+                navigation.navigate('PostScreen', { postId: post.post_id, catId: catId });
+            } else {
+                console.log('error')
+                Toast.show({
+                    type: 'error',
+                    text1: response.data.errorMessage
+                })
+            }
         }
     }
 

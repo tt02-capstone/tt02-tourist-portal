@@ -1,6 +1,7 @@
 import React , { useState, useEffect } from 'react';
 import { View, FlatList, ScrollView, TouchableOpacity} from 'react-native';
 import { ListItem, CheckBox, Card, Avatar, Image, Text, Icon } from '@rneui/themed';
+import { ActivityIndicator } from 'react-native-paper';
 import Button from '../../components/Button';
 import { clearStorage, getUser, getUserType, getEmail } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
@@ -17,6 +18,7 @@ export const CheckoutScreen = ({navigation}) => {
   const [deletion, setDeletion] = useState(false);
   const [cards, setCards] = useState([]); 
   const [itemChecked, setItemChecked] = useState([false]); 
+  const [isCheckout, setIsCheckout] = useState(false);
   const { booking_ids, priceList, selectedCartItems, totalPrice} = route.params;
   const isFocused = useIsFocused();
 
@@ -60,14 +62,17 @@ export const CheckoutScreen = ({navigation}) => {
         booking_ids: booking_ids,
         priceList: priceList,
       }
+      setIsCheckout(true);
       
       const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, tempObj);
       if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
         console.log('error',response.data)
+        setIsCheckout(false);
 
   } else {
       console.log('success', response.data)
       if (response.data) {
+        setIsCheckout(false);
         navigation.reset({
           index: 2,
           routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'BookingHistoryScreen' }],
@@ -88,9 +93,10 @@ export const CheckoutScreen = ({navigation}) => {
       }
 
     } catch {
-        Toast.show({
-          type: 'error',
-          text1: 'Error creating a booking'
+      setIsCheckout(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating a booking'
       });
     }
   }
@@ -254,6 +260,9 @@ export const CheckoutScreen = ({navigation}) => {
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <Text>Total Price: ${totalPrice.toFixed(2)}</Text>
       </View>
+        <View style={{marginRight: -90}}>
+          <ActivityIndicator size='small' animating={isCheckout} color='green'/>
+        </View>
         <Button text="Book Now" style={{width: 100}} onPress={() => {checkout()}} />
       </View>
     </View>

@@ -41,6 +41,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
     const [telecomsList, setTelecomsList] = useState([]);
     const [dealsList, setDealsList] = useState([]);
     const [bookingsList, setBookingsList] = useState([]);
+    const [isSubmit, setIsSubmit] = useState(false);
 
     const route = useRoute();
 
@@ -138,6 +139,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
     async function onSubmit() {
 
         setLoading(true);
+        setIsSubmit(true);
 
         let supportTicketObj;
 
@@ -153,6 +155,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
             
             let response = await createSupportTicketForBooking(user.user_id, values.booking_id, supportTicketObj);
             if (response.status) {
+                setIsSubmit(false);
                 console.log("createSupportTicket response", response.status)
                 Toast.show({
                     type: 'success',
@@ -168,6 +171,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
 
             } else {
                 console.log('error')
+                setIsSubmit(false);
                 Toast.show({
                     type: 'error',
                     text1: response.data.errorMessage
@@ -194,6 +198,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         text1: 'Support ticket created!'
                     })
 
+                    setIsSubmit(false);
                     setLoading(false);
 
                     navigation.reset({
@@ -208,6 +213,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         text1: response.data.errorMessage
                     })
                     setLoading(false);
+                    setIsSubmit(false);
                 }
 
             } else if (values.ticket_type == "VENDOR") { 
@@ -280,6 +286,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         text1: 'Support ticket created!'
                     })
 
+                    setIsSubmit(false);
                     setLoading(false);
 
                     navigation.reset({
@@ -295,6 +302,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         text1: response.data.errorMessage
                     })
                     setLoading(false);
+                    setIsSubmit(false);
                 }
             }
         }
@@ -432,12 +440,14 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         onChangeText={(value) => setValues({ ...values, description: value })}
                         errorText={values.description ? InputValidator.text(values.description) : ''}
                     />
-                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
                         <Button
+                            style={{width: 150, marginLeft: 60}}
                             mode="contained"
                             text={"Submit"}
                             onPress={onSubmit}
                         />
+                        <View style={{marginLeft: 30}}><ActivityIndicator size='large' animating={isSubmit} color='green'/></View>
                     </View>
                 </View>
             </ScrollView>

@@ -590,7 +590,6 @@ const styles = StyleSheet.create({
         width: '24%',
         marginLeft: 20,
         marginRight: 170,
-        backgroundColor: 'slategray',
         borderRadius: 5,
         marginBottom: 3,
     },

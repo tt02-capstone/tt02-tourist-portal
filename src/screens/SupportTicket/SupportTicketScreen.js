@@ -239,7 +239,7 @@ const SupportTicketScreen = ({ navigation }) => {
                         <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
                             <Card>
                                 <Card.Title style={styles.header}>
-                                    #{item.support_ticket_id} - {getNameForSupportTicket(item)}
+                                    {getNameForSupportTicket(item)}
                                 </Card.Title>
 
                                 <Text style={styles.description}>{item.description}</Text>

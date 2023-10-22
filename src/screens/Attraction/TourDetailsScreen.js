@@ -110,7 +110,7 @@ const TourDetailsScreen = ({ navigation }) => {
                     {item.tour_list.map((tourListItem, index) => (
                         <RadioButton.Item
                             key={index}
-                            label={`${formatTime(tourListItem.start_time)} - ${formatTime(tourListItem.end_time)}`}
+                            label={`${formatTime(tourListItem.start_time)} - ${formatTime(tourListItem.end_time)}\nRemaining Slots: ${tourListItem.remaining_slot}`}
                             value={tourListItem.tour_id}
                             status={selectedTour === tourListItem ? 'checked' : 'unchecked'}
                             onPress={() => handleRadioButtonChange(tourListItem)}

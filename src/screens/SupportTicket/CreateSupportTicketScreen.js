@@ -289,6 +289,15 @@ const CreateSupportTicketScreen = ({ navigation }) => {
         }
     }
 
+    function getReferenceNumber(booking) {
+        let date = new Date(booking.start_datetime);
+        let day = date.getDate();
+        let month = date.getMonth();
+        let year = date.getFullYear();
+        let temp = '' + booking.booking_id + day + month + year;
+        return temp;
+    }
+
     return (
         <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.header}>
@@ -338,7 +347,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                                 value: null,
                             }}
                             onValueChange={(value) => setValues({ ...values, booking_id: value })}
-                            items={bookingsList.map(booking => ({ label: `${booking.activity_name} (ID: #${booking.booking_id})`, value: booking.booking_id }))}
+                            items={bookingsList.map(booking => ({ label: `#${getReferenceNumber(booking)} (${booking.activity_name})`, value: booking.booking_id }))}
                             value={values.booking_id}
                             style={pickerSelectStyles}
                         />

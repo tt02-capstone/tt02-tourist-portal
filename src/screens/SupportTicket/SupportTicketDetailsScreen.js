@@ -338,6 +338,15 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
         return `${day}/${month}/${year}, ${hours}:${minutes} ${period}`;
     }
 
+    function getReferenceNumber(booking) {
+        let date = new Date(booking.start_datetime);
+        let day = date.getDate();
+        let month = date.getMonth();
+        let year = date.getFullYear();
+        let temp = '' + booking.booking_id + day + month + year;
+        return temp;
+    }
+
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <Card>
@@ -368,11 +377,11 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                 </View>
                 <Text style={styles.description}>{supportTicket.description}</Text>
                 <Text style={styles.details}>
-                    <Text style={styles.boldText}>Ticket ID:</Text> #{supportTicket.support_ticket_id}
-                </Text>
-                <Text style={styles.details}>
                     <Text style={styles.boldText}>Category:</Text> {formatCategory(supportTicket.ticket_category)}
                 </Text>
+                {supportTicket.booking && <Text style={styles.details}>
+                    <Text style={styles.boldText}>Booking Reference Number:</Text> #{getReferenceNumber(supportTicket.booking)}
+                </Text>}
                 <Text style={styles.details}>
                     <Text style={styles.boldText}>Status:</Text> {formatStatus(supportTicket.is_resolved)}
                 </Text>
@@ -581,7 +590,6 @@ const styles = StyleSheet.create({
         width: '24%',
         marginLeft: 20,
         marginRight: 170,
-        backgroundColor: 'slategray',
         borderRadius: 5,
         marginBottom: 3,
     },

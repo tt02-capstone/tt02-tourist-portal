@@ -209,6 +209,15 @@ const SupportTicketScreen = ({ navigation }) => {
         navigation.navigate('SupportTicketDetailsScreen', { supportTicketId: support_ticket_id });
     }
 
+    function getReferenceNumber(booking) {
+        let date = new Date(booking.start_datetime);
+        let day = date.getDate();
+        let month = date.getMonth();
+        let year = date.getFullYear();
+        let temp = '' + booking.booking_id + day + month + year;
+        return temp;
+    }
+
     return data.length !== 0 ? (
         <Background>
             <ScrollView>
@@ -230,13 +239,17 @@ const SupportTicketScreen = ({ navigation }) => {
                         <TouchableOpacity key={index} onPress={() => viewSupportTicket(item.support_ticket_id)}>
                             <Card>
                                 <Card.Title style={styles.header}>
-                                    #{item.support_ticket_id} - {getNameForSupportTicket(item)}
+                                    {getNameForSupportTicket(item)}
                                 </Card.Title>
 
                                 <Text style={styles.description}>{item.description}</Text>
+
                                 <Text style={styles.details}>
                                     <Text style={styles.boldText}>Category:</Text> {formatCategory(item.ticket_category)}
                                 </Text>
+                                {item.booking && <Text style={styles.details}>
+                                    <Text style={styles.boldText}>Booking Reference Number: </Text>#{getReferenceNumber(item.booking)}
+                                </Text>}
                                 <Text style={styles.details}>
                                     <Text style={styles.boldText}>Status:</Text> {formatStatus(item.is_resolved)}
                                 </Text>

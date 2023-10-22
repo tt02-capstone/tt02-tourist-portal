@@ -165,7 +165,6 @@ const styles = StyleSheet.create({
     description: {
         width: 320,
         height: 200,
-        marginTop: -15,
         textAlignVertical: 'top'
     },
 });

@@ -41,6 +41,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const fetchBooking = async () => {
         try {
             let booking = await getBookingByBookingId(bookingId);
+            console.log(booking);
             setBooking(booking);
 
             if (booking.tour) {
@@ -160,6 +161,15 @@ const BookingDetailsScreen = ({ navigation }) => {
         }
     }
 
+    function getReferenceNumber() {
+        let date = new Date(booking.start_datetime);
+        let day = date.getDate();
+        let month = date.getMonth();
+        let year = date.getFullYear();
+        let temp = '' + booking.booking_id + day + month + year;
+        return temp;
+    }
+
     return booking ? (
         <Background>
             <ScrollView>
@@ -173,6 +183,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                             uri: getImage(booking)
                         }}
                     />
+                    <Text style={styles.description}>Booking Reference Number: #{getReferenceNumber()}</Text>
                     <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount.toFixed(2)}</Text>
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
                     {!booking.tour && <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>}

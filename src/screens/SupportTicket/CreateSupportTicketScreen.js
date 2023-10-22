@@ -5,7 +5,7 @@ import Button from '../../components/Button'
 import Header from '../../components/Header';
 import TextInput from '../../components/TextInput';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text, Card, CheckBox, Tab, TabView } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
 import { createSupportTicketToAdmin, createSupportTicketToVendor, createSupportTicketForBooking, getBookingHistoryList } from '../../redux/supportRedux';
@@ -137,6 +137,8 @@ const CreateSupportTicketScreen = ({ navigation }) => {
 
     async function onSubmit() {
 
+        setLoading(true);
+
         let supportTicketObj;
 
         console.log("values", values)
@@ -157,6 +159,8 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                     text1: 'Support ticket created!'
                 })
 
+                setLoading(false);
+
                 navigation.reset({
                     index: 2,
                     routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'SupportTicketScreen' }],
@@ -168,6 +172,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                     type: 'error',
                     text1: response.data.errorMessage
                 })
+                setLoading(false);
             }
 
         } else {
@@ -189,6 +194,8 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         text1: 'Support ticket created!'
                     })
 
+                    setLoading(false);
+
                     navigation.reset({
                         index: 2,
                         routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'SupportTicketScreen' }],
@@ -200,9 +207,10 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         type: 'error',
                         text1: response.data.errorMessage
                     })
+                    setLoading(false);
                 }
 
-            } else { // equals to VENDOR
+            } else if (values.ticket_type == "VENDOR") { 
 
                 let activityId = 0;
 
@@ -272,6 +280,8 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         text1: 'Support ticket created!'
                     })
 
+                    setLoading(false);
+
                     navigation.reset({
                         index: 2,
                         routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'SupportTicketScreen' }],
@@ -284,9 +294,19 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                         type: 'error',
                         text1: response.data.errorMessage
                     })
+                    setLoading(false);
                 }
             }
         }
+    }
+
+    function getReferenceNumber(booking) {
+        let date = new Date(booking.start_datetime);
+        let day = date.getDate();
+        let month = date.getMonth();
+        let year = date.getFullYear();
+        let temp = '' + booking.booking_id + day + month + year;
+        return temp;
     }
 
     return (
@@ -338,7 +358,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
                                 value: null,
                             }}
                             onValueChange={(value) => setValues({ ...values, booking_id: value })}
-                            items={bookingsList.map(booking => ({ label: `${booking.activity_name} (ID: #${booking.booking_id})`, value: booking.booking_id }))}
+                            items={bookingsList.map(booking => ({ label: `#${getReferenceNumber(booking)} (${booking.activity_name})`, value: booking.booking_id }))}
                             value={values.booking_id}
                             style={pickerSelectStyles}
                         />

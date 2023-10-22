@@ -7,6 +7,7 @@ import { getUser } from '../../helpers/LocalStorage';
 import { useRoute } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { downvote, getPost, upvote } from '../../redux/postRedux';
+import moment from 'moment';
 import { useIsFocused } from "@react-navigation/native";
 import { downvoteComment, getAllPostComment, upvoteComment, updateComment, deleteComment, createComment } from '../../redux/commentRedux';
 import Toast from "react-native-toast-message";
@@ -344,7 +345,7 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.local_user.profile_pic ? post.local_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
                             </TouchableOpacity>
                             {post.local_user.user_id === user.user_id && 
                                 <TouchableOpacity style={{marginLeft: 160}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
@@ -361,7 +362,7 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.tourist_user.profile_pic ? post.tourist_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.tourist_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.tourist_user.name}</Text>
                             </TouchableOpacity>
 
                             {post.tourist_user.user_id === user.user_id && 
@@ -379,7 +380,7 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.internal_staff_user.profile_pic ? post.internal_staff_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.internal_staff_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.internal_staff_user.name}</Text>
                             </TouchableOpacity>
                         </View>
                     }
@@ -391,7 +392,7 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.vendor_staff_user.profile_pic ? post.vendor_staff_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 2, fontSize: 15, fontWeight: 'bold'}}>{post.vendor_staff_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.vendor_staff_user.name}</Text>
                             </TouchableOpacity>
                         </View>
                     }
@@ -411,6 +412,7 @@ const PostScreen = ({ navigation }) => {
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
                         <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list ? post.upvoted_user_id_list.length : 0}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
+                        <Text style={{marginLeft: 50}} >Posted on {moment(post.publish_time).format('lll')}</Text>
 
                         {/* <Button style={{marginLeft: 20, height: 40, width: 130, marginBottom: -8, marginTop: -8, marginRight: 0, backgroundColor: '#044537'}} mode="contained" onPress={onNewParentCommentPressed}>Comment</Button>
                         <Button style={{marginLeft: 10, height: 40, width: 110, marginBottom: -8, marginTop: -8, backgroundColor: '#044537'}} mode="contained" onPress={onReportPostPressed}>Report</Button> */}

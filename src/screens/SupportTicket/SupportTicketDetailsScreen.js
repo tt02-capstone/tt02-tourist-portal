@@ -368,9 +368,6 @@ const SupportTicketDetailsScreen = ({ navigation }) => {
                 </View>
                 <Text style={styles.description}>{supportTicket.description}</Text>
                 <Text style={styles.details}>
-                    <Text style={styles.boldText}>Ticket ID:</Text> #{supportTicket.support_ticket_id}
-                </Text>
-                <Text style={styles.details}>
                     <Text style={styles.boldText}>Category:</Text> {formatCategory(supportTicket.ticket_category)}
                 </Text>
                 <Text style={styles.details}>
@@ -581,7 +578,6 @@ const styles = StyleSheet.create({
         width: '24%',
         marginLeft: 20,
         marginRight: 170,
-        backgroundColor: 'slategray',
         borderRadius: 5,
         marginBottom: 3,
     },

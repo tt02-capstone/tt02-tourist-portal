@@ -184,7 +184,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                         }}
                     />
                     <Text style={styles.description}>Booking Reference Number: #{getReferenceNumber()}</Text>
-                    <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount}</Text>
+                    <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount.toFixed(2)}</Text>
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
                     {!booking.tour && <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>}
                     {booking.tour && <Text style={styles.description}>Start Date: {formatDateTime(booking.start_datetime)}</Text>}

@@ -189,7 +189,7 @@ const BookingHistoryScreen = ({ navigation }) => {
                                 }}>
                                     {/* Text on the left */}
                                     <Text style={styles.description}>
-                                        Total Paid: S${item.payment.payment_amount} {'\n'} {'\n'}
+                                        Total Paid: S${item.payment.payment_amount.toFixed(2)} {'\n'} {'\n'}
                                         Type: {formatType(item.type)} {'\n'} {'\n'}
                                         Date: {formatDate(item.start_datetime)}
                                     </Text>

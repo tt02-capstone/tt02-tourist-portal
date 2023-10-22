@@ -113,6 +113,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
             }
 
             let tourId = '';
+            let tour = '';
             if (noOfPax > 0) {
                 await AsyncStorage.getItem('selectedTourId')
                     .then((value) => {
@@ -143,7 +144,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         console.error('Error retrieving data from AsyncStorage: ', error);
                     });
 
-                let tour = '';
                 if (selectedTourType != null) {
                     tour = selectedTourType.tour_list.find(tour => tour.tour_id == tourId);
                 }
@@ -194,6 +194,11 @@ const AttractionDetailsScreen = ({ navigation }) => {
                     text1: "Please Select your Ticket Quantity!"
                 })
 
+            } else if (tourId != null && tour.remaining_slot < noOfPax) {
+                Toast.show({
+                    type: 'error',
+                    text1: "Insufficient slots available for selected tour!"
+                })
             } else {  // when both ticket date + ticket types are selected 
                 let checkInventory = await checkTicketInventory(attraction.attraction_id, formattedDate, selectedTickets);
                 // current date check 

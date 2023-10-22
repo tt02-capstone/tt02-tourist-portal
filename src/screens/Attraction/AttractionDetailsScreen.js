@@ -526,14 +526,14 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
                             </View>
                         ))}
-                        {selectedDate != undefined && tours.length == 0 &&
+                        {selectedDate != undefined && tours.length == 0 && !formattedPriceList.every(item => item.ticket_count === 0) &&
                             <View style={{ backgroundColor: '#EBFAF2', padding: 8, borderRadius: 10 }}>
                                 <Text style={styles.activityHeader}>
                                     No tours available on this date
                                 </Text>
                             </View>
                         }
-                        {selectedDate != undefined && tours.length > 0 &&
+                        {selectedDate != undefined && tours.length > 0 && !formattedPriceList.every(item => item.ticket_count === 0) &&
                             <View style={{ backgroundColor: '#EBFAF2', padding: 8, borderRadius: 10 }}>
                                 <Text style={styles.activityHeader}>
                                     {tours.length} {tours.length === 1 ? 'tour' : 'tours'} available on this date

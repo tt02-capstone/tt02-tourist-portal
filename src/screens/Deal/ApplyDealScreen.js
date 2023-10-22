@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import RNPickerSelect from 'react-native-picker-select';
 import {timeZoneOffset} from "../../helpers/DateFormat";
 import {useIsFocused, useRoute} from "@react-navigation/native";
+import Header from "../../components/Header";
 
 const ApplyDealScreen = ({ route, navigation }) => {
     const [data, setData] = useState([]);
@@ -175,7 +176,7 @@ const ApplyDealScreen = ({ route, navigation }) => {
         <Background>
             <ScrollView>
                 <View style={styles.container}>
-
+                    <Header>Deals for Vendor {vendorId}</Header>
                     <View>
                         <TouchableOpacity onPress={() => navigation.navigate("CartScreen", {vendorId: vendorId, dealId: 0 })} style={styles.filterButton}>
                             <Text style={styles.filterText}> Cancel Promo</Text>

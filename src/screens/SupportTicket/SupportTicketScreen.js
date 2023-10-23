@@ -25,19 +25,19 @@ const SupportTicketScreen = ({ navigation }) => {
 
     useEffect(() => {
         async function onLoad() {
-            console.log("back here after updating status")
+            // console.log("back here after updating status")
             try {
-                console.log("trying to load")
+                // console.log("trying to load")
                 const userData = await getUser();
                 setUser(userData);
                 const userId = userData.user_id;
 
-                console.log("before retrieving support tickets")
+                // console.log("before retrieving support tickets")
                 let response = await getAllSupportTicketsByUser(userId);
-                console.log("response.data", response.data)
+                // console.log("response.data", response.data)
                 setData(response.data);
                 setFullSupportTicketList(response.data);
-                console.log("fullSupportTicketList", fullSupportTicketList);
+                // console.log("fullSupportTicketList", fullSupportTicketList);
                 setLoading(false);
             } catch (error) {
                 alert('An error occurred! Failed to retrieve supportTicket list!');
@@ -124,7 +124,7 @@ const SupportTicketScreen = ({ navigation }) => {
 
     const getNameForSupportTicket = (item) => {
         if (item.booking != null) {
-            console.log("item.booking", item.booking)
+            // console.log("item.booking", item.booking)
             if (item.booking.attraction != null) {
                 return 'Enquiry to ' + item.booking.attraction.name;
             } else if (item.booking.room != null) {
@@ -205,14 +205,14 @@ const SupportTicketScreen = ({ navigation }) => {
     }
 
     const viewSupportTicket = (support_ticket_id) => {
-        console.log("support_ticket_id", support_ticket_id);
+        // console.log("support_ticket_id", support_ticket_id);
         navigation.navigate('SupportTicketDetailsScreen', { supportTicketId: support_ticket_id });
     }
 
     function getReferenceNumber(booking) {
         let date = new Date(booking.start_datetime);
         let day = date.getDate();
-        let month = date.getMonth();
+        let month = date.getMonth() + 1;
         let year = date.getFullYear();
         let temp = '' + booking.booking_id + day + month + year;
         return temp;

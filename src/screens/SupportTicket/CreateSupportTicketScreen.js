@@ -309,7 +309,7 @@ const CreateSupportTicketScreen = ({ navigation }) => {
     function getReferenceNumber(booking) {
         let date = new Date(booking.start_datetime);
         let day = date.getDate();
-        let month = date.getMonth();
+        let month = date.getMonth() + 1;
         let year = date.getFullYear();
         let temp = '' + booking.booking_id + day + month + year;
         return temp;

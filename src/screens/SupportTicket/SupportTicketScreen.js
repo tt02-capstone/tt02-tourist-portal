@@ -285,16 +285,16 @@ const SupportTicketScreen = ({ navigation }) => {
                                                 handleFilterSelect('supportTicketType', value)
                                             }
                                             items={[
+                                                { label: 'General Enquiry', value: 'GENERAL_ENQUIRY' },
+                                                { label: 'General Booking', value: 'BOOKING' },
+                                                { label: 'Refund', value: 'REFUND' },
+                                                { label: 'Cancellation', value: 'CANCELLATION' },
                                                 { label: 'Attraction', value: 'ATTRACTION' },
                                                 { label: 'Tour', value: 'TOUR' },
                                                 { label: 'Accommodation', value: 'ACCOMMODATION' },
                                                 { label: 'Telecom', value: 'TELECOM' },
                                                 { label: 'Deal', value: 'DEAL' },
                                                 { label: 'Restaurant', value: 'RESTAURANT' },
-                                                { label: 'Refund', value: 'REFUND' },
-                                                { label: 'Cancellation', value: 'CANCELLATION' },
-                                                { label: 'General Enquiry', value: 'GENERAL_ENQUIRY' },
-                                                { label: 'General Booking', value: 'BOOKING' },
                                             ]}
                                             value={supportTicketTypeFilter}
                                             style={pickerSelectStyles}

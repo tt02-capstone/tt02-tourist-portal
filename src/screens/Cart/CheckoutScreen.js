@@ -154,7 +154,7 @@ export const CheckoutScreen = ({navigation}) => {
       <ScrollView>
         <View>
           {
-          selectedCartItems.map((cartItem) => (
+          selectedCartItems.map((cartItem, index) => (
             <ListItem.Swipeable
               shouldCancelWhenOutside={false} 
               rightWidth={90}
@@ -187,7 +187,7 @@ export const CheckoutScreen = ({navigation}) => {
               }
 
               </View>
-              <ListItem.Subtitle style={{fontSize: 14}}>${cartItem.price}</ListItem.Subtitle>
+              <ListItem.Subtitle style={{fontSize: 14}}>${priceList[index]}</ListItem.Subtitle>
             </View>
           </View>       
           </ListItem.Content>

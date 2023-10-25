@@ -94,8 +94,13 @@ export const badgeApi = axios.create({
     baseURL: HOST_WITH_PORT + '/badge'
 })
 
+export const notificationApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/notification'
+})
+
+
 const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, 
-                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi]
+                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, notificationApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( async (config) => {

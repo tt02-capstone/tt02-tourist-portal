@@ -21,9 +21,11 @@ const NotificationScreen = ({ navigation }) => {
     }, []);
 
     const onSendPressed = async (title, body) => {
-        let response = await sendNotification(title, body);
+        let response = await sendNotification(new Date());
         if (response?.status) {
             console.log('screen success')
+        } else {
+            console.log('notification failure')
         }
     }
 

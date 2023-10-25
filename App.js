@@ -55,6 +55,8 @@ import { ReportPostScreen } from './src/screens/Forum/ReportPostScreen';
 import { ForumProfileScreen } from './src/screens/Forum/ForumProfileScreen';
 import { ReportCommentScreen } from './src/screens/Forum/ReportCommentScreen';
 import { BadgesScreen } from './src/screens/Profile/BadgesScreen';
+import registerNNPushToken from 'native-notify';
+import NotificationScreen from './src/screens/Notification/NotificationScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -69,6 +71,8 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 export default function App() {
+    registerNNPushToken(13960, 'BEbA270k2T53VV6Cu8pZIZ');
+
     return (
         <AuthProvider>
             <Layout>
@@ -92,6 +96,7 @@ function MyDrawer() {
         <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
         <Drawer.Screen name="Support Tickets" component={SupportTicketScreen} />
+        <Drawer.Screen name="Notification" component={NotificationScreen} />
       </Drawer.Navigator>
     );
 }

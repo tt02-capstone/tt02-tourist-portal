@@ -1,4 +1,4 @@
-import { userApi } from "../helpers/api";
+import { userApi, badgeApi } from "../helpers/api";
 import { handleApiErrors } from "../helpers/errorCatching";
 
 
@@ -30,4 +30,14 @@ export async function viewUserProfile(userId) {
     console.error("userRedux viewUserProfile Error : ", error);
     return {status: false, data: error.message};
   };
+}
+
+export async function retrieveBadgesByUserId(userId) {
+  try {
+      const response = await badgeApi.get(`/retrieveBadgesByUserId/${userId}`);
+      return handleApiErrors(response);
+  } catch (error) {
+      console.error("forumRedux retrieveBadgesByUserId Error : ", error);
+      return { status: false, data: error.message };
+  }
 }

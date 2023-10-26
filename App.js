@@ -55,6 +55,8 @@ import { ReportPostScreen } from './src/screens/Forum/ReportPostScreen';
 import { ForumProfileScreen } from './src/screens/Forum/ForumProfileScreen';
 import { ReportCommentScreen } from './src/screens/Forum/ReportCommentScreen';
 import { BadgesScreen } from './src/screens/Profile/BadgesScreen';
+import ItineraryScreen from './src/screens/Itinerary/ItineraryScreen';
+import CreateItineraryScreen from './src/screens/Itinerary/CreateItineraryScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -84,6 +86,7 @@ function MyDrawer() {
         <Drawer.Screen name="Profile" component={ViewProfileScreen} />
         <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
         <Drawer.Screen name="Forum" component={CategoryScreen} />
+        <Drawer.Screen name="Itinerary" component={ItineraryScreen} />
         <Drawer.Screen name="Attractions" component={AttractionScreen} />
         <Drawer.Screen name="Accommodations" component={AccommodationScreen} />
         <Drawer.Screen name="Telecoms" component={TelecomScreen} />
@@ -152,6 +155,8 @@ export const Layout = () => {
                         <Stack.Screen name="ReportPostScreen" component={ReportPostScreen} options={{ title : 'Report Post' }} />
                         <Stack.Screen name="ReportCommentScreen" component={ReportCommentScreen} options={{ title : 'Report Comment' }} />
                         <Stack.Screen name="BadgesScreen" component={BadgesScreen} options={{ title : 'Badges' }} />
+                        <Stack.Screen name="ItineraryScreen" component={ItineraryScreen} options={{ title : 'Itinerary' }} />
+                        <Stack.Screen name="CreateItineraryScreen" component={CreateItineraryScreen} options={{ title : 'Create Itinerary' }} />
                     </>
                 ) : (
                     <>

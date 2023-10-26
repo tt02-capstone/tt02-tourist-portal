@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
-import { View, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { DatePickerModal } from 'react-native-paper-dates';
 import CreateItineraryScreen from './CreateItineraryScreen';
 import { IconButton } from 'react-native-paper';
+import Toast from "react-native-toast-message";
 
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -20,39 +21,33 @@ const ItineraryScreen = ({ navigation }) => {
 
     useEffect(() => {
         async function onLoad() {
-            const user = await getUser();
-            setUser(user);
+            console.log("entering onLoad")
+            try {
+                const userData = await getUser();
+                setUser(userData);
+                const userId = userData.user_id;
+                console.log("userId", userId);
+
+                let response = await getItineraryByUser(userId);
+                console.log("response.data", response.data)
+                setItinerary(response.data);
+                setLoading(false);
+            } catch (error) {
+                alert('An error occurred! Failed to retrieve supportTicket list!');
+                setLoading(false);
+            }
         }
         onLoad();
-        fetchItinerary();
 
         if (isFocused) {
             onLoad();
-            fetchItinerary();
         }
 
     }, [isFocused]);
 
-    const fetchItinerary = async () => {
-        console.log("user.user_id", user.user_id);
-        try {
-            let response = await getItineraryByUser(user.user_id);
-            console.log("response");
-            if (response.status) {
-                console.log("response", response.data);
-                setItinerary(response.data);
-                setLoading(false);
-    
-            } else {
-                console.log("Itinerary not fetched!");
-            }
-        } catch (error) {
-            alert('An error occur! Failed to retrieve itinerary details!');
-            setLoading(false);
-        }
-    }
-
     const handleDeleteItineraryPress = (itineraryId) => {
+
+        console.log("itineraryId", itineraryId);
 
         Alert.alert(
             "Delete Confirmation",
@@ -73,6 +68,9 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     async function handleDeleteItinerary(userId, itineraryId) {
+
+        console.log("userId", userId);
+        console.log("ItineraryId", itineraryId);
 
         let response = await deleteItinerary(userId, itineraryId);
 

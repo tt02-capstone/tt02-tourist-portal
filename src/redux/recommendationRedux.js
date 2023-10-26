@@ -10,3 +10,13 @@ export async function getRecommendation(location,listingType,typeId) {
       return {status: false, data: error.message};
     }
 }
+
+export async function getPostRecommendation(catItemId) {
+  try {
+      const response = await recommendationApi.get(`/getPostRecommendation/${catItemId}`);
+      return handleApiErrors(response);
+  } catch (error) {
+    console.error("recommendationRedux getPostRecommendation : ", error);
+    return {status: false, data: error.message};
+  }
+}

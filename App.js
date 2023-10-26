@@ -148,7 +148,7 @@ export const Layout = () => {
                         <Stack.Screen name="CreatePostScreen" component={CreatePostScreen} options={{ title : 'Create Post' }} />
                         <Stack.Screen name="UpdatePostScreen" component={UpdatePostScreen} options={{ title : 'Update Post' }} />
                         <Stack.Screen name="PostScreen" component={PostScreen} options={{ title : 'Post' }} />
-                        <Stack.Screen name="ForumProfileScreen" component={ForumProfileScreen} options={{ title : 'User Forum P Post' }} />
+                        <Stack.Screen name="ForumProfileScreen" component={ForumProfileScreen} options={{ title : 'Forum User Details' }} />
                         <Stack.Screen name="ReportPostScreen" component={ReportPostScreen} options={{ title : 'Report Post' }} />
                         <Stack.Screen name="ReportCommentScreen" component={ReportCommentScreen} options={{ title : 'Report Comment' }} />
                         <Stack.Screen name="BadgesScreen" component={BadgesScreen} options={{ title : 'Badges' }} />

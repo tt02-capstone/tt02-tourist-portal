@@ -98,8 +98,12 @@ export const itineraryApi = axios.create({
     baseURL: HOST_WITH_PORT + '/itinerary'
 })
 
+export const diyEventApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/diyEvent'
+})
+
 const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, 
-                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi]
+                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi, diyEventApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( async (config) => {

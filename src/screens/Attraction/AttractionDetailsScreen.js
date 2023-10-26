@@ -21,6 +21,7 @@ import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import Carousel, { Pagination } from 'react-native-snap-carousel';
+import CreateAttractionDIYEventScreen from './CreateAttractionDIYEventScreen';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -435,6 +436,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         </Button>
                     </Card.Title>
 
+                    <Button text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction })} />
+
                     <View style={styles.tagContainer}>
                         <Text style={[styles.typeTag, { backgroundColor: getColorForType(attraction.attraction_category) }, { textAlign: 'center' },]}>
                             {attraction.attraction_category}
@@ -698,6 +701,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
         resizeMode: 'cover',
+    },
+    button: {
+        width: '40%',
+        marginLeft: '30%',
+        marginRight: '30%',
+        backgroundColor: '#5f80e3',
+        color: 'black'
     },
 });
 

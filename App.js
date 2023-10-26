@@ -58,6 +58,7 @@ import { BadgesScreen } from './src/screens/Profile/BadgesScreen';
 import ItineraryScreen from './src/screens/Itinerary/ItineraryScreen';
 import CreateItineraryScreen from './src/screens/Itinerary/CreateItineraryScreen';
 import EditItineraryScreen from './src/screens/Itinerary/EditItineraryScreen';
+import CreateAttractionDIYEventScreen from './src/screens/Attraction/CreateAttractionDIYEventScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -159,6 +160,7 @@ export const Layout = () => {
                         <Stack.Screen name="ItineraryScreen" component={ItineraryScreen} options={{ title : 'Itinerary' }} />
                         <Stack.Screen name="CreateItineraryScreen" component={CreateItineraryScreen} options={{ title : 'Create Itinerary' }} />
                         <Stack.Screen name="EditItineraryScreen" component={EditItineraryScreen} options={{ title : 'Edit Itinerary' }} />
+                        <Stack.Screen name="CreateAttractionDIYEventScreen" component={CreateAttractionDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
                     </>
                 ) : (
                     <>

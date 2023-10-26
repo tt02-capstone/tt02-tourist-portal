@@ -95,12 +95,12 @@ const ItineraryScreen = ({ navigation }) => {
         <View>
             <Button text="+ Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
             <View style={styles.iconContainer}>
-                {/* <IconButton
+                <IconButton
                     icon="pencil"
                     size={20}
                     style={styles.icon}
-                    onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: item.itinerary_id, itineraryItineraryId: ItineraryId })}
-                /> */}
+                    onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
+                />
                 <IconButton
                     icon="delete"
                     size={20}

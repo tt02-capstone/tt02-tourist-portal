@@ -14,6 +14,7 @@ import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
 import { DatePickerModal } from 'react-native-paper-dates';
+import { timeZoneOffset } from "../../helpers/DateFormat";
 
 const CreateItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -52,6 +53,7 @@ const CreateItineraryScreen = ({ navigation }) => {
         const time = '00:01:00';
 
         const itineraryStartDate = new Date(values.start_date);
+        itineraryStartDate.setHours(itineraryStartDate.getHours() + timeZoneOffset);
         const itineraryStartDateInLocalDateTime = `${itineraryStartDate.toISOString().split('T')[0]}T${time}Z`;
 
         const itineraryEndDate = new Date(values.end_date);
@@ -64,7 +66,7 @@ const CreateItineraryScreen = ({ navigation }) => {
             remarks: values.remarks,
         }
 
-        console.log("user.user_id", user.user_id); 
+        console.log("user.user_id", user.user_id);
         console.log("itineraryObj", itineraryObj);
 
         let response = await createItinerary(user.user_id, itineraryObj);
@@ -137,10 +139,9 @@ const CreateItineraryScreen = ({ navigation }) => {
             </Text>
 
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-
                 <View style={{ alignItems: 'center', minHeight: '100%' }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
-                        <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
+                        <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray', color: 'blue'}}>
                             {values.start_date && values.end_date ? `${formatDatePicker(values.start_date)} - ${formatDatePicker(values.end_date)}` : 'Pick range'}
                         </Button>
                         <DatePickerModal
@@ -155,24 +156,25 @@ const CreateItineraryScreen = ({ navigation }) => {
                             onDismiss={onDismiss}
                             inputMode="start"
                         />
+
+
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(value) => setValues({ ...values, number_of_pax: value })}
+                            value={values.number_of_pax}
+                            placeholder="Num of Pax"
+                            keyboardType="numeric"
+                        />
+
+                        <TextInput
+                            style={styles.description}
+                            label="Write your remarks here"
+                            multiline={true}
+                            value={values.remarks}
+                            onChangeText={(value) => setValues({ ...values, remarks: value })}
+                            errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
+                        />
                     </View>
-
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(value) => setValues({ ...values, number_of_pax: value })}
-                        value={values.number_of_pax}
-                        placeholder="Num of Pax"
-                        keyboardType="numeric"
-                    />
-
-                    <TextInput
-                        style={styles.description}
-                        label="Write your remarks here"
-                        multiline={true}
-                        value={values.remarks}
-                        onChangeText={(value) => setValues({ ...values, remarks: value })}
-                        errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
-                    />
                     <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                         <Button
                             style={{ width: 150, marginLeft: 60 }}

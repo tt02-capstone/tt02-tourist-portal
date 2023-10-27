@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import Background from '../../components/CardBackground'
+import { theme } from '../../core/theme'
 import Button from '../../components/Button'
-import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Modal, Alert, Pressable } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
 import { getAllDiyEventsByDay } from '../../redux/diyEventRedux';
@@ -27,6 +27,10 @@ const ItineraryScreen = ({ navigation }) => {
     const [routes, setRoutes] = useState([]);
     const [firstDayDiyEvents, setFirstDayDiyEvents] = useState([]);
     const [currentDiyEvents, setCurrentDiyEvents] = useState([]);
+
+    // diy event modal
+    const [showDiyModal, setShowDiyModal] = useState(false);
+    const [diyObject, setDiyObject] = useState(undefined);
 
     useEffect(() => {
         async function onLoad() {
@@ -167,12 +171,13 @@ const ItineraryScreen = ({ navigation }) => {
         } else if (event.booking !== null) {
             navigation.navigate('BookingDetailsScreen', { bookingId: event.booking.booking_id});
         } else { // DIY
-            // yet to do
+            setDiyObject(event);
+            setShowDiyModal(true);
         }
     }
 
     const renderScene = ({ route }) => {
-        console.log("renderScene called with route key:", route.key);
+        // console.log("renderScene called with route key:", route.key);
         const dayNum = route.key === '1' ? 1 : parseInt(route.key.replace('day', ''));
 
         return (
@@ -185,6 +190,12 @@ const ItineraryScreen = ({ navigation }) => {
                             <Text>{moment(event.end_datetime).format('lll')}</Text>
                             <Text>{event.location}</Text>
                             <Text>{event.remarks}</Text>
+                            {event.attraction && <Text>Attraction: {event.attraction.attraction_id}</Text>}
+                            {event.accommodation && <Text>Accommodation: {event.accommodation.accommodation_id}</Text>}
+                            {event.telecom && <Text>Telecom: {event.telecom.telecom_id}</Text>}
+                            {event.restaurant && <Text>Restaurant: {event.restaurant.restaurant_id}</Text>}
+                            {event.booking && <Text>Booking: {event.booking.booking_id}</Text>}
+                            {!event.attraction && !event.accommodation && !event.telecom && !event.restaurant && !event.booking && <Text>DIY: {event.diy_event_id}</Text>}
                             <Text onPress={() => navigateFunction(event)}>Go</Text>
                         </Card>
                     ))
@@ -196,7 +207,7 @@ const ItineraryScreen = ({ navigation }) => {
     }
     
     return (
-        <View style={{ height: 400 }}>
+        <View style={{ height: '100%' }}>
             <Button text="+ Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
             {itinerary && <Button text="+ Add Event" style={styles.button} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />}
             <Text>
@@ -240,6 +251,45 @@ const ItineraryScreen = ({ navigation }) => {
                     )}
                 />
             </View>
+
+            {/* View DIY Event Modal */}
+            <View style={styles.centeredView}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showDiyModal}
+                    onRequestClose={() => {
+                        setShowDiyModal(false);
+                    }}
+                >
+
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
+
+                            <View>
+                                <Text><Text style={{fontWeight: 'bold'}}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
+                                <Text><Text style={{fontWeight: 'bold'}}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
+                                <Text><Text style={{fontWeight: 'bold'}}>Location:</Text> {diyObject?.location}</Text>
+                                <Text style={{fontWeight: 'bold', marginTop: 10}}>Remarks:</Text>
+                                <Text>{diyObject?.remarks}</Text>
+                            </View>
+
+                            {/* close modal button */}
+                            <View style={{marginLeft: 75, marginTop: 20}}>
+                                <Pressable
+                                    style={[styles.modalButton, styles.buttonClose]}
+                                    onPress={() => {
+                                        setShowDiyModal(false);
+                                        setDiyObject(undefined)
+                                    }}>
+                                    <Text style={styles.textStyle}>Close</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
         </View>
     );
 }
@@ -259,6 +309,64 @@ const styles = StyleSheet.create({
         marginLeft: -5,
         marginTop: -5,
         marginRight: 3,
+    },
+
+
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 250,
+        width: 350,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 10,
+        marginRight: 10,
+        width: 100,
+        backgroundColor: '#044537',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    buttonClose: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+    dropBorder: {
+        borderWidth: 0,
+        shadowColor: 'rgba(0,0,0, 0.0)',
+        shadowOffset: { height: 0, width: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+        backgroundColor: theme.colors.surface,
     },
 });
 

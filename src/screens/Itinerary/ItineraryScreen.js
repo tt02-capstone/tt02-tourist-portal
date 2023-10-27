@@ -155,6 +155,22 @@ const ItineraryScreen = ({ navigation }) => {
         }
     };
 
+    const navigateFunction = (event) => {
+        if (event.attraction !== null) {
+            navigation.navigate('AttractionDetailsScreen', { attractionId: event.attraction.attraction_id});
+        } else if (event.telecom !== null) {
+            navigation.navigate('TelecomDetailsScreen', { id: event.telecom.telecom_id});
+        } else if (event.accommodation !== null) {
+            navigation.navigate('AccommodationDetailsScreen', { accommodationId: event.accommodation.accommodation_id});
+        } else if (event.restaurant !== null) {
+            navigation.navigate('RestaurantDetailsScreen', { restId: event.restaurant.restaurant_id});
+        } else if (event.booking !== null) {
+            navigation.navigate('BookingDetailsScreen', { bookingId: event.booking.booking_id});
+        } else { // DIY
+            // yet to do
+        }
+    }
+
     const renderScene = ({ route }) => {
         console.log("renderScene called with route key:", route.key);
         const dayNum = route.key === '1' ? 1 : parseInt(route.key.replace('day', ''));
@@ -169,6 +185,7 @@ const ItineraryScreen = ({ navigation }) => {
                             <Text>{moment(event.end_datetime).format('lll')}</Text>
                             <Text>{event.location}</Text>
                             <Text>{event.remarks}</Text>
+                            <Text onPress={() => navigateFunction(event)}>Go</Text>
                         </Card>
                     ))
                 ) : (
@@ -177,10 +194,11 @@ const ItineraryScreen = ({ navigation }) => {
             </View>
         );
     }
-
+    
     return (
         <View style={{ height: 400 }}>
             <Button text="+ Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
+            {itinerary && <Button text="+ Add Event" style={styles.button} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />}
             <Text>
                 {itinerary
                     ? `${moment(itinerary.start_date).format('MMM Do')} - ${moment(itinerary.end_date).format('MMM Do')}`

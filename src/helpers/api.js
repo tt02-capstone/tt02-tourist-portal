@@ -2,7 +2,7 @@ import axios from "axios";
 import {TOKEN_KEY} from "./AuthContext";
 import * as SecureStore from "expo-secure-store";
 
-const HOST = '192.168.1.4'
+const HOST = '192.168.86.145'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -10,14 +10,15 @@ export const userApi = axios.create({
 })
 
 export const loggedUserApi = (usertype) => {
-     if (usertype === 'LOCAL')
-         return localApi
+    if (usertype === 'LOCAL')
+        return localApi
     else if (usertype === 'TOURIST')
         return touristApi
     else
         return Error('User type is neither local nor tourist')
 
 }
+
 export const localApi = axios.create({
     baseURL: HOST_WITH_PORT + '/local'
 })

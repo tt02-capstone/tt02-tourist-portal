@@ -551,10 +551,10 @@ const PostScreen = ({ navigation }) => {
                             renderItem={({ item, isSelect, isOpen, onOpen, onClose, onSelect }) => (
                                 <TouchableOpacity style={styles.commentContainer} onPress={isOpen ? onClose : onOpen}>
                                     <View style={{flexDirection: 'column',}}>
-                                        {item.tourist_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.tourist_user.user_id)}>{item.tourist_user.name}</Text>}
-                                        {item.local_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.local_user.user_id)}>{item.local_user.name}</Text>}
-                                        {item.vendor_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.vendor_staff_user.user_id)}>{item.vendor_staff_user.name}</Text>}
-                                        {item.internal_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.internal_staff_user.user_id)}>{item.internal_staff_user.name}</Text>}
+                                        {item.tourist_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.tourist_user.user_id)}>{item.tourist_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        {item.local_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.local_user.user_id)}>{item.local_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        {item.vendor_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.vendor_staff_user.user_id)}>{item.vendor_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        {item.internal_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.internal_staff_user.user_id)}>{item.internal_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
                                         <Text style={{fontSize: 15, marginBottom: 10, marginTop: 5}}>{item.content}</Text>
 
                                         <View style={{flexDirection: 'row',}}>
@@ -573,8 +573,8 @@ const PostScreen = ({ navigation }) => {
 
                                             {item.local_user && item.local_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
                                             {item.tourist_user && item.tourist_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
 
-                                            <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2 }}>{moment(item.updated_time).format('LT')}</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
+import { Button as DateButton } from 'react-native-paper';
 import Header from '../../components/Header';
 import TextInput from '../../components/TextInput';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
@@ -139,11 +140,11 @@ const CreateItineraryScreen = ({ navigation }) => {
             </Text>
 
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
-                        <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray'}}>
+                <View style={{ alignItems: 'center', minHeight: '100%', marginLeft: 20, marginTop: -160 }}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 }}>
+                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginBottom: -5, marginLeft: -15}}>
                             {values.start_date && values.end_date ? `${formatDatePicker(values.start_date)} - ${formatDatePicker(values.end_date)}` : 'Pick range'}
-                        </Button>
+                        </DateButton>
                         <DatePickerModal
                             locale='en-GB'
                             mode="range"
@@ -162,7 +163,7 @@ const CreateItineraryScreen = ({ navigation }) => {
                             style={styles.input}
                             onChangeText={(value) => setValues({ ...values, number_of_pax: value })}
                             value={values.number_of_pax}
-                            placeholder="Num of Pax"
+                            placeholder="Number of Pax"
                             keyboardType="numeric"
                         />
 
@@ -177,7 +178,7 @@ const CreateItineraryScreen = ({ navigation }) => {
                     </View>
                     <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                         <Button
-                            style={{ width: 150, marginLeft: 60 }}
+                            style={{ width: 150, paddingTop: -100, marginTop: -250, marginLeft: -20 }}
                             mode="contained"
                             text={"Submit"}
                             onPress={onSubmit}

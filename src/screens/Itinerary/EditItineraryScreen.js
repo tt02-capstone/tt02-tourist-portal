@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
+import { Button as DateButton } from 'react-native-paper';
 import Header from '../../components/Header';
 import TextInput from '../../components/TextInput';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
@@ -48,7 +49,7 @@ const EditItineraryScreen = ({ navigation }) => {
                 setValues({
                     // start_date: response.data.start_date,
                     // end_date: response.data.end_date,
-                    number_of_pax: response.data.number_of_pax,
+                    number_of_pax: response.data.number_of_pax.toString(),
                     remarks: response.data.remarks,
                 })
 
@@ -69,7 +70,7 @@ const EditItineraryScreen = ({ navigation }) => {
 
     }, [isFocused]);
 
-    useEffect(() => { 
+    useEffect(() => {
     }, [values]);
 
     async function handleEdit() {
@@ -165,12 +166,11 @@ const EditItineraryScreen = ({ navigation }) => {
             </Text>
 
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
-
-                        <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
+                <View style={{ alignItems: 'center', minHeight: '100%', marginLeft: 20, marginTop: -120 }}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 }}>
+                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginBottom: -5, marginLeft: -15 }}>
                             {values.start_date && values.end_date ? `${formatDatePicker(values.start_date)} - ${formatDatePicker(values.end_date)}` : 'Pick range'}
-                        </Button>
+                        </DateButton>
                         <DatePickerModal
                             locale='en-GB'
                             mode="range"
@@ -200,8 +200,9 @@ const EditItineraryScreen = ({ navigation }) => {
                             onChangeText={(value) => setValues({ ...values, remarks: value })}
                             errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
                         />
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                             <Button
+                                style={{ width: 150, paddingTop: -100, marginTop: 10, marginLeft: -20 }}
                                 mode="contained"
                                 text={"Submit"}
                                 onPress={handleEdit}
@@ -241,6 +242,11 @@ const styles = StyleSheet.create({
         width: 320,
         height: 200,
         textAlignVertical: 'top'
+    },
+    input: {
+        width: 320,
+        height: 50,
+        marginTop: 10,
     },
 });
 

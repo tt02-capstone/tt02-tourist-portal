@@ -33,36 +33,6 @@ const ItineraryScreen = ({ navigation }) => {
     const [diyObject, setDiyObject] = useState(undefined);
 
     useEffect(() => {
-        async function onLoad() {
-            // console.log("entering onLoad")
-            try {
-                const userData = await getUser();
-                setUser(userData);
-                const userId = userData.user_id;
-                // console.log("userId", userId);
-
-                let response = await getItineraryByUser(userId);
-                console.log("getItineraryByUser response.data", response.data)
-                setLoading(false);
-
-                if (response.data) {
-                    setItinerary(response.data);
-
-                    const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
-                    const generatedRoutes = [];
-                    for (let i = 0; i < numberOfDays; i++) {
-                        generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
-                    }
-                    setRoutes(generatedRoutes);
-                    console.log("generatedRoutes", generatedRoutes);
-
-                    getFirstDayDiyEvents(response.data);
-                }
-            } catch (error) {
-                alert('An error occurred! Failed to retrieve itinerary!');
-                setLoading(false);
-            }
-        }
         onLoad();
 
         if (isFocused) {
@@ -70,6 +40,37 @@ const ItineraryScreen = ({ navigation }) => {
         }
 
     }, [isFocused]);
+
+    async function onLoad() {
+        console.log("entering onLoad")
+        try {
+            const userData = await getUser();
+            setUser(userData);
+            const userId = userData.user_id;
+            // console.log("userId", userId);
+
+            let response = await getItineraryByUser(userId);
+            console.log("getItineraryByUser response.data", response.data)
+            setLoading(false);
+
+            if (response.status) {
+                setItinerary(response.data);
+
+                const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
+                const generatedRoutes = [];
+                for (let i = 0; i < numberOfDays; i++) {
+                    generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
+                }
+                setRoutes(generatedRoutes);
+                console.log("generatedRoutes", generatedRoutes);
+
+                getFirstDayDiyEvents(response.data);
+            }
+        } catch (error) {
+            alert('An error occurred! Failed to retrieve itinerary!');
+            setLoading(false);
+        }
+    }
 
     async function getFirstDayDiyEvents(retrievedItinerary) {
         try {
@@ -83,7 +84,7 @@ const ItineraryScreen = ({ navigation }) => {
     }
 
     useEffect(() => {
-    }, [firstDayDiyEvents, currentDiyEvents]);
+    }, [firstDayDiyEvents, currentDiyEvents, itinerary]);
 
     // Function to calculate the number of days between two dates
     const calculateNumberOfDays = (startDate, endDate) => {
@@ -130,7 +131,7 @@ const ItineraryScreen = ({ navigation }) => {
                 text1: 'Itinerary deleted!'
             })
 
-            onLoad();
+            setItinerary(null);
 
         } else {
             console.log("Itinerary deletion failed!");
@@ -161,15 +162,15 @@ const ItineraryScreen = ({ navigation }) => {
 
     const navigateFunction = (event) => {
         if (event.attraction !== null) {
-            navigation.navigate('AttractionDetailsScreen', { attractionId: event.attraction.attraction_id});
+            navigation.navigate('AttractionDetailsScreen', { attractionId: event.attraction.attraction_id });
         } else if (event.telecom !== null) {
-            navigation.navigate('TelecomDetailsScreen', { id: event.telecom.telecom_id});
+            navigation.navigate('TelecomDetailsScreen', { id: event.telecom.telecom_id });
         } else if (event.accommodation !== null) {
-            navigation.navigate('AccommodationDetailsScreen', { accommodationId: event.accommodation.accommodation_id});
+            navigation.navigate('AccommodationDetailsScreen', { accommodationId: event.accommodation.accommodation_id });
         } else if (event.restaurant !== null) {
-            navigation.navigate('RestaurantDetailsScreen', { restId: event.restaurant.restaurant_id});
+            navigation.navigate('RestaurantDetailsScreen', { restId: event.restaurant.restaurant_id });
         } else if (event.booking !== null) {
-            navigation.navigate('BookingDetailsScreen', { bookingId: event.booking.booking_id});
+            navigation.navigate('BookingDetailsScreen', { bookingId: event.booking.booking_id });
         } else { // DIY
             setDiyObject(event);
             setShowDiyModal(true);
@@ -205,16 +206,19 @@ const ItineraryScreen = ({ navigation }) => {
             </View>
         );
     }
-    
+
     return (
         <View style={{ height: '100%' }}>
-            <Button text="+ Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
-            {itinerary && <Button text="+ Add Event" style={styles.button} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />}
-            <Text>
-                {itinerary
-                    ? `${moment(itinerary.start_date).format('MMM Do')} - ${moment(itinerary.end_date).format('MMM Do')}`
-                    : 'No itinerary available'}
-            </Text>
+            {!itinerary && <Button text="Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />}
+            {itinerary && <Button text="Add Event" style={styles.button} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />}
+            {!itinerary && <Text>No itinerary available</Text>}
+            {itinerary && (
+                <View>
+                    <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
+                    <Text><Text style={{ fontWeight: 'bold' }}>Num of Pax:</Text> {itinerary.number_of_pax}</Text>
+                    <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
+                </View>
+            )}
             {itinerary && (
                 <View style={styles.iconContainer}>
                     {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
@@ -234,23 +238,24 @@ const ItineraryScreen = ({ navigation }) => {
                 </View>
             )}
 
-            <View style={{ flex: 1 }}>
-
-                <TabView
-                    navigationState={{ index, routes }}
-                    renderScene={renderScene}
-                    onIndexChange={handleTabChange}
-                    initialLayout={{ width: '100%' }}
-                    scrollEnabled={true}
-                    renderTabBar={props => (
-                        <TabBar
-                            {...props}
-                            scrollEnabled={true}
-                            tabStyle={{ width: calculateTabWidth() }}
-                        />
-                    )}
-                />
-            </View>
+            {itinerary && (
+                <View style={{ flex: 1 }}>
+                    <TabView
+                        navigationState={{ index, routes }}
+                        renderScene={renderScene}
+                        onIndexChange={handleTabChange}
+                        initialLayout={{ width: '100%' }}
+                        scrollEnabled={true}
+                        renderTabBar={props => (
+                            <TabBar
+                                {...props}
+                                scrollEnabled={true}
+                                tabStyle={{ width: calculateTabWidth() }}
+                            />
+                        )}
+                    />
+                </View>
+            )}
 
             {/* View DIY Event Modal */}
             <View style={styles.centeredView}>
@@ -268,15 +273,15 @@ const ItineraryScreen = ({ navigation }) => {
                             <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
 
                             <View>
-                                <Text><Text style={{fontWeight: 'bold'}}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
-                                <Text><Text style={{fontWeight: 'bold'}}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
-                                <Text><Text style={{fontWeight: 'bold'}}>Location:</Text> {diyObject?.location}</Text>
-                                <Text style={{fontWeight: 'bold', marginTop: 10}}>Remarks:</Text>
+                                <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
+                                <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
+                                <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
+                                <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
                                 <Text>{diyObject?.remarks}</Text>
                             </View>
 
                             {/* close modal button */}
-                            <View style={{marginLeft: 75, marginTop: 20}}>
+                            <View style={{ marginLeft: 75, marginTop: 20 }}>
                                 <Pressable
                                     style={[styles.modalButton, styles.buttonClose]}
                                     onPress={() => {

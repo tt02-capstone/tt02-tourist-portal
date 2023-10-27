@@ -436,8 +436,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         </Button>
                     </Card.Title>
 
-                    <Button text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction })} />
-
                     <View style={styles.tagContainer}>
                         <Text style={[styles.typeTag, { backgroundColor: getColorForType(attraction.attraction_category) }, { textAlign: 'center' },]}>
                             {attraction.attraction_category}
@@ -449,6 +447,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
                             {attraction.generic_location ? attraction.generic_location.replace(/_/g, ' ') : ''}
                         </Text>
                     </View>
+
+                    <CartButton text="Add to Itinerary" style={{ backgroundColor: '#5f80e3', fontSize: 10, width: 150, alignSelf: 'center' }} onPress={() => navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction })} />
 
                     <View style={styles.carouselContainer}>
                         <Carousel
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
         marginLeft: '30%',
         marginRight: '30%',
         backgroundColor: '#5f80e3',
-        color: 'black'
+        fontSize: 10,
     },
 });
 

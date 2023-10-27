@@ -149,7 +149,6 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
         console.log("diyEventObj", diyEventObj);
         console.log("type", type);
 
-
         let response = await createDiyEvent(itinerary.itinerary_id, typeId, type, diyEventObj);
         if (response.status) {
             setIsSubmit(false);

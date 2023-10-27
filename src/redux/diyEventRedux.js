@@ -1,6 +1,16 @@
 import { diyEventApi } from "../helpers/api";
 import { handleApiErrors } from "../helpers/errorCatching";
 
+export async function getAllDiyEventsByDay(itineraryId, day) {
+    try {
+      const response = await diyEventApi.get(`/getAllDiyEventsByDay/${itineraryId}/${day}`);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("diyEventRedux getAllDiyEventsByDay Error : ", error);
+      return {status: false, data: error.message};
+    }
+}
+
 export async function createDiyEvent(itineraryId, typeId, type, diyEventToCreate) {
   try {
     const response = await diyEventApi.post(`/createDiyEvent/${itineraryId}/${typeId}/${type}`, diyEventToCreate);

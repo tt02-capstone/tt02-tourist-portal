@@ -52,7 +52,7 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                 console.log("createAttractionDIYEventScreen itinerary", response.data)
                 setItinerary(response.data);
 
-                console.log("itineraryid", itinerary.itinerary_id);
+                console.log("itineraryid", response.data.itinerary_id);
 
                 setLoading(false);
             } catch (error) {

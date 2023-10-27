@@ -141,7 +141,7 @@ const CreateItineraryScreen = ({ navigation }) => {
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
                 <View style={{ alignItems: 'center', minHeight: '100%' }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
-                        <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray', color: 'blue'}}>
+                        <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray'}}>
                             {values.start_date && values.end_date ? `${formatDatePicker(values.start_date)} - ${formatDatePicker(values.end_date)}` : 'Pick range'}
                         </Button>
                         <DatePickerModal
@@ -155,8 +155,8 @@ const CreateItineraryScreen = ({ navigation }) => {
                             onConfirm={onConfirm}
                             onDismiss={onDismiss}
                             inputMode="start"
+                            
                         />
-
 
                         <TextInput
                             style={styles.input}

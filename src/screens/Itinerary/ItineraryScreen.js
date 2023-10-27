@@ -14,6 +14,7 @@ import { IconButton } from 'react-native-paper';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { set } from 'date-fns';
+import moment from 'moment';
 
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -37,19 +38,22 @@ const ItineraryScreen = ({ navigation }) => {
                 // console.log("userId", userId);
 
                 let response = await getItineraryByUser(userId);
-                // console.log("response.data", response.data)
-                setItinerary(response.data);
+                console.log("getItineraryByUser response.data", response.data)
                 setLoading(false);
 
-                const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
-                const generatedRoutes = [];
-                for (let i = 0; i < numberOfDays; i++) {
-                    generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
-                }
-                setRoutes(generatedRoutes);
-                console.log("generatedRoutes", generatedRoutes);
+                if (response.data) {
+                    setItinerary(response.data);
 
-                getFirstDayDiyEvents(response.data);
+                    const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
+                    const generatedRoutes = [];
+                    for (let i = 0; i < numberOfDays; i++) {
+                        generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
+                    }
+                    setRoutes(generatedRoutes);
+                    console.log("generatedRoutes", generatedRoutes);
+
+                    getFirstDayDiyEvents(response.data);
+                }
             } catch (error) {
                 alert('An error occurred! Failed to retrieve itinerary!');
                 setLoading(false);
@@ -122,6 +126,8 @@ const ItineraryScreen = ({ navigation }) => {
                 text1: 'Itinerary deleted!'
             })
 
+            onLoad();
+
         } else {
             console.log("Itinerary deletion failed!");
             console.log(response.data);
@@ -155,11 +161,19 @@ const ItineraryScreen = ({ navigation }) => {
 
         return (
             <View style={{ flex: 1 }}>
-                {currentDiyEvents.map(event => (
-                    <Card>
-                        <Text>{event.name}</Text>
-                    </Card>
-                ))}
+                {currentDiyEvents.length > 0 ? (
+                    currentDiyEvents.map(event => (
+                        <Card key={event.diy_event_id}>
+                            <Text>{event.name}</Text>
+                            <Text>{moment(event.start_datetime).format('lll')}</Text>
+                            <Text>{moment(event.end_datetime).format('lll')}</Text>
+                            <Text>{event.location}</Text>
+                            <Text>{event.remarks}</Text>
+                        </Card>
+                    ))
+                ) : (
+                    <Text>No events available for this day.</Text>
+                )}
             </View>
         );
     }
@@ -167,20 +181,29 @@ const ItineraryScreen = ({ navigation }) => {
     return (
         <View style={{ height: 400 }}>
             <Button text="+ Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
-            <View style={styles.iconContainer}>
-                <IconButton
-                    icon="pencil"
-                    size={20}
-                    style={styles.icon}
-                    onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
-                />
-                <IconButton
-                    icon="delete"
-                    size={20}
-                    style={styles.icon}
-                    onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}
-                />
-            </View>
+            <Text>
+                {itinerary
+                    ? `${moment(itinerary.start_date).format('MMM Do')} - ${moment(itinerary.end_date).format('MMM Do')}`
+                    : 'No itinerary available'}
+            </Text>
+            {itinerary && (
+                <View style={styles.iconContainer}>
+                    {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
+                        <IconButton
+                            icon="pencil"
+                            size={20}
+                            style={styles.icon}
+                            onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
+                        />
+                    )}
+                    <IconButton
+                        icon="delete"
+                        size={20}
+                        style={styles.icon}
+                        onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}
+                    />
+                </View>
+            )}
 
             <View style={{ flex: 1 }}>
 

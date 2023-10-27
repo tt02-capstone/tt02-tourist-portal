@@ -161,7 +161,7 @@ const EditItineraryScreen = ({ navigation }) => {
     return (
         <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.header}>
-                Edit Support Ticket
+                Edit Itinerary
             </Text>
 
             <ScrollView automaticallyAdjustKeyboardInsets={true}>

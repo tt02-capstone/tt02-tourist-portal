@@ -17,6 +17,8 @@
     "@mui/material": "^5.14.14",
     "@mui/x-tree-view": "^6.0.0-beta.0",
     "@react-native-async-storage/async-storage": "1.18.2",
+    "@react-native-community/datetimepicker": "^7.6.1",
+    "@react-native-community/viewpager": "^5.0.11",
     "@react-navigation/drawer": "^6.6.4",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",

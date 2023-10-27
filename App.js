@@ -57,6 +57,11 @@ import { ReportCommentScreen } from './src/screens/Forum/ReportCommentScreen';
 import { BadgesScreen } from './src/screens/Profile/BadgesScreen';
 import registerNNPushToken from 'native-notify';
 import NotificationScreen from './src/screens/Notification/NotificationScreen';
+import ItineraryScreen from './src/screens/Itinerary/ItineraryScreen';
+import CreateItineraryScreen from './src/screens/Itinerary/CreateItineraryScreen';
+import EditItineraryScreen from './src/screens/Itinerary/EditItineraryScreen';
+import CreateAttractionDIYEventScreen from './src/screens/Attraction/CreateAttractionDIYEventScreen';
+import CreateDIYEventScreen from './src/screens/Itinerary/CreateDIYEventScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -88,6 +93,7 @@ function MyDrawer() {
         <Drawer.Screen name="Profile" component={ViewProfileScreen} />
         <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
         <Drawer.Screen name="Forum" component={CategoryScreen} />
+        <Drawer.Screen name="Itinerary" component={ItineraryScreen} />
         <Drawer.Screen name="Attractions" component={AttractionScreen} />
         <Drawer.Screen name="Accommodations" component={AccommodationScreen} />
         <Drawer.Screen name="Telecoms" component={TelecomScreen} />
@@ -153,10 +159,15 @@ export const Layout = () => {
                         <Stack.Screen name="CreatePostScreen" component={CreatePostScreen} options={{ title : 'Create Post' }} />
                         <Stack.Screen name="UpdatePostScreen" component={UpdatePostScreen} options={{ title : 'Update Post' }} />
                         <Stack.Screen name="PostScreen" component={PostScreen} options={{ title : 'Post' }} />
-                        <Stack.Screen name="ForumProfileScreen" component={ForumProfileScreen} options={{ title : 'User Forum P Post' }} />
+                        <Stack.Screen name="ForumProfileScreen" component={ForumProfileScreen} options={{ title : 'Forum User Details' }} />
                         <Stack.Screen name="ReportPostScreen" component={ReportPostScreen} options={{ title : 'Report Post' }} />
                         <Stack.Screen name="ReportCommentScreen" component={ReportCommentScreen} options={{ title : 'Report Comment' }} />
                         <Stack.Screen name="BadgesScreen" component={BadgesScreen} options={{ title : 'Badges' }} />
+                        <Stack.Screen name="ItineraryScreen" component={ItineraryScreen} options={{ title : 'Itinerary' }} />
+                        <Stack.Screen name="CreateItineraryScreen" component={CreateItineraryScreen} options={{ title : 'Create Itinerary' }} />
+                        <Stack.Screen name="EditItineraryScreen" component={EditItineraryScreen} options={{ title : 'Edit Itinerary' }} />
+                        <Stack.Screen name="CreateDIYEventScreen" component={CreateDIYEventScreen} options={{ title : 'Create New Event' }} />
+                        <Stack.Screen name="CreateAttractionDIYEventScreen" component={CreateAttractionDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
                     </>
                 ) : (
                     <>

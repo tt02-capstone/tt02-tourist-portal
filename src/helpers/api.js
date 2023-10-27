@@ -10,14 +10,14 @@ export const userApi = axios.create({
 })
 
 export const loggedUserApi = (usertype) => {
-     if (usertype === 'LOCAL')
-         return localApi
+    if (usertype === 'LOCAL')
+        return localApi
     else if (usertype === 'TOURIST')
         return touristApi
     else
         return Error('User type is neither local nor tourist')
-
 }
+
 export const localApi = axios.create({
     baseURL: HOST_WITH_PORT + '/local'
 })
@@ -94,13 +94,20 @@ export const badgeApi = axios.create({
     baseURL: HOST_WITH_PORT + '/badge'
 })
 
+export const itineraryApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/itinerary'
+})
+
+export const diyEventApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/diyEvent'
+})
+
 export const notificationApi = axios.create({
     baseURL: HOST_WITH_PORT + '/notification'
 })
 
-
 const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, 
-                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, notificationApi]
+                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi, diyEventApi, notificationApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( async (config) => {

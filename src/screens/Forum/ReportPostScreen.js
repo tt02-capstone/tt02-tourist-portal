@@ -1,21 +1,21 @@
 import React, {useEffect, useState} from 'react'
-import {StyleSheet } from 'react-native'
+import {StyleSheet, View } from 'react-native'
 import { useRoute } from '@react-navigation/native';
 import Button from '../../components/Button'
 import TextInput from '../../components/TextInput'
-import { Provider, Surface, ThemeProvider, } from "react-native-paper";
+import Background from '../../components/CardBackground'
+import RNPickerSelect from 'react-native-picker-select';
 import { getUser } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import InputValidator from "../../helpers/InputValidator";
+import { theme } from '../../core/theme'
 import { reportPost } from '../../redux/reportRedux';
-import DropDown from "react-native-paper-dropdown";
 
 export const ReportPostScreen = ({navigation}) => {
 
     const [user, setUser] = useState('');
     const route = useRoute();
     const { catId, postId } = route.params;
-    const [showDropDown, setShowDropDown] = useState(false); // dropdown boolean
 
     const [formData, setFormData] = useState({ // form input fields
         content: '',
@@ -30,21 +30,6 @@ export const ReportPostScreen = ({navigation}) => {
     useEffect(() => {
         fetchUser();
     }, []);
-
-    const reasonTypeList = [
-        {
-          label: "Offensive Behaviour",
-          value: "OFFENSIVE_BEHAVIOUR",
-        },
-        {
-          label: "Inappropriate Content",
-          value: "INAPPROPRIATE_CONTENT",
-        },
-        {
-          label: "Others",
-          value: "OTHER",
-        },
-      ];
 
     const onReportPressed = async () => {
         if (!formData.reason_type) {
@@ -84,49 +69,95 @@ export const ReportPostScreen = ({navigation}) => {
     }
 
     return (
-        <Provider>
-            <ThemeProvider>
-                <Surface style={styles.containerStyle}>
-                    <DropDown
-                        label={"Reason"}
-                        mode={"outlined"}
-                        visible={showDropDown}
-                        showDropDown={() => setShowDropDown(true)}
-                        onDismiss={() => setShowDropDown(false)}
-                        value={formData.reason_type}
-                        dropDownStyle={{marginTop: -42}}
-                        setValue={(reason_type) => setFormData({...formData, reason_type})}
-                        list={reasonTypeList}
-                    />
-                </Surface>
+        <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{marginTop: 50}}>
+                <RNPickerSelect
+                    placeholder={{
+                        label: 'Reason',
+                        value: null,
+                    }}
+                    onValueChange={(value) => setFormData({ ...formData, reason_type: value })}
+                    items={[
+                        { label: 'Offensive Behaviour', value: 'OFFENSIVE_BEHAVIOUR' },
+                        { label: 'Inappropriate Content', value: 'INAPPROPRIATE_CONTENT' },
+                        { label: 'Others', value: 'OTHER' },
+                    ]}
+                    value={formData.reason_type}
+                    style={pickerSelectStyles}
+                />
+            </View>
 
-                <TextInput
-                style={{marginLeft: 20, width: 350, height: 280, marginTop: -200, marginBottom: 10 }}
-                label="Reason"
+            <TextInput
+                style={{marginLeft: 0, width: 370, height: 250 }}
+                label="Please describe in detail"
                 multiline={true}
                 returnKeyType="next"
                 value={formData.content}
                 onChangeText={(content) => setFormData({...formData, content})}
                 errorText={formData.content ? InputValidator.text(formData.content) : ''}
             />
-            </ThemeProvider>
 
             <Button
-                style={{marginLeft: 20, width: 350, marginBottom: 300 }}
+                style={{marginLeft: 10, width: 350, marginBottom: 300 }}
                 mode="contained"
                 text={"Report"}
                 onPress={onReportPressed}
             />
-        </Provider>
+        </Background>
     )
 }
 
 const styles = StyleSheet.create({
-    containerStyle: {
-      flex: 1,
-      marginLeft: 20,
-      marginRight: 20,
-      marginTop: 20,
-      width: 350,
+    tag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 90,
+        fontSize: 10,
+        fontWeight: 'bold'
+    },
+    boldText: {
+        fontWeight: 'bold',
+    },
+    header: {
+        fontSize: 21,
+        color: theme.colors.primary,
+        fontWeight: 'bold',
+        paddingVertical: 12,
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 10
+    },
+    description: {
+        width: 320,
+        height: 200,
+        marginTop: -15,
+        textAlignVertical: 'top'
+    }
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 4,
+        color: 'black',
+        paddingRight: 30,
+        marginBottom: 15,
+    },
+    inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: 'purple',
+        borderRadius: 8,
+        color: 'black',
+        paddingRight: 30,
     },
 });

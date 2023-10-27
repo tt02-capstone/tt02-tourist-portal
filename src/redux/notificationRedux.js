@@ -2,12 +2,32 @@ import axios from 'axios';
 import { notificationApi } from '../helpers/api';
 import { handleApiErrors } from '../helpers/errorCatching';
 
-export async function sendNotification(date) {
+export async function sendNotification(userId, date) {
     try {
-        const response = await notificationApi.post(`/sendNotification`, {date: date});
+        const response = await notificationApi.post(`/sendNotification/${userId}`, {date: date});
         return handleApiErrors(response);
     } catch (error) {
         console.error("notificationRedux sendNotification Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function getUserNotification(userId) {
+    try {
+        const response = await notificationApi.get(`/getUserNotification/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("notificationRedux getUserNotification Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function updateNotification(notificationId) {
+    try {
+        const response = await notificationApi.put(`/updateNotification/${notificationId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("notificationRedux updateNotification Error : ", error);
         return {status: false, data: error.message};
     }
 }
@@ -28,16 +48,4 @@ export async function sendNotification(date) {
 //         console.error("notificationRedux sendNotification: ", error);
 //         return {status: false, data: error.message};
 //     });
-// }
-
-// POST message
-// https://app.nativenotify.com/api/notification
-// {
-//     appId: 13960,
-//     appToken: "BEbA270k2T53VV6Cu8pZIZ",
-//     title: "Push title here as a string",
-//     body: "Push message here as a string",
-//     dateSent: "10-25-2023 3:14PM",
-//     pushData: { yourProperty: "yourPropertyValue" }, // optional
-//     bigPictureURL: Big picture URL as a string // optional
 // }

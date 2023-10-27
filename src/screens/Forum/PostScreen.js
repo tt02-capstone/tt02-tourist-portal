@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Background from '../../components/CardBackground';
-import { View, StyleSheet, Image, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, Modal, Pressable, ScrollView } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Card } from '@rneui/themed';
 import { getUser } from '../../helpers/LocalStorage';
@@ -14,6 +14,11 @@ import Toast from "react-native-toast-message";
 import CheckboxTree from 'react-native-checkbox-tree';
 import TextInput from "../../components/TextInput";
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { getPostRecommendation } from '../../redux/recommendationRedux';
+import ForumAttractionRecom from './ForumRecommendation/ForumAttractionRecom';
+import { theme } from '../../core/theme'
+import ForumRestaurantRecom from './ForumRecommendation/ForumRestaurantRecom';
+import ForumAccommodationRecom from './ForumRecommendation/ForumAccommodationRecom';
 
 const PostScreen = ({ navigation }) => {
 
@@ -35,6 +40,9 @@ const PostScreen = ({ navigation }) => {
     const [formData, setFormData] = useState({
         parentComment: ''
     })
+
+    // recommendation
+    const [recommendation, setRecommendation] = useState([]);
 
     async function fetchUser() {
         const userData = await getUser()
@@ -58,6 +66,22 @@ const PostScreen = ({ navigation }) => {
             setFetchPost(false);
         }
     }, [postId, fetchPost, isFocused]);
+
+    // fetch recommendation
+    useEffect(() => {
+        const fetchData = async (id) => {
+            let response = await getPostRecommendation(id);
+            if (response.status) {
+                setRecommendation(response.data);
+            } else {
+                console.log("Recommendation not fetch!");
+            }
+        }
+
+        if (catId) {
+            fetchData(catId);
+        }
+    }, [catId])
 
     const onUpvotePressed = async () => {
         if (!user.upvoted_user_id_list || !user.upvoted_user_id_list.includes(user.user_id)) {
@@ -154,6 +178,7 @@ const PostScreen = ({ navigation }) => {
             if (response.status) {
                 setFormData({parentComment: ''})
                 setFetchComment(true);
+                setShowParentCommentTextInput(false);
                 Toast.show({
                     type: 'success',
                     text1: 'Commented!'
@@ -334,11 +359,34 @@ const PostScreen = ({ navigation }) => {
         navigation.navigate('ForumProfileScreen', { postId: postId, catId: catId, userId: userId});
     }
 
+    // factor for recommendations 
+    const viewRecommendedAttraction = (redirect_attraction_id) => {
+        navigation.push('AttractionDetailsScreen', { attractionId: redirect_attraction_id });
+    }
+
+    const viewRecommendedRest = (redirect_rest_id) => {
+        navigation.push('RestaurantDetailsScreen', { restId: redirect_rest_id });
+    }
+
+    const viewRecommendedAccom = (redirect_accom_id) => {
+        navigation.push('AccommodationDetailsScreen', { accommodationId: redirect_accom_id });
+    }
+
+    const handleItemClick = (item) => {
+        if (item.listing_type === "ATTRACTION") {
+            viewRecommendedAttraction(item.attraction_id);
+        } else if (item.listing_type === "RESTAURANT") {
+            viewRecommendedRest(item.restaurant_id);
+        } else if (item.listing_type === "ACCOMMODATION") {
+            viewRecommendedAccom(item.accommodation_id);
+        }
+    }
+
     return post ? (
         <Background>
             <View style={{height: 750}}>
                 <Card>
-                {post.local_user && 
+                    {post.local_user && 
                         <View style={{flexDirection: 'row'}}>
                             <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => viewUserProfile(post.local_user.user_id)}>
                                 <Image
@@ -347,6 +395,7 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
                             </TouchableOpacity>
+
                             {post.local_user.user_id === user.user_id && 
                                 <TouchableOpacity style={{marginLeft: 160}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
                                     <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
@@ -366,7 +415,7 @@ const PostScreen = ({ navigation }) => {
                             </TouchableOpacity>
 
                             {post.tourist_user.user_id === user.user_id && 
-                                <TouchableOpacity style={{marginLeft: 160}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                <TouchableOpacity style={{marginLeft: 180}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
                                     <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
                                 </TouchableOpacity>
                             }
@@ -382,6 +431,12 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.internal_staff_user.name}</Text>
                             </TouchableOpacity>
+
+                            {post.internal_staff_user.user_id === user.user_id && 
+                                <TouchableOpacity style={{marginLeft: 180}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
+                                </TouchableOpacity>
+                            }
                         </View>
                     }
 
@@ -394,6 +449,12 @@ const PostScreen = ({ navigation }) => {
                                 />
                                 <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.vendor_staff_user.name}</Text>
                             </TouchableOpacity>
+
+                            {post.vendor_staff_user.user_id === user.user_id && 
+                                <TouchableOpacity style={{marginLeft: 180}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
+                                </TouchableOpacity>
+                            }
                         </View>
                     }
                     <Card.Divider />
@@ -412,19 +473,50 @@ const PostScreen = ({ navigation }) => {
                         <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
                         <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list ? post.upvoted_user_id_list.length : 0}</Text>
                         <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
-                        <Text style={{marginLeft: 50}} >Posted on {moment(post.publish_time).format('lll')}</Text>
 
-                        {/* <Button style={{marginLeft: 20, height: 40, width: 130, marginBottom: -8, marginTop: -8, marginRight: 0, backgroundColor: '#044537'}} mode="contained" onPress={onNewParentCommentPressed}>Comment</Button>
-                        <Button style={{marginLeft: 10, height: 40, width: 110, marginBottom: -8, marginTop: -8, backgroundColor: '#044537'}} mode="contained" onPress={onReportPostPressed}>Report</Button> */}
+                        <TouchableOpacity style={{marginLeft: 45, marginTop: -5}} mode="text" onPress={onNewParentCommentPressed}>
+                                    <Ionicons name="brush" style={{ color: 'black'}} size={25}/>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={{marginLeft: 20, marginTop: -5}} mode="text" onPress={onReportPostPressed}>
+                                    <Ionicons name="flag" style={{ color: 'black'}} size={25}/>
+                        </TouchableOpacity>
+
+                        <Text style={{marginLeft: 20, marginTop: 3}} >Last edit: {moment(post.publish_time).format('LT')}</Text>
                     </View>
 
+                    {/* recommendation */}
+                    <View style={{marginBottom: -15}}>
+                        {recommendation && recommendation.length > 0 && <Text style={{marginLeft: 0, marginTop: 15, marginBottom: -10, fontSize: 15, fontWeight: 'bold'}}>Nearby Recommendations</Text>}
+                        {recommendation.length > 0 && (
+                            <ScrollView horizontal>
+                                <View style={{ flexDirection: 'row', height: 120}}>
+                                    {
+                                        recommendation.map((item, index) => (
+                                            <TouchableOpacity key={index} onPress={() => handleItemClick(item)}>
+                                                {item.listing_type === 'ATTRACTION' && (
+                                                    <ForumAttractionRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'RESTAURANT' && (
+                                                    <ForumRestaurantRecom item={item} />
+                                                )}
+                                                {item.listing_type === 'ACCOMMODATION' && (
+                                                    <ForumAccommodationRecom item={item} />
+                                                )}
+                                            </TouchableOpacity>
+                                        ))
+                                    }
+                                </View>
+                            </ScrollView>
+                        )}
+                    </View>
                 </Card>
 
                 {/* Comments from here onwards */}
                 {comments && comments.length > 0 && <Text style={{marginLeft: 20, marginTop: 10, fontSize: 15, fontWeight: 'bold'}}>Comments</Text>}
                 <View style={{height: 370, width: 360, marginLeft: 5}}>
                     {showParentCommentTextInput &&
-                        <View style={{flexDirection: 'row'}}>
+                        <View style={{flexDirection: 'row', marginTop: -10, marginBottom: -15}}>
                             <TextInput
                                 label="Add New Comment"
                                 returnKeyType="next"
@@ -441,8 +533,9 @@ const PostScreen = ({ navigation }) => {
 
                     {(!comments || (comments && comments.length === 0)) && <Text style={{ textAlign: 'center', fontSize: 20, marginTop: 20}} >No Comments Written</Text>}
 
+                    {/* comment tree */}
                     <View style={styles.container}>
-                    {comments && comments.length > 0 && 
+                        {comments && comments.length > 0 && 
                         <CheckboxTree
                             ref={ref}
                             clear
@@ -460,7 +553,9 @@ const PostScreen = ({ navigation }) => {
                                     <View style={{flexDirection: 'column',}}>
                                         {item.tourist_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.tourist_user.user_id)}>{item.tourist_user.name}</Text>}
                                         {item.local_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.local_user.user_id)}>{item.local_user.name}</Text>}
-                                        <Text style={{fontSize: 15, marginBottom: 10}}>{item.content}</Text>
+                                        {item.vendor_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.vendor_staff_user.user_id)}>{item.vendor_staff_user.name}</Text>}
+                                        {item.internal_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.internal_staff_user.user_id)}>{item.internal_staff_user.name}</Text>}
+                                        <Text style={{fontSize: 15, marginBottom: 10, marginTop: 5}}>{item.content}</Text>
 
                                         <View style={{flexDirection: 'row',}}>
                                             <Ionicons name="arrow-up" size={20} color={item && item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onUpvoteCommentPressed(item.comment_id)} />
@@ -478,12 +573,14 @@ const PostScreen = ({ navigation }) => {
 
                                             {item.local_user && item.local_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
                                             {item.tourist_user && item.tourist_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+
+                                            <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2 }}>{moment(item.updated_time).format('LT')}</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
                             )}
                         />
-                    }
+                        }
                     </View>
                 </View>
             </View>
@@ -506,7 +603,7 @@ const PostScreen = ({ navigation }) => {
                             <TextInput
                                 label="Add New Comment"
                                 multiline={true}
-                                style={{width: 260, height: 100, marginLeft: -10}}
+                                style={{width: 260, marginLeft: -10}}
                                 value={formCreateComment}
                                 onChangeText={(formCreateComment) => setFormCreateComment(formCreateComment)}
                                 autoCapitalize="none"
@@ -553,7 +650,7 @@ const PostScreen = ({ navigation }) => {
 
                             <TextInput
                                 multiline={true}
-                                style={{width: 260, height: 100, marginLeft: -10}}
+                                style={{width: 260, marginLeft: -15}}
                                 value={formUpdateComment}
                                 onChangeText={(formUpdateComment) => setFormUpdateComment(formUpdateComment)}
                                 autoCapitalize="none"
@@ -582,10 +679,9 @@ const PostScreen = ({ navigation }) => {
                     </View>
                 </Modal>
             </View>
-
         </Background>
     ) : (
-        <View></View>
+        <Background></Background>
     )
 }
 const styles = StyleSheet.create({
@@ -612,7 +708,7 @@ const styles = StyleSheet.create({
         marginTop: 0,
         marginBottom: 10,
         width: 320,
-        height: 150,
+        height: 140,
     },
     profileImage: {
         marginTop: 0,
@@ -629,7 +725,9 @@ const styles = StyleSheet.create({
     header: {
         color: '#044537',
         fontSize: 15,
-        minWidth: '100%'
+        minWidth: '100%',
+        marginTop: -5,
+        marginBottom: 5,
     },
     card: {
         marginBottom: 16,
@@ -721,6 +819,15 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
+    },
+    dropBorder: {
+        borderWidth: 0,
+        shadowColor: 'rgba(0,0,0, 0.0)',
+        shadowOffset: { height: 0, width: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+        backgroundColor: theme.colors.surface,
     },
 });
 

@@ -65,6 +65,7 @@ import CreateDIYEventScreen from './src/screens/Itinerary/CreateDIYEventScreen';
 import SendNotificationScreen from './src/screens/Notification/SendNotificationScreen';
 import { CommonHeader } from './src/screens/CommonHeader';
 import CreateAccommodationDIYEventScreen from './src/screens/Accommodation/CreateAccommodationDIYEventScreen';
+import CreateTelecomDIYEventScreen from './src/screens/Telecom/CreateTelecomDIYEventScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -173,6 +174,7 @@ export const Layout = () => {
                         <Stack.Screen name="CreateAttractionDIYEventScreen" component={CreateAttractionDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
                         <Stack.Screen name="NotificationScreen" component={NotificationScreen} options={{ title : 'Notification' }} />
                         <Stack.Screen name="CreateAccommodationDIYEventScreen" component={CreateAccommodationDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
+                        <Stack.Screen name="CreateTelecomDIYEventScreen" component={CreateTelecomDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
                     </>
                 ) : (
                     <>

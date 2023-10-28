@@ -462,13 +462,13 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         </Button>
                     </Card.Title>
 
-                    <Button text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} />
-
                     <View style={styles.tagContainer}>
                         <Text style={[styles.tag, { backgroundColor: getColorForType(accommodation.type), textAlign: 'center' }]}>{accommodation.type}</Text>
                         <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{accommodation.estimated_price_tier ? accommodation.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
                         <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{accommodation.generic_location ? accommodation.generic_location.replace(/_/g, ' ') : ''}</Text>
                     </View>
+
+                    <CartButton text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} />
 
                     <View style={styles.carouselContainer}>
                         <Carousel

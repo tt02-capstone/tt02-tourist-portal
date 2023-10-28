@@ -16,6 +16,7 @@ import { getTelecomById, toggleSaveTelecom } from '../../redux/telecomRedux';
 import { addTelecomToCart } from '../../redux/cartRedux';
 import moment from 'moment-timezone';
 import {timeZoneOffset} from "../../helpers/DateFormat";
+import CreateTelecomDIYEventScreen from './CreateTelecomDIYEventScreen';
 
 const TelecomDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -203,6 +204,8 @@ const TelecomDetailsScreen = ({ navigation }) => {
                     </Text>
 
                     <Text style={styles.description}>{telecom.description}</Text>
+
+                    <CartButton text="Add to Itinerary" style={styles.itineraryButton} onPress={() => navigation.navigate('CreateTelecomDIYEventScreen', { typeId: telecom.telecom_id, selectedTelecom: telecom })} />
                 </Card>
                 
                 <Card containerStyle={styles.dropBorder}>
@@ -316,6 +319,13 @@ const styles = StyleSheet.create({
         marginTop: -5,
         width: '100%',
         alignSelf: 'center',
+    },
+    itineraryButton: {
+        width: '40%',
+        marginLeft: '30%',
+        marginRight: '30%',
+        backgroundColor: '#5f80e3',
+        color: 'black'
     }
     
 });

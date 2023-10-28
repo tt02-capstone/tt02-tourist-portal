@@ -21,6 +21,7 @@ import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { getRecommendation } from '../../redux/recommendationRedux';
 import moment from 'moment';
+import CreateAttractionDIYEventScreen from './CreateAccommodationDIYEventScreen';
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -461,6 +462,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         </Button>
                     </Card.Title>
 
+                    <Button text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} />
+
                     <View style={styles.tagContainer}>
                         <Text style={[styles.tag, { backgroundColor: getColorForType(accommodation.type), textAlign: 'center' }]}>{accommodation.type}</Text>
                         <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{accommodation.estimated_price_tier ? accommodation.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
@@ -812,6 +815,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
         resizeMode: 'cover',
+    },
+    button: {
+        width: '40%',
+        marginLeft: '30%',
+        marginRight: '30%',
+        backgroundColor: '#5f80e3',
+        color: 'black'
     },
 });
 

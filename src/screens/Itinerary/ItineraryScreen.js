@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { theme } from '../../core/theme'
 import Button from '../../components/Button'
-import { View, ScrollView, StyleSheet, Modal, Alert, Pressable } from 'react-native';
+import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
-import { getAllDiyEventsByDay } from '../../redux/diyEventRedux';
+import { getAllDiyEventsByDay, deleteDiyEvent } from '../../redux/diyEventRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useIsFocused } from "@react-navigation/native";
@@ -15,6 +15,7 @@ import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { set } from 'date-fns';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -42,7 +43,6 @@ const ItineraryScreen = ({ navigation }) => {
     }, [isFocused]);
 
     async function onLoad() {
-        console.log("entering onLoad")
         try {
             const userData = await getUser();
             setUser(userData);
@@ -177,15 +177,58 @@ const ItineraryScreen = ({ navigation }) => {
         }
     }
 
+    const handleDeleteDiyEventPress = (eventId) => {
+        Alert.alert(
+            "Delete Confirmation",
+            "Are you sure you want to delete this event?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Delete Cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handleDeleteDiyEvent(eventId)
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    const handleDeleteDiyEvent = async (eventId) => {
+        let response = await deleteDiyEvent(eventId);
+        if (response.status) {
+            Toast.show({
+                type: 'success',
+                text1: 'Event deleted!'
+            });
+
+            const index = currentDiyEvents.findIndex(event => event.diy_event_id === eventId);
+            if (index !== -1) {
+                const updatedDiyEvents = [...currentDiyEvents];
+                updatedDiyEvents.splice(index, 1);
+                setCurrentDiyEvents(updatedDiyEvents);
+            }
+        } else {
+            console.log("Event deletion failed!");
+            console.log(response.data);
+            Toast.show({
+                type: 'error',
+                text1: response.data.errorMessage
+            });
+        }
+    };
+
     const renderScene = ({ route }) => {
         // console.log("renderScene called with route key:", route.key);
         const dayNum = route.key === '1' ? 1 : parseInt(route.key.replace('day', ''));
 
         return (
-            <View style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
                 {currentDiyEvents.length > 0 ? (
                     currentDiyEvents.map(event => (
-                        <Card key={event.diy_event_id}>
+                        <Card key={event.diy_event_id} style={styles.card}>
                             <Text>{event.name}</Text>
                             <Text>{moment(event.start_datetime).format('lll')}</Text>
                             <Text>{moment(event.end_datetime).format('lll')}</Text>
@@ -198,12 +241,18 @@ const ItineraryScreen = ({ navigation }) => {
                             {event.booking && <Text>Booking: {event.booking.booking_id}</Text>}
                             {!event.attraction && !event.accommodation && !event.telecom && !event.restaurant && !event.booking && <Text>DIY: {event.diy_event_id}</Text>}
                             <Text onPress={() => navigateFunction(event)}>Go</Text>
+                            {!event.booking && <IconButton
+                                icon="delete"
+                                size={20}
+                                style={[styles.icon, styles.closeButton]}
+                                onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
+                            />}
                         </Card>
                     ))
                 ) : (
                     <Text>No events available for this day.</Text>
                 )}
-            </View>
+            </ScrollView>
         );
     }
 
@@ -372,6 +421,11 @@ const styles = StyleSheet.create({
         shadowRadius: 0,
         elevation: 0,
         backgroundColor: theme.colors.surface,
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
     },
 });
 

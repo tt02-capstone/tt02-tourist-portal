@@ -59,6 +59,7 @@ const NotificationScreen = ({ navigation }) => {
         <Background style={{alignItems: 'center' }}>
             <ScrollView style={{marginTop: 15}}>
                 <View>
+                    {!dataList || (dataList && dataList.length) === 0 && <Text style={{fontSize: 20, marginTop: 10}}>No Notification Currently</Text>}
                     {dataList.map((item, index) => (
                         <TouchableOpacity key={index} style={styles.card} onPress={() => onPressed(item.notification_id)}>
                             <Card>

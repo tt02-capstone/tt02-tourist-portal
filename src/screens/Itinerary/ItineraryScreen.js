@@ -15,7 +15,6 @@ import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { set } from 'date-fns';
 import moment from 'moment';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -196,6 +195,10 @@ const ItineraryScreen = ({ navigation }) => {
         );
     };
 
+    const handleEditDiyEventPress = (event) => {
+        navigation.navigate('EditDIYEventScreen', { diyEventData: event });
+    };
+
     const handleDeleteDiyEvent = async (eventId) => {
         let response = await deleteDiyEvent(eventId);
         if (response.status) {
@@ -247,6 +250,12 @@ const ItineraryScreen = ({ navigation }) => {
                                 style={[styles.icon, styles.closeButton]}
                                 onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                             />}
+                            <IconButton
+                                icon="pencil"
+                                size={20}
+                                style={[styles.icon, styles.editButton]}
+                                onPress={() => handleEditDiyEventPress(event)}
+                            />
                         </Card>
                     ))
                 ) : (
@@ -427,6 +436,11 @@ const styles = StyleSheet.create({
         top: 5,
         right: 5,
     },
+    editButton: {
+        position: 'absolute',
+        top: 5,
+        right: 50,
+      },
 });
 
 export default ItineraryScreen

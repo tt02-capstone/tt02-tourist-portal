@@ -456,9 +456,12 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 <Card>
                     <Card.Title style={styles.header}>
                         {accommodation.name}
-                        <Button mode="text" style={{ marginTop: -10 }} onPress={save} >
+                        <Button mode="text" style={{ marginTop: -15, marginRight: -20 }} onPress={save} >
                             {isSaved && <Icon name="heart" size={20} color='red' />}
                             {!isSaved && <Icon name="heart" size={20} color='grey' />}
+                        </Button>
+                        <Button mode="text" style={{ marginTop: -15, marginLeft: -5 }} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} >
+                            <Icon name="calendar" size={20} color='grey' />
                         </Button>
                     </Card.Title>
 
@@ -468,7 +471,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{accommodation.generic_location ? accommodation.generic_location.replace(/_/g, ' ') : ''}</Text>
                     </View>
 
-                    <CartButton text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} />
+                    {/* <CartButton text="Add to Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} /> */}
 
                     <View style={styles.carouselContainer}>
                         <Carousel

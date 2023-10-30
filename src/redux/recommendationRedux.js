@@ -11,6 +11,17 @@ export async function getRecommendation(location,listingType,typeId) {
     }
 }
 
+export async function getRecommendationFromBookings(userId) {
+    try {
+        const response = await recommendationApi.get(`/getRecommendationFromBookings/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("recommendationRedux Error getRecommendation : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+
 export async function getPostRecommendation(catItemId) {
   try {
       const response = await recommendationApi.get(`/getPostRecommendation/${catItemId}`);

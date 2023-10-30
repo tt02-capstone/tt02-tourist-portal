@@ -293,6 +293,7 @@ const PostScreen = ({ navigation }) => {
                 published_time: originalComment.published_time,
                 content: formUpdateComment, // changed
                 updated_time: new Date(), // changed
+                is_published: true // cater for new attribute @ backend
             };
 
             const response = await updateComment(tempComment);
@@ -335,6 +336,7 @@ const PostScreen = ({ navigation }) => {
                 published_time: comment.published_time,
                 content: '[deleted]', // changed
                 updated_time: new Date(), // changed
+                is_published: false, // cater for new attribute @ backend
             };
 
             const response = await updateComment(tempComment);
@@ -479,9 +481,9 @@ const PostScreen = ({ navigation }) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity style={{marginLeft: 20, marginTop: -5}} mode="text" onPress={onReportPostPressed}>
-                                    <Ionicons name="flag" style={{ color: 'black'}} size={25}/>
+                        <Ionicons name="flag" style={{ color: 'black'}} size={25}/>
                         </TouchableOpacity>
-
+                        
                         <Text style={{marginLeft: 20, marginTop: 3}} >Last edit: {moment(post.publish_time).format('LT')}</Text>
                     </View>
 
@@ -558,22 +560,26 @@ const PostScreen = ({ navigation }) => {
                                         <Text style={{fontSize: 15, marginBottom: 10, marginTop: 5}}>{item.content}</Text>
 
                                         <View style={{flexDirection: 'row',}}>
-                                            <Ionicons name="arrow-up" size={20} color={item && item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onUpvoteCommentPressed(item.comment_id)} />
-                                            <Text style={{marginLeft: 5, marginRight: 4, marginTop: 2, color: item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{item.upvoted_user_id_list ? item.upvoted_user_id_list.length : 0}</Text>
-                                            <Ionicons name="arrow-down" size={20} color={item && item.upvoted_user_id_list && item.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onDownvoteCommentPressed(item.comment_id)} />
+                                            { item.is_published && (
+                                                <>
+                                                    <Ionicons name="arrow-up" size={20} color={item && item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onUpvoteCommentPressed(item.comment_id)} />
+                                                    <Text style={{marginLeft: 5, marginRight: 4, marginTop: 2, color: item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{item.upvoted_user_id_list ? item.upvoted_user_id_list.length : 0}</Text>
+                                                    <Ionicons name="arrow-down" size={20} color={item && item.upvoted_user_id_list && item.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onDownvoteCommentPressed(item.comment_id)} />
+                                                </>
+                                            )}
                                             
                                             <Text style={{marginLeft: 5, marginRight: 10, marginTop: 2}}>{item.child_comment_list ? item.child_comment_list.length : 0} Replies</Text>
-                                            <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => addChildComment(item)}>Reply</Text>
+                                            {item.is_published &&  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => addChildComment(item)}>Reply</Text>}
 
-                                            {item.local_user && item.local_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
 
-                                            {item.local_user && item.local_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
 
-                                            {item.local_user && item.local_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.local_user && item.local_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
 
                                         </View>
                                     </View>

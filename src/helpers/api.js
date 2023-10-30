@@ -2,7 +2,7 @@ import axios from "axios";
 import {TOKEN_KEY} from "./AuthContext";
 import * as SecureStore from "expo-secure-store";
 
-const HOST = '192.168.1.4'
+const HOST = '192.168.86.145'
 const HOST_WITH_PORT = `http://${HOST}:8080`
 
 export const userApi = axios.create({
@@ -16,7 +16,6 @@ export const loggedUserApi = (usertype) => {
         return touristApi
     else
         return Error('User type is neither local nor tourist')
-
 }
 
 export const localApi = axios.create({
@@ -103,8 +102,12 @@ export const diyEventApi = axios.create({
     baseURL: HOST_WITH_PORT + '/diyEvent'
 })
 
+export const notificationApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/notification'
+})
+
 const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, 
-                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi, diyEventApi]
+                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi, diyEventApi, notificationApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( async (config) => {

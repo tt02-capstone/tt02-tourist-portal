@@ -21,6 +21,7 @@ import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { getRecommendation } from '../../redux/recommendationRedux';
 import moment from 'moment';
+import CreateAttractionDIYEventScreen from './CreateAccommodationDIYEventScreen';
 
 const AccommodationDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -455,9 +456,12 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 <Card>
                     <Card.Title style={styles.header}>
                         {accommodation.name}
-                        <Button mode="text" style={{ marginTop: -10 }} onPress={save} >
+                        <Button mode="text" style={{ marginTop: -15, marginRight: -20 }} onPress={save} >
                             {isSaved && <Icon name="heart" size={20} color='red' />}
                             {!isSaved && <Icon name="heart" size={20} color='grey' />}
+                        </Button>
+                        <Button mode="text" style={{ marginTop: -15, marginLeft: -5 }} onPress={() => navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation })} >
+                            <Icon name="calendar" size={20} color='grey' />
                         </Button>
                     </Card.Title>
 
@@ -466,7 +470,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{accommodation.estimated_price_tier ? accommodation.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
                         <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{accommodation.generic_location ? accommodation.generic_location.replace(/_/g, ' ') : ''}</Text>
                     </View>
-
+                    
                     <View style={styles.carouselContainer}>
                         <Carousel
                             data={imageList}
@@ -812,6 +816,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
         resizeMode: 'cover',
+    },
+    button: {
+        width: '40%',
+        marginLeft: '30%',
+        marginRight: '30%',
+        backgroundColor: '#5f80e3',
+        color: 'black'
     },
 });
 

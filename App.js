@@ -55,11 +55,19 @@ import { ReportPostScreen } from './src/screens/Forum/ReportPostScreen';
 import { ForumProfileScreen } from './src/screens/Forum/ForumProfileScreen';
 import { ReportCommentScreen } from './src/screens/Forum/ReportCommentScreen';
 import { BadgesScreen } from './src/screens/Profile/BadgesScreen';
+import registerNNPushToken from 'native-notify';
+import NotificationScreen from './src/screens/Notification/NotificationScreen';
 import ItineraryScreen from './src/screens/Itinerary/ItineraryScreen';
 import CreateItineraryScreen from './src/screens/Itinerary/CreateItineraryScreen';
 import EditItineraryScreen from './src/screens/Itinerary/EditItineraryScreen';
 import CreateAttractionDIYEventScreen from './src/screens/Attraction/CreateAttractionDIYEventScreen';
 import CreateDIYEventScreen from './src/screens/Itinerary/CreateDIYEventScreen';
+import SendNotificationScreen from './src/screens/Notification/SendNotificationScreen';
+import { CommonHeader } from './src/screens/CommonHeader';
+import CreateAccommodationDIYEventScreen from './src/screens/Accommodation/CreateAccommodationDIYEventScreen';
+import CreateTelecomDIYEventScreen from './src/screens/Telecom/CreateTelecomDIYEventScreen';
+import EditDIYEventScreen from './src/screens/Itinerary/EditDIYEventScreen';
+import ItineraryRecommendationsScreen from './src/screens/Itinerary/ItineraryRecommendationsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -74,6 +82,8 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 export default function App() {
+    registerNNPushToken(13960, 'BEbA270k2T53VV6Cu8pZIZ');
+
     return (
         <AuthProvider>
             <Layout>
@@ -84,7 +94,7 @@ export default function App() {
 
 function MyDrawer() {
     return (
-      <Drawer.Navigator screenOptions={{ headerRight: () => <Cart /> }}>
+      <Drawer.Navigator screenOptions={{ headerRight: () => <CommonHeader /> }}>
         <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Profile" component={ViewProfileScreen} />
         <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
@@ -98,6 +108,7 @@ function MyDrawer() {
         <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
         <Drawer.Screen name="Support Tickets" component={SupportTicketScreen} />
+        <Drawer.Screen name="Send Notification" component={SendNotificationScreen} />
       </Drawer.Navigator>
     );
 }
@@ -113,7 +124,7 @@ export const Layout = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{
-                headerRight: () => <Cart />,
+                headerRight: () => <CommonHeader />,
             }} initialRouteName="LoginScreen">
                 {authState?.authenticated? (
                     <>
@@ -163,6 +174,11 @@ export const Layout = () => {
                         <Stack.Screen name="EditItineraryScreen" component={EditItineraryScreen} options={{ title : 'Edit Itinerary' }} />
                         <Stack.Screen name="CreateDIYEventScreen" component={CreateDIYEventScreen} options={{ title : 'Create New Event' }} />
                         <Stack.Screen name="CreateAttractionDIYEventScreen" component={CreateAttractionDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
+                        <Stack.Screen name="NotificationScreen" component={NotificationScreen} options={{ title : 'Notification' }} />
+                        <Stack.Screen name="CreateAccommodationDIYEventScreen" component={CreateAccommodationDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
+                        <Stack.Screen name="CreateTelecomDIYEventScreen" component={CreateTelecomDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
+                        <Stack.Screen name="EditDIYEventScreen" component={EditDIYEventScreen} options={{ title : 'Edit Event' }} />
+                        <Stack.Screen name="ItineraryRecommendationsScreen" component={ItineraryRecommendationsScreen} options={{ title : 'Recommendations' }} />
                     </>
                 ) : (
                     <>

@@ -3,15 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 
 export default function TelecomRecom({ item }) {
-    const getColorForType = (label) => {
-        const labelColorMap = {
-            'HOTEL': 'lightblue',
-            'AIRBNB': 'lightgreen',
-        };
-
-        return labelColorMap[label] || 'gray';
-    };
-
     function formatEstimatedPriceTier(text) {
         if (text === 'TIER_1') {
             return '$';

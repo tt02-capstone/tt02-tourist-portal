@@ -267,7 +267,6 @@ const ItineraryScreen = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             {!itinerary && <Button text="Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />}
-            {itinerary && <Button text="Add Event" style={styles.button} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />}
             {!itinerary && <Text>No itinerary available</Text>}
             {itinerary && (
                 <View>
@@ -315,7 +314,7 @@ const ItineraryScreen = ({ navigation }) => {
             )}
 
             {/* View DIY Event Modal */}
-            <View style={styles.centeredView}>
+            {showDiyModal && (<View style={styles.centeredView}>
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -337,7 +336,6 @@ const ItineraryScreen = ({ navigation }) => {
                                 <Text>{diyObject?.remarks}</Text>
                             </View>
 
-                            {/* close modal button */}
                             <View style={{ marginLeft: 75, marginTop: 20 }}>
                                 <Pressable
                                     style={[styles.modalButton, styles.buttonClose]}
@@ -351,8 +349,13 @@ const ItineraryScreen = ({ navigation }) => {
                         </View>
                     </View>
                 </Modal>
-            </View>
+            </View>)}
 
+            {itinerary && (
+                <View style={styles.addEventButtonContainer}>
+                    <Button text="Add Event" style={styles.recommendationButton} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />
+                </View>
+            )}
             {itinerary && (
                 <View style={styles.buttonContainer}>
                     <Button
@@ -378,10 +381,15 @@ const styles = StyleSheet.create({
         marginRight: '30%',
         backgroundColor: '#5f80e3'
     },
-    buttonContainer: {
-        justifyContent: 'flex-end', // Push the button to the bottom
+    addEventButtonContainer: {
+        justifyContent: 'flex-end',
         alignItems: 'center',
-        marginBottom: 20, // Add some spacing from the bottom
+        marginTop: 20,
+    },
+    buttonContainer: {
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginBottom: 20,
     },
     recommendationButton: {
         width: '80%',

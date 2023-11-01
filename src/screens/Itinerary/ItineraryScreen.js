@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { theme } from '../../core/theme'
 import Button from '../../components/Button'
-import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity, Dimensions } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
 import { getAllDiyEventsByDay, deleteDiyEvent } from '../../redux/diyEventRedux';
@@ -32,6 +32,13 @@ const ItineraryScreen = ({ navigation }) => {
     const [showDiyModal, setShowDiyModal] = useState(false);
     const [diyObject, setDiyObject] = useState(undefined);
 
+    // add button
+    const [showOptions, setShowOptions] = useState(false);
+    const handleMainButtonPress = () => {
+        setShowOptions(true);
+    };
+    const windowHeight = Dimensions.get('window').height;
+
     useEffect(() => {
         onLoad();
 
@@ -52,10 +59,14 @@ const ItineraryScreen = ({ navigation }) => {
             console.log("getItineraryByUser response.data", response.data)
             setItinerary(response.data);
 
-            const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
+            const startDate = moment(response.data.start_date);
+            const endDate = moment(response.data.end_date);
+
+            const numberOfDays = endDate.diff(startDate, 'days') + 1; // Include the end date
             const generatedRoutes = [];
             for (let i = 0; i < numberOfDays; i++) {
-                generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
+                const currentDate = startDate.clone().add(i, 'days');
+                generatedRoutes.push({ key: `${i + 1}`, title: currentDate.format('MMM Do') });
             }
             setRoutes(generatedRoutes);
             console.log("generatedRoutes", generatedRoutes);
@@ -227,7 +238,7 @@ const ItineraryScreen = ({ navigation }) => {
         const dayNum = route.key === '1' ? 1 : parseInt(route.key.replace('day', ''));
 
         return (
-            <ScrollView style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1, marginBottom: 40 }}>
                 {currentDiyEvents.length > 0 ? (
                     currentDiyEvents.map(event => (
                         <Card key={event.diy_event_id} style={styles.card}>
@@ -258,7 +269,7 @@ const ItineraryScreen = ({ navigation }) => {
                         </Card>
                     ))
                 ) : (
-                    <Text>No events available for this day.</Text>
+                    <Text style={{ marginLeft: 15, marginTop: 15 }}>No events available for this day.</Text>
                 )}
             </ScrollView>
         );
@@ -266,109 +277,128 @@ const ItineraryScreen = ({ navigation }) => {
 
     return (
         <View style={{ flex: 1 }}>
-            {!itinerary && <Button text="Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />}
-            {!itinerary && <Text>No itinerary available</Text>}
-            {itinerary && (
-                <View>
-                    <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
-                    <Text><Text style={{ fontWeight: 'bold' }}>Num of Pax:</Text> {itinerary.number_of_pax}</Text>
-                    <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
+            {!itinerary ? (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ marginBottom: 5 }}>No itinerary available</Text>
+                    <Button text="Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
                 </View>
-            )}
-            {itinerary && (
-                <View style={styles.iconContainer}>
-                    {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
-                        <IconButton
-                            icon="pencil"
-                            size={20}
-                            style={styles.icon}
-                            onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
-                        />
-                    )}
-                    <IconButton
-                        icon="delete"
-                        size={20}
-                        style={styles.icon}
-                        onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}
-                    />
-                </View>
-            )}
+            ) : (
+                <>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: 10, marginTop: 10, marginBottom: 10, marginLeft: 10 }}>
+                        {/* Container for Duration, Number of Pax, and Remarks */}
+                        <View>
+                            <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
+                            <Text><Text style={{ fontWeight: 'bold' }}>Number of Pax:</Text> {itinerary.number_of_pax}</Text>
+                            <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
+                        </View>
 
-            {itinerary && (
-                <View style={{ flex: 1 }}>
-                    <TabView
-                        navigationState={{ index, routes }}
-                        renderScene={renderScene}
-                        onIndexChange={handleTabChange}
-                        initialLayout={{ width: '100%' }}
-                        scrollEnabled={true}
-                        renderTabBar={props => (
-                            <TabBar
-                                {...props}
-                                scrollEnabled={true}
-                                tabStyle={{ width: calculateTabWidth() }}
+                        {/* Container for Edit (Pencil) and Delete Icons */}
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
+                            {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
+                                <IconButton
+                                    icon="pencil"
+                                    size={20}
+                                    style={styles.icon}
+                                    onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
+                                />
+                            )}
+                            <IconButton
+                                icon="delete"
+                                size={20}
+                                style={styles.icon}
+                                onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}
                             />
-                        )}
-                    />
-                </View>
-            )}
-
-            {/* View DIY Event Modal */}
-            {showDiyModal && (<View style={styles.centeredView}>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={showDiyModal}
-                    onRequestClose={() => {
-                        setShowDiyModal(false);
-                    }}
-                >
-
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
-
-                            <View>
-                                <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
-                                <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
-                                <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
-                                <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
-                                <Text>{diyObject?.remarks}</Text>
-                            </View>
-
-                            <View style={{ marginLeft: 75, marginTop: 20 }}>
-                                <Pressable
-                                    style={[styles.modalButton, styles.buttonClose]}
-                                    onPress={() => {
-                                        setShowDiyModal(false);
-                                        setDiyObject(undefined)
-                                    }}>
-                                    <Text style={styles.textStyle}>Close</Text>
-                                </Pressable>
-                            </View>
                         </View>
                     </View>
-                </Modal>
-            </View>)}
 
-            {itinerary && (
-                <View style={styles.addEventButtonContainer}>
-                    <Button text="Add Event" style={styles.recommendationButton} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />
-                </View>
-            )}
-            {itinerary && (
-                <View style={styles.buttonContainer}>
-                    <Button
-                        text="View Recommendations"
-                        style={styles.recommendationButton}
-                        onPress={() =>
-                            navigation.navigate('ItineraryRecommendationsScreen', {
-                                date: selectedDate ? selectedDate : itinerary.start_date.split('T')[0],
-                                itineraryId: itinerary.itinerary_id,
-                            })
-                        }
-                    />
-                </View>
+                    <View style={{ flex: 1 }}>
+                        <TabView
+                            navigationState={{ index, routes }}
+                            renderScene={renderScene}
+                            onIndexChange={handleTabChange}
+                            initialLayout={{ width: '100%' }}
+                            scrollEnabled={true}
+                            renderTabBar={props => (
+                                <TabBar
+                                    {...props}
+                                    scrollEnabled={true}
+                                    tabStyle={{ width: calculateTabWidth() }}
+                                    style={{ backgroundColor: '#5f80e3' }}
+                                />
+                            )}
+                        />
+                    </View>
+
+                    {/* View DIY Event Modal */}
+                    {showDiyModal && (
+                        <View style={styles.centeredView}>
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={showDiyModal}
+                                onRequestClose={() => {
+                                    setShowDiyModal(false);
+                                }}
+                            >
+                                <View style={styles.centeredView}>
+                                    <View style={styles.modalView}>
+                                        <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
+                                        <View>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
+                                            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
+                                            <Text>{diyObject?.remarks}</Text>
+                                        </View>
+                                        <View style={{ marginLeft: 75, marginTop: 20 }}>
+                                            <Pressable
+                                                style={[styles.modalButton, styles.buttonClose]}
+                                                onPress={() => {
+                                                    setShowDiyModal(false);
+                                                    setDiyObject(undefined)
+                                                }}>
+                                                <Text style={styles.textStyle}>Close</Text>
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Modal>
+                        </View>
+                    )}
+
+                    {/* <Button text="Add To Itinerary" style={styles.recommendationButton} onPress={handleMainButtonPress} /> */}
+
+                    <TouchableOpacity style={styles.floatingButton} onPress={handleMainButtonPress}>
+                        <Text style={styles.buttonText}>+</Text>
+                    </TouchableOpacity>
+
+                    <Modal visible={showOptions} animationType="slide" transparent={true}>
+                        <View style={styles.modalContainer}>
+                            <View style={[styles.modalContent, { height: windowHeight * 0.3 }]}>
+                                <Button
+                                    text="Create DIY Event"
+                                    style={{ width: '90%' }}
+                                    onPress={() => {
+                                        setShowOptions(false);
+                                        navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary });
+                                    }}
+                                />
+                                <Button
+                                    text="View Recommendations"
+                                    style={{ width: '90%' }}
+                                    onPress={() => {
+                                        setShowOptions(false);
+                                        navigation.navigate('ItineraryRecommendationsScreen', {
+                                            date: selectedDate ? selectedDate : itinerary.start_date.split('T')[0],
+                                            itineraryId: itinerary.itinerary_id,
+                                        });
+                                    }}
+                                />
+                                <Button text="Cancel" style={{ width: '90%', backgroundColor: 'gray' }} onPress={() => setShowOptions(false)} />
+                            </View>
+                        </View>
+                    </Modal>
+                </>
             )}
         </View>
     );
@@ -379,7 +409,8 @@ const styles = StyleSheet.create({
         width: '40%',
         marginLeft: '30%',
         marginRight: '30%',
-        backgroundColor: '#5f80e3'
+        backgroundColor: '#5f80e3',
+        marginBottom: 20
     },
     addEventButtonContainer: {
         justifyContent: 'flex-end',
@@ -393,7 +424,7 @@ const styles = StyleSheet.create({
     },
     recommendationButton: {
         width: '80%',
-        backgroundColor: '#5f80e3',
+        backgroundColor: '#044537',
         alignSelf: 'center',
     },
     iconContainer: {
@@ -472,6 +503,35 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 5,
         right: 50,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        width: '100%',
+        padding: 20,
+    },
+    floatingButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#044537', 
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonText: {
+        fontSize: 24,
+        color: 'white', 
+        fontWeight: 'bold',
     },
 });
 

@@ -40,3 +40,23 @@ export async function deleteDiyEvent(diyEventIdToDelete) {
     return {status: false, data: error.message};
   }
 }
+
+export async function diyEventOverlap(itineraryId) {
+  try {
+    const response = await diyEventApi.get(`/diyEventOverlap/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("diyEventRedux diyEventOverlap Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function diyEventBookingOverlap(itineraryId) {
+  try {
+    const response = await diyEventApi.get(`/diyEventBookingOverlap/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("diyEventRedux diyEventBookingOverlap Error : ", error);
+    return {status: false, data: error.message};
+  }
+}

@@ -2,65 +2,52 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
-import Header from '../../components/Header';
 import TextInput from '../../components/TextInput';
-import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
-import { Text, Card, CheckBox, Tab, TabView } from '@rneui/themed';
+import { getUser } from '../../helpers/LocalStorage';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { Button as DateButton } from 'react-native-paper';
+import { Text, Card } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
 import { createDiyEvent } from '../../redux/diyEventRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { theme } from '../../core/theme'
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { DatePickerModal } from 'react-native-paper-dates';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 import { useIsFocused } from "@react-navigation/native";
 
 const CreateTelecomDIYEventScreen = ({ navigation }) => {
-    const [user, setUser] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [values, setValues] = useState({
-        name: '',
-        startDate: new Date(), // picker value
-        startTime: new Date(), // picker value
-        endTime: new Date(), // picker value
-        start_datetime: new Date(), // to send to backend
-        end_datetime: new Date(), // to send to backend
-        location: '',
-        remarks: '',
-    });
-    const [isSubmit, setIsSubmit] = useState(false);
-    const [open, setOpen] = useState(false);
-    const isFocused = useIsFocused();
-    const [itinerary, setItinerary] = useState(null);
 
+    const isFocused = useIsFocused();
     const route = useRoute();
     const { typeId, selectedTelecom } = route.params;
 
+    const [user, setUser] = useState(null);
+    const [itinerary, setItinerary] = useState(null);
+
+    const [values, setValues] = useState({
+        remarks: '',
+        // name and location given by restaurant by default
+    });
+
+    const [date, setDate] = useState(null);
+    const [openDate, setOpenDate] = useState(false);
+
     useEffect(() => {
         async function onLoad() {
-            console.log("createTelecomDIYEventScreen entering onLoad")
-            try {
-                const userData = await getUser();
-                setUser(userData);
-                const userId = userData.user_id;
-                console.log("Telecom userId", userId);
+            // get user
+            const userData = await getUser();
+            setUser(userData);
+            // console.log(userData);
 
-                let response = await getItineraryByUser(userId);
-                console.log("Telecom itinerary", response.data)
+            // get itinerary
+            let response = await getItineraryByUser(userData.user_id);
+            if (response.status) {
                 setItinerary(response.data);
-
-                console.log("itineraryid", response.data.itinerary_id);
-
-                setLoading(false);
-            } catch (error) {
-                alert('An error occurred! Failed to retrieve itinerary!');
-                setLoading(false);
+            } else {
+                console.log("itinerary not fetched!");
             }
         }
-        onLoad();
 
         if (isFocused) {
             onLoad();
@@ -68,95 +55,71 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
 
     }, [isFocused]);
 
-    useEffect(() => {
-    }, [values]);
-
-    function createDateTimeObjects(adjustedStartDate, adjustedStartTime) {
-        // Extract date parts from adjustedStartDate
-        const startDateYear = adjustedStartDate.getFullYear();
-        const startDateMonth = adjustedStartDate.getMonth() + 1; // Month is zero-indexed, so add 1
-        const startDateDay = adjustedStartDate.getDate();
-
-        // Extract time parts from adjustedStartTime
-        const startTimeHours = adjustedStartTime.getHours();
-        const startTimeMinutes = adjustedStartTime.getMinutes();
-        const startTimeSeconds = adjustedStartTime.getSeconds();
-
-        // Create startDateTime and endDateTime
-        const startDateTime = new Date(
-            startDateYear,
-            startDateMonth - 1, // Subtract 1 to get the zero-indexed month
-            startDateDay,
-            startTimeHours,
-            startTimeMinutes,
-            startTimeSeconds
-        );
-
-        return startDateTime;
-    }
-
-    function addDays(date, days) {
-        const result = new Date(date);
-        result.setDate(result.getDate() + days);
-        return result;
-    }
-
     async function onSubmit() {
 
-        setLoading(true);
-        setIsSubmit(true);
-
-        let diyEventObj;
-
-        // console.log("values", values);
-
-        const adjustedStartDate = new Date(values.startDate);
-        adjustedStartDate.setHours(values.startDate.getHours() + timeZoneOffset);
-        // console.log("adjustedStartDate", adjustedStartDate);
-
-        const adjustedStartTime = new Date(values.startTime);
-        adjustedStartTime.setHours(values.startTime.getHours() + timeZoneOffset);
-        // console.log("adjustedStartTime", adjustedStartTime);
-
-        // Set endDateTime based on number of days SIM card is valid for
-        const startDateTime = createDateTimeObjects(adjustedStartDate, adjustedStartTime);
-        const endDateTime = addDays(startDateTime, selectedTelecom.num_of_days_valid);
-
-        console.log("startDateTime", startDateTime);
-        console.log("endDateTime", endDateTime);
-
-        // start_datetime and end_datetime can be configured as some users might book multiple different hotels during a trip
-        diyEventObj = {
-            name: selectedTelecom ? selectedTelecom.name : '',
-            start_datetime: startDateTime.toISOString(),
-            end_datetime: endDateTime.toISOString(),
-            location: 'N/A',
-            remarks: values.remarks,
+        if (date == null) {
+            Toast.show({
+                type: 'error',
+                text1: 'Please select a date!'
+            })
+            return;
         }
 
-        const type = "telecom";
+        let tempStartDate = new Date(date);
+        tempStartDate.setHours(0);
+        tempStartDate.setMinutes(0);
+        tempStartDate.setSeconds(0);
+        tempStartDate.setHours(tempStartDate.getHours() + timeZoneOffset);
+
+        let tempEndDate = new Date(date);
+        tempEndDate.setDate(tempEndDate.getDate() + selectedTelecom.num_of_days_valid-1);
+        tempEndDate.setHours(23);
+        tempEndDate.setMinutes(59);
+        tempEndDate.setSeconds(0);
+        tempEndDate.setHours(tempEndDate.getHours() + timeZoneOffset);
+
+        console.log('tempStartDate', tempStartDate, itinerary.start_date);
+        console.log('tempEndDate', tempEndDate, itinerary.end_date);
+
+        let tempItineraryStart = new Date(itinerary.start_date);
+        tempItineraryStart.setHours(tempItineraryStart.getHours() + timeZoneOffset);
+
+        let tempItineraryEnd = new Date(itinerary.end_date);
+        tempItineraryEnd.setHours(tempItineraryEnd.getHours() + timeZoneOffset);
+
+        if (new Date(tempEndDate) < new Date(tempItineraryStart) || new Date(tempStartDate) > new Date(tempItineraryEnd)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Please select dates within your itinerary!'
+            })
+            return;
+        }
+
+        let diyEventObj = {
+            name: selectedTelecom.name,
+            start_datetime: tempStartDate,
+            end_datetime: tempEndDate,
+            location: '',
+            remarks: values.remarks ? values.remarks : '',
+        }
 
         console.log("itinerary.itinerary_id", itinerary.itinerary_id);
         console.log("typeId", typeId);
         console.log("diyEventObj", diyEventObj);
-        console.log("type", type);
 
-        let response = await createDiyEvent(itinerary.itinerary_id, typeId, type, diyEventObj);
+        let response = await createDiyEvent(itinerary.itinerary_id, typeId, "telecom", diyEventObj);
         if (response.status) {
-            setIsSubmit(false);
             Toast.show({
                 type: 'success',
-                text1: 'Telecom added to itinerary!'
+                text1: 'Restaurant added to itinerary!'
             })
 
             navigation.reset({
                 index: 2,
                 routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'ItineraryScreen' }],
             });
-
         } else {
             console.log('error')
-            setIsSubmit(false);
             Toast.show({
                 type: 'error',
                 text1: response.data.errorMessage
@@ -165,38 +128,15 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
     }
 
     const onDismiss = useCallback(() => {
-        setOpen(false);
-    }, [setOpen]);
+        setOpenDate(false);
+    }, [setOpenDate]);
 
     const onConfirm = useCallback(
-        ({ startDate, endDate }) => {
-            const itineraryStartDate = new Date(itinerary.start_date);
-            const itineraryEndDate = new Date(itinerary.end_date);
-
-            if (startDate && endDate) {
-                if (startDate < currentDate) {
-                    setValues({ start_date: null, end_date: null });
-                    onDismiss();
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Telecom cannot be added to Itinerary for past dates.'
-                    });
-                } else {
-                    setOpen(false);
-                    // might cause issues
-                    setValues({ start_date: startDate, end_date: endDate });
-                }
-            } else {
-                setOpen(false);
-                setValues({ start_date: startDate, end_date: endDate });
-                onDismiss();
-                Toast.show({
-                    type: 'error',
-                    text1: 'Both start and end dates must be selected.'
-                });
-            }
+        ({ date }) => {
+            setOpenDate(false);
+            setDate(date);
         },
-        [setOpen, setValues, onDismiss]
+        [setOpenDate, setDate]
     );
 
     function formatDatePicker(string) {
@@ -205,109 +145,169 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
         return date.toLocaleDateString([], dateOptions);
     }
 
-    const onDateChange = (event, selectedDate) => {
-        console.log("startDate", selectedDate);
-        setValues({ ...values, startDate: selectedDate })
-    };
+    function formatEstimatedPriceTier(text) {
+        if (text === 'TIER_1') {
+            return '$';
+        } else if (text === 'TIER_2') {
+            return '$$';
+        } else if (text === 'TIER_3') {
+            return '$$$';
+        } else if (text === 'TIER_4') {
+            return '$$$$';
+        } else if (text === 'TIER_5') {
+            return '$$$$$';
+        } else {
+            return text;
+        }
+    }
 
-    const onStartTimeChange = (event, selectedTime) => {
-        console.log("startTime", selectedTime);
-        setValues({ ...values, startTime: selectedTime })
-    };
+    function formatDurationCategory(text) {
+        if (text === 'ONE_DAY') {
+            return '1 DAY';
+        } else if (text === 'THREE_DAY') {
+            return '3 DAYS';
+        } else if (text === 'SEVEN_DAY') {
+            return '7 DAYS';
+        } else if (text === 'FOURTEEN_DAY') {
+            return '14 DAYS';
+        } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
+            return '> 14 DAYS';
+        } else {
+            return text;
+        }
+    }
 
-    const onEndTimeChange = (event, selectedTime) => {
-        console.log("endTime", selectedTime);
-        setValues({ ...values, endTime: selectedTime })
-    };
+    function formatDataLimitCategory(text) {
+        if (text === 'VALUE_10') {
+            return '10GB';
+        } else if (text === 'VALUE_30') {
+            return '30GB';
+        } else if (text === 'VALUE_50') {
+            return '50GB';
+        } else if (text === 'VALUE_100') {
+            return '100GB';
+        } else if (text === 'UNLIMITED') {
+            return 'Unlimited';
+        } else {
+            return text;
+        }
+    }
 
-    return (
-        <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={styles.header}>
-                Add Telecom to Itinerary
-            </Text>
-
+    return user && itinerary && selectedTelecom ? (
+        <Background style={{ alignItems: 'center' }}>
+            {/* restaurant details */}
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
+                <View style={styles.topCard}>
+                    <Card>
+                        <Card.Title style={styles.header}>{selectedTelecom.name} </Card.Title>
 
-                        {/* add suggested duration somewhere */}
-
-                        <DateTimePicker
-                            testID="startDatePicker"
-                            value={values.startDate}
-                            mode={"date"}
-                            is24Hour={true}
-                            onChange={onDateChange}
+                        <Card.Image
+                            style={{ padding: 0, height: 200, marginBottom: 20}}
+                            source={{
+                            uri: selectedTelecom.image
+                            }}
                         />
+                                    
+                        <Text style={styles.subtitle}>
+                            <Text style={{fontWeight: 'bold'}}>Duration: </Text><Text>{selectedTelecom.num_of_days_valid} day(s)</Text>
+                        </Text>
 
-                        <DateTimePicker
-                            testID="startTimePicker"
-                            value={values.startTime}
-                            mode={"time"}
-                            is24Hour={true}
-                            onChange={onStartTimeChange}
+                        <View style={styles.tagContainer}>
+                            <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{formatEstimatedPriceTier(selectedTelecom.estimated_price_tier)}</Text>
+                            <Text style={[styles.tag, { backgroundColor: 'royalblue', color: 'white', textAlign: 'center' }]}>{formatDurationCategory(selectedTelecom.plan_duration_category)}</Text>
+                            <Text style={[styles.tag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{formatDataLimitCategory(selectedTelecom.data_limit_category)}</Text>
+                        </View>
+                    </Card>
+                </View>
+                
+                {/* itinerary form */}
+                <View style={{ alignItems: 'center', marginTop: 100}}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -100 }}>
+                        
+                        <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{marginTop: 0, marginBottom: 0, marginLeft: -5}}>
+                            {date ? `${formatDatePicker(date)}` : 'Pick Start Date'}
+                        </DateButton>
+                        <DatePickerModal
+                            locale="en"
+                            mode="single"
+                            visible={openDate}
+                            date={date}
+                            onConfirm={onConfirm}
+                            onDismiss={onDismiss}
                         />
-
-                        <Text>Event Name: {selectedTelecom ? selectedTelecom.name + ' Telecom Package' : 'no telecom'}</Text>
 
                         <TextInput
-                            style={styles.description}
-                            label="Write your remarks here"
+                            style={styles.inputFormRemarks}
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}
                             errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
                         />
                     </View>
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 30 }}>
                         <Button
-                            style={{ width: 150, marginLeft: 60 }}
                             mode="contained"
                             text={"Submit"}
                             onPress={onSubmit}
                         />
-                        {/* <View style={{ marginLeft: 30 }}><ActivityIndicator size='large' animating={isSubmit} color='green' /></View> */}
                     </View>
                 </View>
             </ScrollView>
         </Background>
+    ) : (
+        <View></View>
     )
 }
 
 const styles = StyleSheet.create({
+    topCard: {
+        height: 410,
+    },
+    header:{
+        textAlign: 'left',
+        fontSize: 20,
+        color: '#044537',
+        flexDirection: 'row',
+        fontWeight: 'bold'
+    },
+    tagContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 5,
+    },
     tag: {
         color: 'black',
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
-        fontSize: 10,
+        width: 100,
+        fontSize: 11,
         fontWeight: 'bold'
     },
-    boldText: {
+    subtitle: {
+        marginBottom: 5,
+        fontSize: 15,
+        color: 'grey'
+    },
+    carouselContainer: {
+        marginTop: 8,
+        marginBottom: 10,
+    },
+
+    inputFormRemarks: {
+        width: 340,
+        marginTop: 5,
+        marginBottom: 10,
+    },
+    label: {
+        fontSize: 17,
         fontWeight: 'bold',
-    },
-    header: {
-        fontSize: 21,
-        color: theme.colors.primary,
-        fontWeight: 'bold',
-        paddingVertical: 12,
-        textAlign: 'center',
-        marginTop: 10,
-        marginBottom: 10
-    },
-    description: {
-        width: 320,
-        height: 200,
-        marginTop: -15,
-        textAlignVertical: 'top',
-    },
-    input: {
-        width: 320,
-        height: 50,
-        marginTop: 10,
-    },
+        marginTop: 20,
+        marginLeft: 10,
+    }
 });
 
 export default CreateTelecomDIYEventScreen

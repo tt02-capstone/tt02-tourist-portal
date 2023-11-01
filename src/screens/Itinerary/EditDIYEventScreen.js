@@ -287,7 +287,7 @@ const EditDIYEventScreen = ({ navigation }) => {
 
                         <TextInput
                             style={styles.description}
-                            label="Write your remarks here"
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={formData.remarks}
                             onChangeText={(value) => setFormData({ ...formData, remarks: value })}

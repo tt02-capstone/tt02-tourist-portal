@@ -179,7 +179,7 @@ const CreateItineraryScreen = ({ navigation }) => {
 
                         <TextInput
                             style={styles.description}
-                            label="Write your remarks here (Optional)"
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}

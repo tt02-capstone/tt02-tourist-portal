@@ -4,7 +4,7 @@ import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity, Dimensions } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
-import { getAllDiyEventsByDay, deleteDiyEvent } from '../../redux/diyEventRedux';
+import { getAllDiyEventsByDay, deleteDiyEvent, diyEventOverlap, diyEventBookingOverlap } from '../../redux/diyEventRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useIsFocused } from "@react-navigation/native";
@@ -18,8 +18,6 @@ import moment from 'moment';
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const isFocused = useIsFocused();
-    const [range, setRange] = useState({ startDate: undefined, endDate: undefined });
-    const [open, setOpen] = useState(false);
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(false);
     const [index, setIndex] = useState(0);
@@ -27,6 +25,12 @@ const ItineraryScreen = ({ navigation }) => {
     const [firstDayDiyEvents, setFirstDayDiyEvents] = useState([]);
     const [currentDiyEvents, setCurrentDiyEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [fetchItinerary, setFetchItinerary] = useState(true);
+
+    // diy event overlap
+    const [showMinorOverlap, setShowMinorOverlap] = useState(null);
+    const [showMajorOverlap, setShowMajorOverlap] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     // diy event modal
     const [showDiyModal, setShowDiyModal] = useState(false);
@@ -42,13 +46,14 @@ const ItineraryScreen = ({ navigation }) => {
     useEffect(() => {
         onLoad();
 
-        if (isFocused) {
+        if (isFocused || fetchItinerary) {
             onLoad();
         }
 
-    }, [isFocused]);
+    }, [isFocused, fetchItinerary]);
 
     async function onLoad() {
+        console.log("fetched!");
         const userData = await getUser();
         setUser(userData);
         const userId = userData.user_id;
@@ -56,8 +61,19 @@ const ItineraryScreen = ({ navigation }) => {
 
         let response = await getItineraryByUser(userId);
         if (response.status) {
-            console.log("getItineraryByUser response.data", response.data)
+            // console.log("getItineraryByUser response.data", response.data)
             setItinerary(response.data);
+
+            let minorOverlapResponse = await diyEventOverlap(response.data.itinerary_id);
+            if (minorOverlapResponse.status) {
+                setShowMinorOverlap(minorOverlapResponse.data);
+            }
+
+            let majorOverlapResponse = await diyEventBookingOverlap(response.data.itinerary_id);
+            if (majorOverlapResponse.status) {
+                setShowMajorOverlap(majorOverlapResponse.data);
+                setShowModal(majorOverlapResponse.data && majorOverlapResponse.data.length > 1 ? true : false);
+            }
 
             const startDate = moment(response.data.start_date);
             const endDate = moment(response.data.end_date);
@@ -72,9 +88,12 @@ const ItineraryScreen = ({ navigation }) => {
             console.log("generatedRoutes", generatedRoutes);
 
             getFirstDayDiyEvents(response.data);
+
+            setFetchItinerary(false);
         } else {
             console.log('itinerary not created / fetched!');
         }
+
         setLoading(false);
     }
 
@@ -216,6 +235,7 @@ const ItineraryScreen = ({ navigation }) => {
                 type: 'success',
                 text1: 'Event deleted!'
             });
+            setFetchItinerary(true);
 
             const index = currentDiyEvents.findIndex(event => event.diy_event_id === eventId);
             if (index !== -1) {
@@ -287,6 +307,8 @@ const ItineraryScreen = ({ navigation }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: 10, marginTop: 10, marginBottom: 10, marginLeft: 10 }}>
                         {/* Container for Duration, Number of Pax, and Remarks */}
                         <View>
+                            {showMinorOverlap && showMinorOverlap.length > 1 && <Text style={{ fontWeight: 'bold', color: 'red' }}>{showMinorOverlap}</Text>}
+                            {showMajorOverlap && showMajorOverlap.length > 1 && <Text style={{ fontWeight: 'bold', color: 'red' }}>{showMajorOverlap}</Text>}
                             <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
                             <Text><Text style={{ fontWeight: 'bold' }}>Number of Pax:</Text> {itinerary.number_of_pax}</Text>
                             <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
@@ -309,7 +331,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}
                             />
                         </View>
-                    </View>
+                    </View >
 
                     <View style={{ flex: 1 }}>
                         <TabView
@@ -331,40 +353,41 @@ const ItineraryScreen = ({ navigation }) => {
 
                     {/* View DIY Event Modal */}
                     {showDiyModal && (
-                        <View style={styles.centeredView}>
-                            <Modal
-                                animationType="slide"
-                                transparent={true}
-                                visible={showDiyModal}
-                                onRequestClose={() => {
-                                    setShowDiyModal(false);
-                                }}
-                            >
-                                <View style={styles.centeredView}>
-                                    <View style={styles.modalView}>
-                                        <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
-                                        <View>
-                                            <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
-                                            <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
-                                            <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
-                                            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
-                                            <Text>{diyObject?.remarks}</Text>
-                                        </View>
-                                        <View style={{ marginLeft: 75, marginTop: 20 }}>
-                                            <Pressable
-                                                style={[styles.modalButton, styles.buttonClose]}
-                                                onPress={() => {
-                                                    setShowDiyModal(false);
-                                                    setDiyObject(undefined)
-                                                }}>
-                                                <Text style={styles.textStyle}>Close</Text>
-                                            </Pressable>
+                            <View style={styles.centeredView}>
+                                <Modal
+                                    animationType="slide"
+                                    transparent={true}
+                                    visible={showDiyModal}
+                                    onRequestClose={() => {
+                                        setShowDiyModal(false);
+                                    }}
+                                >
+                                    <View style={styles.centeredView}>
+                                        <View style={styles.modalView}>
+                                            <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
+                                            <View>
+                                                <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
+                                                <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
+                                                <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
+                                                <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
+                                                <Text>{diyObject?.remarks}</Text>
+                                            </View>
+                                            <View style={{ marginLeft: 75, marginTop: 20 }}>
+                                                <Pressable
+                                                    style={[styles.modalButton, styles.buttonClose]}
+                                                    onPress={() => {
+                                                        setShowDiyModal(false);
+                                                        setDiyObject(undefined)
+                                                    }}>
+                                                    <Text style={styles.textStyle}>Close</Text>
+                                                </Pressable>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            </Modal>
-                        </View>
-                    )}
+                                </Modal>
+                            </View>
+                        )
+                    }
 
                     {/* <Button text="Add To Itinerary" style={styles.recommendationButton} onPress={handleMainButtonPress} /> */}
 
@@ -400,7 +423,38 @@ const ItineraryScreen = ({ navigation }) => {
                     </Modal>
                 </>
             )}
-        </View>
+
+            {/* booking overlap modal */}
+            {showDiyModal && (
+            <View style={styles.centeredView}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showModal}
+                    onRequestClose={() => {
+                        setShowModal(false);
+                    }}
+                >
+
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>{showMajorOverlap}</Text>
+
+                            <View style={{ flexDirection: 'row' }}>
+                                {/* close modal button */}
+                                <Pressable
+                                    style={[styles.modalButton, styles.buttonClose]}
+                                    onPress={() => {
+                                        setShowModal(false);
+                                    }}>
+                                    <Text style={styles.textStyle}>Close</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>)}
+        </View >
     );
 }
 
@@ -524,14 +578,63 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#044537', 
+        backgroundColor: '#044537',
         justifyContent: 'center',
         alignItems: 'center',
     },
     buttonText: {
         fontSize: 24,
-        color: 'white', 
+        color: 'white',
         fontWeight: 'bold',
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 160,
+        width: 300,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 10,
+        marginRight: 10,
+        backgroundColor: '#044537',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    buttonClose: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+        color: 'red',
+        fontWeight: 'bold'
     },
 });
 

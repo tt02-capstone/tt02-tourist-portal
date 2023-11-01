@@ -323,8 +323,8 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                         </View>
 
                         <TextInput
-                            style={styles.inputFormRemarks}
-                            label="Write your remarks here"
+                            style={styles.description}
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}

@@ -470,7 +470,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     const onItineraryPressed = () => {
         if (itinerary) {
-            navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation, selectedAccommodation: accommodation });
+            navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation });
         } else {
             setShowModal(true); // show cannot navigate modal
         }

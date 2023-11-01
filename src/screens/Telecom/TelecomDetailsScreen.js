@@ -5,18 +5,18 @@ import { Button } from 'react-native-paper';
 import CartButton from '../../components/Button';
 import { theme } from '../../core/theme'
 import { getUser, storeUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, ScrollView, StyleSheet, Modal, Pressable} from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { cartApi } from '../../helpers/api';
 import { getTelecomById, toggleSaveTelecom } from '../../redux/telecomRedux';
 import { addTelecomToCart } from '../../redux/cartRedux';
 import moment from 'moment-timezone';
 import {timeZoneOffset} from "../../helpers/DateFormat";
 import CreateTelecomDIYEventScreen from './CreateTelecomDIYEventScreen';
+import { getItineraryByUser } from '../../redux/itineraryRedux';
 
 const TelecomDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -30,9 +30,22 @@ const TelecomDetailsScreen = ({ navigation }) => {
     const route = useRoute();
     const { id } = route.params;
 
+    // itinerary
+    const [itinerary, setItinerary] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
+    }
+
+    async function fetchItinerary() {
+        const response = await getItineraryByUser(user.user_id);
+        if (response.status) {
+            setItinerary(response.data);
+        } else {
+            console.log("itinerary not created / found!");
+        }
     }
 
     const fetchTelecom = async () => {        
@@ -63,6 +76,8 @@ const TelecomDetailsScreen = ({ navigation }) => {
                 } 
             }
             setIsSaved(saved);
+
+            fetchItinerary();
         }
     }, [user])
 
@@ -178,15 +193,26 @@ const TelecomDetailsScreen = ({ navigation }) => {
         }
     }
 
+    const onItineraryPressed = () => {
+        if (itinerary) {
+            navigation.navigate('CreateTelecomDIYEventScreen', { typeId: telecom.telecom_id, selectedTelecom: telecom });
+        } else {
+            setShowModal(true); // show cannot navigate modal
+        }
+    }
+
     return (
         <Background>
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
                         {telecom.name} 
-                        <Button mode="text" style={{ marginTop: -10}} onPress={save} >
-                            {isSaved && <Icon name="heart" size={15} color='red' />}
-                            {!isSaved && <Icon name="heart" size={15} color='grey'/>}
+                        <Button mode="text" style={{ marginTop: -10, marginRight: -10}} onPress={save} >
+                            {isSaved && <Icon name="heart" size={20} color='red' />}
+                            {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                        </Button>
+                        <Button mode="text" style={{ marginTop: -10 }} onPress={onItineraryPressed} >
+                            <Icon name="calendar" size={20} color='grey' />
                         </Button>
                     </Card.Title>
 
@@ -204,8 +230,6 @@ const TelecomDetailsScreen = ({ navigation }) => {
                     </Text>
 
                     <Text style={styles.description}>{telecom.description}</Text>
-
-                    <CartButton text="Add to Itinerary" style={styles.itineraryButton} onPress={() => navigation.navigate('CreateTelecomDIYEventScreen', { typeId: telecom.telecom_id, selectedTelecom: telecom })} />
                 </Card>
                 
                 <Card containerStyle={styles.dropBorder}>
@@ -243,6 +267,36 @@ const TelecomDetailsScreen = ({ navigation }) => {
                         mode="contained" 
                         onPress={addToCart}
                     />
+                </View>
+
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={showModal}
+                        onRequestClose={() => {
+                            setShowModal(false);
+                        }}
+                    >
+
+                    <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>You have not created an itinerary!</Text>
+                                <Text style={styles.modalText}>Please create one before adding!</Text>
+
+                                <View style={{flexDirection: 'row'}}>
+                                    {/* close modal button */}
+                                    <Pressable
+                                        style={[styles.modalButton, styles.buttonClose]}
+                                        onPress={() => {
+                                            setShowModal(false);
+                                        }}>
+                                        <Text style={styles.textStyle}>Close</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
             </ScrollView>
         </Background>
@@ -326,8 +380,55 @@ const styles = StyleSheet.create({
         marginRight: '30%',
         backgroundColor: '#5f80e3',
         color: 'black'
-    }
+    },
     
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 160,
+        width: 300,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 10,
+        marginRight: 10,
+        backgroundColor: '#044537',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    buttonClose: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
 });
 
 export default TelecomDetailsScreen

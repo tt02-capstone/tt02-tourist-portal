@@ -42,33 +42,29 @@ const ItineraryScreen = ({ navigation }) => {
     }, [isFocused]);
 
     async function onLoad() {
-        try {
-            const userData = await getUser();
-            setUser(userData);
-            const userId = userData.user_id;
-            // console.log("userId", userId);
+        const userData = await getUser();
+        setUser(userData);
+        const userId = userData.user_id;
+        // console.log("userId", userId);
 
-            let response = await getItineraryByUser(userId);
+        let response = await getItineraryByUser(userId);
+        if (response.status) {
             console.log("getItineraryByUser response.data", response.data)
-            setLoading(false);
-            console.log('gab', itinerary.start_date)
-            if (response.status) {
-                setItinerary(response.data);
+            setItinerary(response.data);
 
-                const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
-                const generatedRoutes = [];
-                for (let i = 0; i < numberOfDays; i++) {
-                    generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
-                }
-                setRoutes(generatedRoutes);
-                console.log("generatedRoutes", generatedRoutes);
-
-                getFirstDayDiyEvents(response.data);
+            const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
+            const generatedRoutes = [];
+            for (let i = 0; i < numberOfDays; i++) {
+                generatedRoutes.push({ key: `${i + 1}`, title: `Day ${i + 1}` });
             }
-        } catch (error) {
-            alert('An error occurred! Failed to retrieve itinerary!');
-            setLoading(false);
+            setRoutes(generatedRoutes);
+            console.log("generatedRoutes", generatedRoutes);
+
+            getFirstDayDiyEvents(response.data);
+        } else {
+            console.log('itinerary not created / fetched!');
         }
+        setLoading(false);
     }
 
     async function getFirstDayDiyEvents(retrievedItinerary) {

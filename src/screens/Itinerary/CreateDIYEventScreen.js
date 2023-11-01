@@ -69,11 +69,6 @@ const CreateDIYEventScreen = ({ navigation }) => {
                 type: 'error',
                 text1: "Please enter a location!"
             })
-        } else if (formData.remarks === undefined || formData.remarks.length === 0) {
-            Toast.show({
-                type: 'error',
-                text1: "Please enter a remark!"
-            })
         } else {
             setLoading(true);
 
@@ -98,7 +93,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
                     start_datetime: tempStartDate,
                     end_datetime: tempEndDate,
                     location: formData.location,
-                    remarks: formData.remarks,
+                    remarks: formData.remarks ? formData.remarks : '',
                 }
     
                 let response = await createDiyEvent(itinerary.itinerary_id, 0, "none", obj);
@@ -221,7 +216,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
     return (
         <Background style={{ alignItems: 'center', justifyContent: 'center' }}>
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                <View style={{ alignItems: 'center', minHeight: '100%', marginLeft: 20, marginTop: -150 }}>
+                <View style={{ alignItems: 'center', minHeight: '100%', marginLeft: 20, marginTop: -180 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 }}>
 
                         <TextInput
@@ -232,7 +227,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
                             errorText={formData.name ? InputValidator.text(formData.name) : ''}
                         />
 
-                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray', marginTop: 10, marginBottom: -5, marginLeft: -5}}>
+                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{marginTop: 10, marginBottom: -5, marginLeft: -5}}>
                             {formStartDate && formEndDate ? `${formatDatePicker(formStartDate)} - ${formatDatePicker(formEndDate)}` : 'Pick range'}
                         </DateButton>
                         <DatePickerModal
@@ -248,7 +243,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
                             inputMode="start"
                         />
 
-                        <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray', marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200}}>
+                        <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200}}>
                             {formStartTime ? `${formatTimePicker(formStartTime)}` : 'Pick Start Time'}
                         </DateButton>
                         <TimePickerModal
@@ -259,7 +254,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
                             minutes={0}
                         />
 
-                        <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{backgroundColor: 'lightgray', marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200}}>
+                        <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200}}>
                             {formEndTime ? `${formatTimePicker(formEndTime)}` : 'Pick End Time'}
                         </DateButton>
                         <TimePickerModal
@@ -280,7 +275,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
 
                         <TextInput
                             style={styles.description}
-                            label="Write your remarks here"
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={formData.remarks}
                             onChangeText={(value) => setFormData({ ...formData, remarks: value })}
@@ -290,7 +285,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
 
                     <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                         <Button
-                            style={{ width: 150, paddingTop: -100, marginTop: -250, marginLeft: -20 }}
+                            style={{ width: 150, paddingTop: -100, marginTop: -290, marginLeft: -20 }}
                             mode="contained"
                             text={"Submit"}
                             onPress={onSubmit}
@@ -327,7 +322,6 @@ const styles = StyleSheet.create({
     },
     description: {
         width: 320,
-        height: 100,
         marginTop: -15,
         textAlignVertical: 'top'
     },

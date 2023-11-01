@@ -12,6 +12,8 @@ import axios from "axios";
 import {getPublishedTelecomList} from "../redux/telecomRedux";
 import {getRecommendationFromBookings} from "../redux/recommendationRedux";
 import RNPickerSelect from "react-native-picker-select";
+import {getPaymentHistoryList} from "../redux/reduxBooking";
+import {useIsFocused} from "@react-navigation/native";
 
 export const HomeScreen = ({ navigation }) => {
   const [userData, setUserData] = useState('')
@@ -22,39 +24,92 @@ export const HomeScreen = ({ navigation }) => {
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [originalCombinedList, setOriginalCombinedList] = useState([]);
+  const isFocused = useIsFocused();
+
+  function shuffleArray(array) {
+    // Create a copy of the original array to avoid modifying the original array.
+    const shuffledArray = [...array];
+
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+      // Swap elements at i and j.
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+
+    return shuffledArray;
+  }
 
 
-  useEffect( () => {
-    // if(userData) {
-      const fetchData = async () => {
+  useEffect(() => {
+    async function onLoad() {
+      try {
+        const userData = await getUser();
+        setUserData(userData);
         const userId = userData.user_id;
-        console.log("HomeScreen userId", userId);
-        let response = await getRecommendationFromBookings(9);
-        console.log(response)
+
+        let response = await getRecommendationFromBookings(userId);
+        // console.log(response)
         if (response.status) {
-          const combinedList = [
+          let combinedList = [
             ...response.data.accommodationList,
             ...response.data.attractionList,
             ...response.data.restaurantList,
             ...response.data.telecomList,
-            ...response.data.tourList,
+            ...response.data.tourTypeList,
           ];
-          console.log(combinedList)
+          // console.log(combinedList)
+          combinedList = shuffleArray(combinedList)
           setOriginalList(response.data)
           setOriginalCombinedList(combinedList)
           setRecommendedList(combinedList);
-          // console.log(JSON.parse(response.data))
-          // console.log(response.data.attractionList)
         } else {
           console.log("Recommendation list not fetch!");
         }
-      };
-      fetchData()
-    // }
+      } catch (error) {
+        alert('An error occur! Failed to retrieve recommendation list!' );
+        console.log(error)
+      }
+    }
+    onLoad();
 
-    fetchUser();
+    if (isFocused) {
+      onLoad();
+    }
+  }, [isFocused]);
 
-  }, []);
+  // useEffect( () => {
+  //   console.log("HomeScreen userId", userData);
+  //
+  //   if(userData) {
+  //     const fetchData = async () => {
+  //       const userId = userData.user_id;
+  //       console.log("HomeScreen userId", userId);
+  //       let response = await getRecommendationFromBookings(9);
+  //       console.log(response)
+  //       if (response.status) {
+  //         let combinedList = [
+  //           ...response.data.accommodationList,
+  //           ...response.data.attractionList,
+  //           ...response.data.restaurantList,
+  //           ...response.data.telecomList,
+  //           ...response.data.tourTypeList,
+  //         ];
+  //         console.log(combinedList)
+  //         combinedList = shuffleArray(combinedList)
+  //         setOriginalList(response.data)
+  //         setOriginalCombinedList(combinedList)
+  //         setRecommendedList(combinedList);
+  //       } else {
+  //         console.log("Recommendation list not fetch!");
+  //       }
+  //     };
+  //     fetchData()
+  //   }
+  //
+  //   fetchUser();
+  //
+  // }, []);
 
   async function fetchUser() {
     const userData = await getUser()
@@ -88,7 +143,7 @@ export const HomeScreen = ({ navigation }) => {
     })
   }
 
-  const viewAttraction = (attraction_id) => {
+  const viewAttractionDetails = (attraction_id) => {
     navigation.navigate('AttractionDetailsScreen', { attractionId: attraction_id }); // set the attraction id here
   }
 
@@ -105,6 +160,22 @@ export const HomeScreen = ({ navigation }) => {
     }, 10);
   };
 
+  const viewTourDetails = (item) => {
+    navigation.navigate('TourDetailsScreen', { item });
+  }
+
+  const getColorForTypeAccommodation = (label) => {
+    const labelColorMap = {
+      'HOTEL': 'lightblue',
+      'AIRBNB': 'lightgreen',
+    };
+
+    return labelColorMap[label] || 'gray';
+  };
+
+  const viewAccommodationDetails = (accommodation_id) => {
+    navigation.navigate('AccommodationDetailsScreen', { accommodationId: accommodation_id }); // set the accommodation id here
+  }
 
 
   function formatEstimatedPriceTier(text) {
@@ -180,6 +251,107 @@ export const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const viewAttractions = () => {
+    navigation.navigate('AttractionScreen')
+  }
+
+  const viewAccommodations = () => {
+    navigation.navigate('AccommodationScreen')
+  }
+
+  const viewRestaurant = () => {
+    navigation.navigate('RestaurantScreen')
+  }
+
+  const viewTelecoms = () => {
+    navigation.navigate('TelecomScreen')
+  }
+
+  const viewDeals = () => {
+    navigation.navigate('DealScreen')
+  }
+
+  const SearchByCategory = () => {
+    return <>
+      <View style={styles.container}>
+        <Card>
+          <Card.Title>Attractions</Card.Title>
+          <Card.Image
+              style={{ padding: 0 }}
+              source={{
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/attractions.jpg'
+              }}
+          />
+          <Text style={styles.description}>
+            Embark on an exciting journey in Singapore and explore a diverse array of attractions that cater to every interest
+            from iconic landmarks to hidden gems!
+          </Text>
+          <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAttractions} />
+        </Card>
+
+        <Card>
+          <Card.Title>Accomodation</Card.Title>
+          <Card.Image
+              style={{ padding: 0 }}
+              source={{
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg'
+              }}
+          />
+          <Text style={styles.description}>
+            Discover a wide range of accommodation options in Singapore, tailored to suit every traveler's preferences.
+            Start exploring your options now!
+          </Text>
+          <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewAccommodations} />
+        </Card>
+
+        <Card>
+          <Card.Title>Restaurant</Card.Title>
+          <Card.Image
+              style={{ padding: 0 }}
+              source={{
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/restaurant.jpg'
+              }}
+          />
+          <Text style={styles.description}>
+            Indulge your taste buds in Singapore's vibrant culinary scene, where a myriad of restaurants await to
+            delight your palate. Come and savor the extraordinary culinary delights that await you!
+          </Text>
+          <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewRestaurant} />
+        </Card>
+
+        <Card>
+          <Card.Title>Telecom Packages</Card.Title>
+          <Card.Image
+              style={{ padding: 0 }}
+              source={{
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png'
+              }}
+          />
+          <Text style={styles.description}>
+            Stay connected during your Singapore adventure with tailored telecom packages designed especially for tourists.
+            Choose from a variety of cost-effective plans and make the most of your visit with our telecom packages!
+          </Text>
+          <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewTelecoms} />
+        </Card>
+
+        <Card>
+          <Card.Title>Deals and Discount</Card.Title>
+          <Card.Image
+              style={{ padding: 10 }}
+              source={{
+                uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/discount.png'
+              }}
+          />
+          <Text style={styles.description}>
+            Unlock unbeatable deals and discounts that add extra value to your Singapore journey. Don't miss out
+            on the chance to save while indulging in the best Singapore can offer!
+          </Text>
+          <Button style={styles.button} text="VIEW MORE" mode="contained" onPress={viewDeals} />
+        </Card>
+      </View>
+    </>
+  }
+
   const applyFilters = () => {
     let filteredList = [];
 
@@ -201,7 +373,7 @@ export const HomeScreen = ({ navigation }) => {
               filteredList = originalList.telecomList;
               break;
             case 'tourCategory':
-              filteredList = originalList.tourList;
+              filteredList = originalList.tourTypeList;
               break;
           }
         }
@@ -216,27 +388,40 @@ export const HomeScreen = ({ navigation }) => {
   return (
     <Background>
       <ScrollView>
-        <View style={styles.textcontainer}>
-          <Text style={styles.header}>
-            Recommendations to get you started on your next adventure
-          </Text>
-        </View>
+        {recommendedList.length > 0? (
+            <>
+                <View style={styles.textcontainer}>
+                  <Text style={styles.header}>
+                    Recommendations to get you started on your next adventure
+                  </Text>
+                </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
-            <Text style={styles.filterText}>Filter</Text>
-          </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
+                <Text style={styles.filterText}>Filter</Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity onPress={clearFilters} style={styles.filterButton}>
-            <Text style={styles.filterText}>Clear Filters</Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity onPress={clearFilters} style={styles.filterButton}>
+                <Text style={styles.filterText}>Clear Filters</Text>
+              </TouchableOpacity>
+            </View>
+            </>
+        ): (
+            <>
+              <View style={styles.textcontainer}>
+                <Text style={styles.header}>
+                  Welcome back! Explore a range of Attractions, Accommodations and more below
+                </Text>
+              </View>
+              {SearchByCategory()}
+            </>
+        )}
 
         <View style={styles.container}>
           {recommendedList && recommendedList.map((item, index) => {
             if (item.listing_type && item.listing_type === 'ATTRACTION') {
               return ( // Add the 'return' statement here
-                  <TouchableOpacity key={index} onPress={() => viewAttraction(item.attraction_id)}>
+                  <TouchableOpacity key={index} onPress={() => viewAttractionDetails(item.attraction_id)}>
                     <Card>
                       <Card.Title style={styles.telecomheader}>
                         {item.name}
@@ -311,6 +496,89 @@ export const HomeScreen = ({ navigation }) => {
                     </Card>
                   </TouchableOpacity>
               )}
+
+            if(item.accommodation_id) {
+              return (
+                  <TouchableOpacity
+                      key={index}
+                      onPress={() => viewAccommodationDetails(item.accommodation_id)}
+                      style={styles.card}
+                  >
+                    <Card>
+                      <Card.Title style={styles.cardTitle}>{item.name}</Card.Title>
+                      <Card.Image
+                          style={styles.cardImage}
+                          source={{
+                            uri: item.accommodation_image_list[0],
+                          }}
+                      />
+                      <Text style={styles.cardDescription}>{item.description}</Text>
+                      <View style={styles.tagContainer}>
+                        <Text
+                            style={[
+                              styles.tag,
+                              { backgroundColor: getColorForTypeAccommodation(item.type) },
+                              { textAlign: 'center' },
+                            ]}
+                        >
+                          {item.type}
+                        </Text>
+                        <Text
+                            style={[
+                              styles.tag,
+                              { backgroundColor: 'purple', color: 'white' },
+                              { textAlign: 'center' },
+                            ]}
+                        >
+                          {item.estimated_price_tier.replace(/_/g, ' ')}
+                        </Text>
+                        <Text
+                            style={[
+                              styles.locationTag,
+                              { backgroundColor: 'green', color: 'white', textAlign: 'center' },
+                            ]}
+                        >
+                          {item.generic_location.replace(/_/g, ' ')}
+                        </Text>
+                      </View>
+                    </Card>
+                  </TouchableOpacity>
+              )
+            }
+
+            if(item.tour_type_id) {
+              return (<TouchableOpacity key={index}>
+                <Card>
+                  <Card.Title style={styles.cardTitle}>
+                    {item.name}
+                  </Card.Title>
+                  <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'start',
+                    padding: 16,
+                  }}>
+                    {/* Text on the left */}
+                    <Text style={styles.description}>
+                      Price: S${item.price} {'\n'} {'\n'}
+                      Est. Duration: {item.estimated_duration} Hours {'\n'} {'\n'}
+                      Recommended Pax: {item.recommended_pax}
+                    </Text>
+                    {/* Image on the right */}
+                    <Card.Image
+                        style={{
+                          width: 120,
+                          height: 120,
+                          marginLeft: 40,
+                        }}
+                        source={{
+                          uri: item.tour_image_list[0]
+                        }}
+                    />
+                  </View>
+                  <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewTourDetails(item)} />
+                </Card>
+              </TouchableOpacity>)
+            }
           })}
 
           <Modal

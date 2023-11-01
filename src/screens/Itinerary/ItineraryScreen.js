@@ -13,7 +13,6 @@ import CreateItineraryScreen from './CreateItineraryScreen';
 import { IconButton } from 'react-native-paper';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { set } from 'date-fns';
 import moment from 'moment';
 
 const ItineraryScreen = ({ navigation }) => {

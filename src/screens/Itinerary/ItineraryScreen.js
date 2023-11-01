@@ -26,6 +26,7 @@ const ItineraryScreen = ({ navigation }) => {
     const [routes, setRoutes] = useState([]);
     const [firstDayDiyEvents, setFirstDayDiyEvents] = useState([]);
     const [currentDiyEvents, setCurrentDiyEvents] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     // diy event modal
     const [showDiyModal, setShowDiyModal] = useState(false);
@@ -50,7 +51,7 @@ const ItineraryScreen = ({ navigation }) => {
             let response = await getItineraryByUser(userId);
             console.log("getItineraryByUser response.data", response.data)
             setLoading(false);
-
+            console.log('gab', itinerary.start_date)
             if (response.status) {
                 setItinerary(response.data);
 
@@ -148,6 +149,9 @@ const ItineraryScreen = ({ navigation }) => {
     const handleTabChange = async (newIndex) => {
         console.log("Selected day:", newIndex + 1);
         setIndex(newIndex);
+
+        const dateSelected = moment(itinerary.start_date).add(newIndex, 'days').format('YYYY-MM-DD');
+        setSelectedDate(dateSelected);
 
         try {
             let response = await getAllDiyEventsByDay(itinerary.itinerary_id, newIndex + 1);
@@ -352,6 +356,21 @@ const ItineraryScreen = ({ navigation }) => {
                     </View>
                 </Modal>
             </View>
+
+            {itinerary && (
+                <View style={styles.buttonContainer}>
+                    <Button
+                        text="View Recommendations"
+                        style={styles.recommendationButton}
+                        onPress={() =>
+                            navigation.navigate('ItineraryRecommendationsScreen', {
+                                date: selectedDate ? selectedDate : itinerary.start_date.split('T')[0],
+                                itineraryId: itinerary.itinerary_id,
+                            })
+                        }
+                    />
+                </View>
+            )}
         </View>
     );
 }
@@ -362,6 +381,16 @@ const styles = StyleSheet.create({
         marginLeft: '30%',
         marginRight: '30%',
         backgroundColor: '#5f80e3'
+    },
+    buttonContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    recommendationButton: {
+        width: '80%',
+        backgroundColor: '#5f80e3',
+        alignSelf: 'center',
     },
     iconContainer: {
         flexDirection: 'row',
@@ -439,7 +468,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 5,
         right: 50,
-      },
+    },
 });
 
 export default ItineraryScreen

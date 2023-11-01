@@ -11,12 +11,13 @@ import InputValidator from '../../helpers/InputValidator';
 import { createDiyEvent } from '../../redux/diyEventRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { theme } from '../../core/theme'
-import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
+import moment from 'moment';
+import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 import { useIsFocused } from "@react-navigation/native";
+import { set } from 'date-fns';
 
 const CreateAccommodationDIYEventScreen = ({ navigation }) => {
 
@@ -24,26 +25,28 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
     const route = useRoute();
     const { typeId, selectedAccommodation } = route.params;
 
-    // accommodation card
-    const [user, setUser] = useState('');
+    const [user, setUser] = useState(null);
+    const [accommodation, setAccommodation] = useState(null);
     const [itinerary, setItinerary] = useState(null);
-    const [imageList, setImageList] = useState([]);
+    const [imgList, setImgList] = useState([]);
     const [imageActiveSlide, setImageActiveSlide] = useState(0);
+
+    const [values, setValues] = useState({
+        remarks: '',
+        // name and location given by accommodation by default
+    });
 
     // diy event form
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const [values, setValues] = useState({
-        remarks: '',
-    });
-
     useEffect(() => {
         async function onLoad() {
+            // get user
             const userData = await getUser();
             setUser(userData);
-            const userId = userData.user_id;
+            // console.log(userData);
 
             // get itinerary
             let response = await getItineraryByUser(userData.user_id);
@@ -52,33 +55,25 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
             } else {
                 console.log("itinerary not fetched!");
             }
+
+            setAccommodation(selectedAccommodation);
+            setImgList(selectedAccommodation.accommodation_image_list);
         }
 
         if (isFocused) {
             onLoad();
-            setImageList(selectedAccommodation.accommodation_image_list);
         }
 
     }, [isFocused]);
 
-    function formatLocalDateTime(localDateTimeString) {
-        const dateTime = new Date(localDateTimeString);
-        const timeOptions = { hour: '2-digit', minute: '2-digit' };
-        return dateTime.toLocaleTimeString([], timeOptions);
-    }
+    const getColorForType = (label) => {
+        const labelColorMap = {
+            'HOTEL': 'lightblue',
+            'AIRBNB': 'lightgreen',
+        };
 
-    const onDismiss = useCallback(() => {
-        setOpen(false);
-    }, [setOpen]);
-
-    const onConfirm = useCallback(
-        ({ startDate, endDate }) => {
-            setOpen(false);
-            setStartDate(startDate);
-            setEndDate(endDate);
-        },
-        [setOpen, setStartDate, setEndDate]
-    );
+        return labelColorMap[label] || 'gray';
+    };
 
     async function onSubmit() {
 
@@ -138,40 +133,54 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
         }
     }
 
+    const onDismiss = useCallback(() => {
+        setOpen(false);
+    }, [setOpen]);
+
+    const onConfirm = useCallback(
+        ({ startDate, endDate }) => {
+            setOpen(false);
+            setStartDate(startDate);
+            setEndDate(endDate);
+        },
+        [setOpen, setStartDate, setEndDate]
+    );
+
     function formatDatePicker(string) {
         const date = new Date(string);
         const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
         return date.toLocaleDateString([], dateOptions);
     }
 
-    const getColorForType = (label) => {
-        const labelColorMap = {
-            'HOTEL': 'lightblue',
-            'AIRBNB': 'lightgreen',
-        };
+    function formatLocalDateTime(localDateTimeString) {
+        const dateTime = new Date(localDateTimeString);
+        const timeOptions = { hour: '2-digit', minute: '2-digit' };
+        return dateTime.toLocaleTimeString([], timeOptions);
+    }
 
-        return labelColorMap[label] || 'gray';
-    };
-
-    return user && itinerary && selectedAccommodation ? (
+    return user && itinerary && accommodation ? (
         <Background style={{ alignItems: 'center' }}>
             {/* accommodation details */}
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                <Card>
-                    <View style={styles.topCard}>
-                        <Card.Title style={styles.header}>
-                            {selectedAccommodation.name}
-                        </Card.Title>
+                <View style={styles.topCard}>
+                    <Card>
+                        <Card.Title style={styles.header}>{accommodation.name} </Card.Title>
 
                         <View style={styles.tagContainer}>
-                            <Text style={[styles.tag, { backgroundColor: getColorForType(selectedAccommodation.type), textAlign: 'center' }]}>{selectedAccommodation.type}</Text>
-                            <Text style={[styles.tag, { backgroundColor: 'purple', color: 'white', textAlign: 'center' }]}>{selectedAccommodation.estimated_price_tier ? selectedAccommodation.estimated_price_tier.replace(/_/g, ' ') : ''}</Text>
-                            <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' }]}>{selectedAccommodation.generic_location ? selectedAccommodation.generic_location.replace(/_/g, ' ') : ''}</Text>
+                            <Text style={[styles.typeTag, { backgroundColor: getColorForType(accommodation.type) }, { textAlign: 'center' }]}>
+                                {accommodation.type}
+                            </Text>
+                            <Text style={[styles.tierTag, { backgroundColor: 'purple', color: 'white' }, { textAlign: 'center' },]}>
+                                {accommodation.estimated_price_tier ? accommodation.estimated_price_tier.replace(/_/g, ' ') : ''}
+                            </Text>
+                            <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' },]}>
+                                {accommodation.generic_location ? accommodation.generic_location.replace(/_/g, ' ') : ''}
+                            </Text>
                         </View>
-                        
+
                         <View style={styles.carouselContainer}>
                             <Carousel
-                                data={imageList}
+                                data={imgList}
                                 renderItem={renderCarouselItem}
                                 sliderWidth={330}
                                 itemWidth={330}
@@ -179,7 +188,7 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
                                 onSnapToItem={(index) => setImageActiveSlide(index)}
                             />
                             <Pagination
-                                dotsLength={imageList.length} // Total number of items
+                                dotsLength={imgList.length} // Total number of items
                                 activeDotIndex={imageActiveSlide} // Current active slide index
                                 containerStyle={{ paddingVertical: 10, marginTop: 5 }}
                                 dotStyle={{
@@ -193,58 +202,56 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
                             />
                         </View>
 
-                        <Text style={styles.details}>
-                            <Text style={styles.boldText}>Address:</Text>{' '}
-                            {selectedAccommodation.address}
+                        <Text style={{ fontSize: 12 }}>
+                            <Text style={{ fontWeight: 'bold' }}>Address:</Text>{' '}
+                            {accommodation.address}
                         </Text>
-                        <View style={{flexDirection: 'row'}}>
-                            <Text style={styles.details}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ fontSize: 12 }}>
                                 <Text style={styles.boldText}>Check In Time:</Text>{' '}
                                 {formatLocalDateTime(selectedAccommodation.check_in_time)}
                             </Text>
-                            <Text style={{fontSize: 12, marginLeft: 10}}>
+                            <Text style={{ fontSize: 12, marginLeft: 10 }}>
                                 <Text style={styles.boldText}>Check Out Time:</Text>{' '}
                                 {formatLocalDateTime(selectedAccommodation.check_out_time)}
                             </Text>
                         </View>
-                    </View>
-                </Card>
-                
-                {/* itinerary form */}
-                <View style={{ alignItems: 'center', minHeight: '100%' }}>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 0, marginTop: -500 }}>
+                    </Card>
+                </View>
 
-                        <View style={{flexDirection: 'row'}}>
-                            <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{marginTop: 0, marginBottom: 0, marginLeft: -5}}>
-                                {startDate && endDate ? `${formatDatePicker(startDate)} - ${formatDatePicker(endDate)}` : 'Pick Date Range'}
-                            </DateButton>
-                            <DatePickerModal
-                                locale="en"
-                                mode="range"
-                                visible={open}
-                                startDate={startDate}
-                                endDate={endDate}
-                                onConfirm={onConfirm}
-                                onDismiss={onDismiss}
-                            />
-                        </View>
+                {/* itinerary form */}
+                <View style={{ alignItems: 'center', marginTop: 120 }}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -80 }}>
+
+                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
+                            {startDate && endDate ? `${formatDatePicker(startDate)} - ${formatDatePicker(endDate)}` : 'Pick Date Range'}
+                        </DateButton>
+                        <DatePickerModal
+                            locale="en"
+                            mode="range"
+                            visible={open}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onConfirm={onConfirm}
+                            onDismiss={onDismiss}
+                        />
 
                         <TextInput
-                            style={styles.description}
+                            style={styles.inputFormRemarks}
                             label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}
                             errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
                         />
+                    </View>
 
-                        <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 0 }}>
-                            <Button
-                                mode="contained"
-                                text={"Submit"}
-                                onPress={onSubmit}
-                            />
-                        </View>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 30 }}>
+                        <Button
+                            mode="contained"
+                            text={"Submit"}
+                            onPress={onSubmit}
+                        />
                     </View>
                 </View>
             </ScrollView>
@@ -255,44 +262,40 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
+    topCard: {
+        height: 410,
     },
     header: {
         textAlign: 'left',
-        fontSize: 15,
+        fontSize: 13,
         color: '#044537',
-        flexDirection: 'row'
-    },
-    image: {
-        width: 30,
-        height: 30,
-        marginRight: 10,
-    },
-    subtitle: {
-        marginBottom: 5,
-        fontSize: 12,
-        color: 'grey'
-    },
-    description: {
-        marginBottom: 10,
-        fontSize: 12,
-        marginTop: 10
-    },
-    tag: {
-        color: 'black',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        margin: 5,
-        width: 90,
-        fontSize: 10,
+        flexDirection: 'row',
         fontWeight: 'bold'
     },
     tagContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: 12,
+        marginBottom: 5,
+    },
+    typeTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 85,
+        fontSize: 9,
+        fontWeight: 'bold',
+    },
+    tierTag: {
+        color: 'black',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        margin: 5,
+        width: 50,
+        fontSize: 9,
+        fontWeight: 'bold',
     },
     locationTag: {
         color: 'black',
@@ -300,17 +303,25 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 120,
-        fontSize: 11,
+        width: 80,
+        fontSize: 8,
         fontWeight: 'bold',
     },
     carouselContainer: {
-        flex: 1,
-        marginTop: 2,
+        marginTop: 8,
         marginBottom: 10,
     },
-    details: {
-        fontSize: 12
+
+    inputFormRemarks: {
+        width: 340,
+        marginTop: 5,
+        marginBottom: 10,
+    },
+    label: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginTop: 20,
+        marginLeft: 10,
     },
     boldText: {
         fontWeight: 'bold',

@@ -735,7 +735,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                         <View style={styles.centeredView}>
                                 <View style={styles.modalView}>
                                     <Text style={styles.modalText}>You have not created an itinerary!</Text>
-                                    <Text style={styles.modalText}>Please create one before added!</Text>
+                                    <Text style={styles.modalText}>Please create one before adding!</Text>
 
                                     <View style={{flexDirection: 'row'}}>
                                         {/* close modal button */}

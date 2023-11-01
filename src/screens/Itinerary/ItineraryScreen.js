@@ -4,7 +4,7 @@ import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
-import { getAllDiyEventsByDay, deleteDiyEvent } from '../../redux/diyEventRedux';
+import { getAllDiyEventsByDay, deleteDiyEvent, diyEventOverlap, diyEventBookingOverlap } from '../../redux/diyEventRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useIsFocused } from "@react-navigation/native";
@@ -18,8 +18,6 @@ import moment from 'moment';
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const isFocused = useIsFocused();
-    const [range, setRange] = useState({ startDate: undefined, endDate: undefined });
-    const [open, setOpen] = useState(false);
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(false);
     const [index, setIndex] = useState(0);
@@ -27,6 +25,12 @@ const ItineraryScreen = ({ navigation }) => {
     const [firstDayDiyEvents, setFirstDayDiyEvents] = useState([]);
     const [currentDiyEvents, setCurrentDiyEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [fetchItinerary, setFetchItinerary] = useState(true);
+
+    // diy event overlap
+    const [showMinorOverlap, setShowMinorOverlap] = useState(null);
+    const [showMajorOverlap, setShowMajorOverlap] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     // diy event modal
     const [showDiyModal, setShowDiyModal] = useState(false);
@@ -35,13 +39,14 @@ const ItineraryScreen = ({ navigation }) => {
     useEffect(() => {
         onLoad();
 
-        if (isFocused) {
+        if (isFocused || fetchItinerary) {
             onLoad();
         }
 
-    }, [isFocused]);
+    }, [isFocused, fetchItinerary]);
 
     async function onLoad() {
+        console.log("fetched!");
         const userData = await getUser();
         setUser(userData);
         const userId = userData.user_id;
@@ -49,8 +54,19 @@ const ItineraryScreen = ({ navigation }) => {
 
         let response = await getItineraryByUser(userId);
         if (response.status) {
-            console.log("getItineraryByUser response.data", response.data)
+            // console.log("getItineraryByUser response.data", response.data)
             setItinerary(response.data);
+
+            let minorOverlapResponse = await diyEventOverlap(response.data.itinerary_id);
+            if (minorOverlapResponse.status) {
+                setShowMinorOverlap(minorOverlapResponse.data);
+            }
+
+            let majorOverlapResponse = await diyEventBookingOverlap(response.data.itinerary_id);
+            if (majorOverlapResponse.status) {
+                setShowMajorOverlap(majorOverlapResponse.data);
+                setShowModal(majorOverlapResponse.data && majorOverlapResponse.data.length > 1 ? true : false);
+            }
 
             const numberOfDays = calculateNumberOfDays(response.data.start_date, response.data.end_date);
             const generatedRoutes = [];
@@ -61,9 +77,12 @@ const ItineraryScreen = ({ navigation }) => {
             console.log("generatedRoutes", generatedRoutes);
 
             getFirstDayDiyEvents(response.data);
+
+            setFetchItinerary(false);
         } else {
             console.log('itinerary not created / fetched!');
         }
+
         setLoading(false);
     }
 
@@ -205,6 +224,7 @@ const ItineraryScreen = ({ navigation }) => {
                 type: 'success',
                 text1: 'Event deleted!'
             });
+            setFetchItinerary(true);
 
             const index = currentDiyEvents.findIndex(event => event.diy_event_id === eventId);
             if (index !== -1) {
@@ -271,6 +291,9 @@ const ItineraryScreen = ({ navigation }) => {
             {!itinerary && <Text>No itinerary available</Text>}
             {itinerary && (
                 <View>
+                    {showMinorOverlap && showMinorOverlap.length > 1 && <Text style={{ fontWeight: 'bold', color: 'red' }}>{showMinorOverlap}</Text>}
+                    {showMajorOverlap && showMajorOverlap.length > 1 && <Text style={{ fontWeight: 'bold', color: 'red' }}>{showMajorOverlap}</Text>}
+
                     <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
                     <Text><Text style={{ fontWeight: 'bold' }}>Num of Pax:</Text> {itinerary.number_of_pax}</Text>
                     <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
@@ -296,7 +319,7 @@ const ItineraryScreen = ({ navigation }) => {
             )}
 
             {itinerary && (
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, minHeight: '40%' }}>
                     <TabView
                         navigationState={{ index, routes }}
                         renderScene={renderScene}
@@ -367,6 +390,36 @@ const ItineraryScreen = ({ navigation }) => {
                     />
                 </View>
             )}
+
+            {/* booking overlap modal */}
+            <View style={styles.centeredView}>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={showModal}
+                    onRequestClose={() => {
+                        setShowModal(false);
+                    }}
+                >
+
+                <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>{showMajorOverlap}</Text>
+
+                            <View style={{flexDirection: 'row'}}>
+                                {/* close modal button */}
+                                <Pressable
+                                    style={[styles.modalButton, styles.buttonClose]}
+                                    onPress={() => {
+                                        setShowModal(false);
+                                    }}>
+                                    <Text style={styles.textStyle}>Close</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
         </View>
     );
 }
@@ -464,6 +517,56 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 5,
         right: 50,
+    },
+
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 160,
+        width: 300,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 10,
+        marginRight: 10,
+        backgroundColor: '#044537',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    buttonClose: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+        color: 'red',
+        fontWeight: 'bold'
     },
 });
 

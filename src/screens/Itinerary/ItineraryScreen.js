@@ -261,31 +261,48 @@ const ItineraryScreen = ({ navigation }) => {
             <ScrollView style={{ flex: 1, marginBottom: 40 }}>
                 {currentDiyEvents.length > 0 ? (
                     currentDiyEvents.map(event => (
-                        <Card key={event.diy_event_id} style={styles.card}>
-                            <Text>{event.name}</Text>
-                            <Text>{moment(event.start_datetime).format('lll')}</Text>
-                            <Text>{moment(event.end_datetime).format('lll')}</Text>
-                            <Text>{event.location}</Text>
-                            <Text>{event.remarks}</Text>
-                            {event.attraction && <Text>Attraction: {event.attraction.attraction_id}</Text>}
+                        <Card style={{ flex: 1 }}>
+                            <View style={styles.rowContainer} key={event.diy_event_id}>
+                                <View>
+                                    <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
+                                    <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
+                                    <Text>{event.location}</Text>
+                                    <Text>{event.remarks}</Text>
+                                    {/* {event.attraction && <Text>Attraction: {event.attraction.attraction_id}</Text>}
                             {event.accommodation && <Text>Accommodation: {event.accommodation.accommodation_id}</Text>}
                             {event.telecom && <Text>Telecom: {event.telecom.telecom_id}</Text>}
                             {event.restaurant && <Text>Restaurant: {event.restaurant.restaurant_id}</Text>}
                             {event.booking && <Text>Booking: {event.booking.booking_id}</Text>}
-                            {!event.attraction && !event.accommodation && !event.telecom && !event.restaurant && !event.booking && <Text>DIY: {event.diy_event_id}</Text>}
-                            <Text onPress={() => navigateFunction(event)}>Go</Text>
-                            {!event.booking && <IconButton
-                                icon="delete"
-                                size={20}
-                                style={[styles.icon, styles.closeButton]}
-                                onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
-                            />}
-                            <IconButton
-                                icon="pencil"
-                                size={20}
-                                style={[styles.icon, styles.editButton]}
-                                onPress={() => handleEditDiyEventPress(event)}
-                            />
+                            {!event.attraction && !event.accommodation && !event.telecom && !event.restaurant && !event.booking && <Text>DIY: {event.diy_event_id}</Text>} */}
+                                </View>
+
+                                <View style={styles.chevronContainer}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <IconButton
+                                            icon="pencil"
+                                            size={20}
+                                            style={[styles.icon]}
+                                            onPress={() => handleEditDiyEventPress(event)}
+                                        />
+
+                                        {!event.booking && <IconButton
+                                            icon="delete"
+                                            size={20}
+                                            style={[styles.icon]}
+                                            onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
+                                        />}
+                                    </View>
+
+                                    <View style={{ alignItems: 'flex-end' }}>
+                                        <IconButton
+                                            icon="chevron-right"
+                                            size={35}
+                                            style={[styles.icon, styles.chevronButton]}
+                                            onPress={() => navigateFunction(event)}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
                         </Card>
                     ))
                 ) : (
@@ -353,40 +370,40 @@ const ItineraryScreen = ({ navigation }) => {
 
                     {/* View DIY Event Modal */}
                     {showDiyModal && (
-                            <View style={styles.centeredView}>
-                                <Modal
-                                    animationType="slide"
-                                    transparent={true}
-                                    visible={showDiyModal}
-                                    onRequestClose={() => {
-                                        setShowDiyModal(false);
-                                    }}
-                                >
-                                    <View style={styles.centeredView}>
-                                        <View style={styles.modalView}>
-                                            <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
-                                            <View>
-                                                <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
-                                                <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
-                                                <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
-                                                <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
-                                                <Text>{diyObject?.remarks}</Text>
-                                            </View>
-                                            <View style={{ marginLeft: 75, marginTop: 20 }}>
-                                                <Pressable
-                                                    style={[styles.modalButton, styles.buttonClose]}
-                                                    onPress={() => {
-                                                        setShowDiyModal(false);
-                                                        setDiyObject(undefined)
-                                                    }}>
-                                                    <Text style={styles.textStyle}>Close</Text>
-                                                </Pressable>
-                                            </View>
+                        <View style={styles.centeredView}>
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={showDiyModal}
+                                onRequestClose={() => {
+                                    setShowDiyModal(false);
+                                }}
+                            >
+                                <View style={styles.centeredView}>
+                                    <View style={styles.modalView}>
+                                        <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
+                                        <View>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
+                                            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
+                                            <Text>{diyObject?.remarks}</Text>
+                                        </View>
+                                        <View style={{ marginLeft: 75, marginTop: 20 }}>
+                                            <Pressable
+                                                style={[styles.modalButton, styles.buttonClose]}
+                                                onPress={() => {
+                                                    setShowDiyModal(false);
+                                                    setDiyObject(undefined)
+                                                }}>
+                                                <Text style={styles.textStyle}>Close</Text>
+                                            </Pressable>
                                         </View>
                                     </View>
-                                </Modal>
-                            </View>
-                        )
+                                </View>
+                            </Modal>
+                        </View>
+                    )
                     }
 
                     {/* <Button text="Add To Itinerary" style={styles.recommendationButton} onPress={handleMainButtonPress} /> */}
@@ -426,34 +443,34 @@ const ItineraryScreen = ({ navigation }) => {
 
             {/* booking overlap modal */}
             {showDiyModal && (
-            <View style={styles.centeredView}>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={showModal}
-                    onRequestClose={() => {
-                        setShowModal(false);
-                    }}
-                >
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={showModal}
+                        onRequestClose={() => {
+                            setShowModal(false);
+                        }}
+                    >
 
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>{showMajorOverlap}</Text>
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>{showMajorOverlap}</Text>
 
-                            <View style={{ flexDirection: 'row' }}>
-                                {/* close modal button */}
-                                <Pressable
-                                    style={[styles.modalButton, styles.buttonClose]}
-                                    onPress={() => {
-                                        setShowModal(false);
-                                    }}>
-                                    <Text style={styles.textStyle}>Close</Text>
-                                </Pressable>
+                                <View style={{ flexDirection: 'row' }}>
+                                    {/* close modal button */}
+                                    <Pressable
+                                        style={[styles.modalButton, styles.buttonClose]}
+                                        onPress={() => {
+                                            setShowModal(false);
+                                        }}>
+                                        <Text style={styles.textStyle}>Close</Text>
+                                    </Pressable>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                </Modal>
-            </View>)}
+                    </Modal>
+                </View>)}
         </View >
     );
 }
@@ -635,6 +652,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'red',
         fontWeight: 'bold'
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
 });
 

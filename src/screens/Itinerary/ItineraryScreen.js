@@ -265,7 +265,7 @@ const ItineraryScreen = ({ navigation }) => {
     }
 
     return (
-        <View style={{ height: '100%' }}>
+        <View style={{ flex: 1 }}>
             {!itinerary && <Button text="Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />}
             {itinerary && <Button text="Add Event" style={styles.button} onPress={() => navigation.navigate('CreateDIYEventScreen', { itinerary: itinerary })} />}
             {!itinerary && <Text>No itinerary available</Text>}
@@ -379,9 +379,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#5f80e3'
     },
     buttonContainer: {
-        flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-end', // Push the button to the bottom
         alignItems: 'center',
+        marginBottom: 20, // Add some spacing from the bottom
     },
     recommendationButton: {
         width: '80%',

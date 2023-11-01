@@ -431,8 +431,12 @@ const AttractionDetailsScreen = ({ navigation }) => {
                 <Card>
                     <Card.Title style={styles.header}>
                         {attraction.name}
-                        <Button mode="text" style={{ marginTop: -13 }} onPress={saveAttr} >
-                            <Icon name="heart" size={15} color='grey' />
+                        <Button mode="text" style={{ marginTop: -15, marginRight: -20 }} onPress={saveAttr} >
+                            <Icon name="heart" size={20} color='grey' />
+                        </Button>
+                        
+                        <Button mode="text" style={{ marginTop: -15, marginLeft: -5 }} onPress={() => navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction })} >
+                            <Icon name="calendar" size={20} color='grey' />
                         </Button>
                     </Card.Title>
 
@@ -447,8 +451,6 @@ const AttractionDetailsScreen = ({ navigation }) => {
                             {attraction.generic_location ? attraction.generic_location.replace(/_/g, ' ') : ''}
                         </Text>
                     </View>
-
-                    <CartButton text="Add to Itinerary" style={{ backgroundColor: '#5f80e3', fontSize: 10, width: 150, alignSelf: 'center' }} onPress={() => navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction })} />
 
                     <View style={styles.carouselContainer}>
                         <Carousel

@@ -324,7 +324,7 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
 
                         <TextInput
                             style={styles.inputFormRemarks}
-                            label="Write your remarks here"
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}

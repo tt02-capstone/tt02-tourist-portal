@@ -19,8 +19,10 @@ import ForumAttractionRecom from './ForumRecommendation/ForumAttractionRecom';
 import { theme } from '../../core/theme'
 import ForumRestaurantRecom from './ForumRecommendation/ForumRestaurantRecom';
 import ForumAccommodationRecom from './ForumRecommendation/ForumAccommodationRecom';
+import { getPrimaryBadge } from '../../redux/userRedux';
 
 const PostScreen = ({ navigation }) => {
+    const [badge, setBadge] = useState();
 
     // post attributes
     const [user, setUser] = useState('');
@@ -47,6 +49,11 @@ const PostScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
+
+        const b = await getPrimaryBadge(userData.user_id)
+        if (b.status) {
+            setBadge(b.data)
+        }
     }
 
     // fetch post
@@ -386,7 +393,7 @@ const PostScreen = ({ navigation }) => {
 
     return post ? (
         <Background>
-            <View style={{height: 750}}>
+            <ScrollView style={{height: 750}}>
                 <Card>
                     {post.local_user && 
                         <View style={{flexDirection: 'row'}}>
@@ -395,12 +402,20 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.local_user.profile_pic ? post.local_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>
+                                    {post.local_user.name}
+                                    {badge && (
+                                        <Image
+                                        style={styles.badgeImage}
+                                        source={{uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }}
+                                        />
+                                    )}
+                                </Text>
                             </TouchableOpacity>
 
                             {post.local_user.user_id === user.user_id && 
-                                <TouchableOpacity style={{marginLeft: 160}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
-                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
+                                <TouchableOpacity style={{marginLeft: 180, marginTop:4}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={20}/>
                                 </TouchableOpacity>
                             }
                         </View>
@@ -413,11 +428,19 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.tourist_user.profile_pic ? post.tourist_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.tourist_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>
+                                    {post.tourist_user.name}
+                                    {badge && (
+                                        <Image
+                                        style={styles.badgeImage}
+                                        source={{uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }}
+                                        />
+                                    )}
+                                </Text>
                             </TouchableOpacity>
 
                             {post.tourist_user.user_id === user.user_id && 
-                                <TouchableOpacity style={{marginLeft: 180}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
+                                <TouchableOpacity style={{marginLeft: 180, marginTop:4}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
                                     <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
                                 </TouchableOpacity>
                             }
@@ -431,14 +454,16 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.internal_staff_user.profile_pic ? post.internal_staff_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.internal_staff_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>
+                                    {post.internal_staff_user.name}
+                                    {badge && (
+                                        <Image
+                                        style={styles.badgeImage}
+                                        source={{uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }}
+                                        />
+                                    )}
+                                </Text>
                             </TouchableOpacity>
-
-                            {post.internal_staff_user.user_id === user.user_id && 
-                                <TouchableOpacity style={{marginLeft: 180}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
-                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
-                                </TouchableOpacity>
-                            }
                         </View>
                     }
 
@@ -449,14 +474,16 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.vendor_staff_user.profile_pic ? post.vendor_staff_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.vendor_staff_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>
+                                    {post.vendor_staff_user.name}
+                                    {badge && (
+                                        <Image
+                                        style={styles.badgeImage}
+                                        source={{uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }}
+                                        />
+                                    )}
+                                </Text>
                             </TouchableOpacity>
-
-                            {post.vendor_staff_user.user_id === user.user_id && 
-                                <TouchableOpacity style={{marginLeft: 180}} mode="text" onPress={() => updatePost(post, post.post_image_list)}>
-                                    <Ionicons name="create-outline" style={{ color: 'black'}} size={25}/>
-                                </TouchableOpacity>
-                            }
                         </View>
                     }
                     <Card.Divider />
@@ -472,24 +499,24 @@ const PostScreen = ({ navigation }) => {
                     <Card.Divider />
 
                     <View style={{flexDirection: 'row'}}>
-                        <Ionicons name="arrow-up" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
+                        <Ionicons name="arrow-up" style={styles.icon} size={18} color={post && post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onUpvotePressed} />
                         <Text style={{marginLeft: 10, marginRight: 15, color: post.upvoted_user_id_list && post.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{post.upvoted_user_id_list ? post.upvoted_user_id_list.length : 0}</Text>
-                        <Ionicons name="arrow-down" style={styles.icon} size={20} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
+                        <Ionicons name="arrow-down" style={styles.icon} size={18} color={post && post.upvoted_user_id_list && post.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={onDownvotePressed} />
 
-                        <TouchableOpacity style={{marginLeft: 45, marginTop: -5}} mode="text" onPress={onNewParentCommentPressed}>
-                                    <Ionicons name="brush" style={{ color: 'black'}} size={25}/>
+                        <TouchableOpacity style={{marginLeft: 105, marginTop: -5}} mode="text" onPress={onNewParentCommentPressed}>
+                            <Ionicons name="brush" style={{ color: 'black'}} size={18}/>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{marginLeft: 20, marginTop: -5}} mode="text" onPress={onReportPostPressed}>
-                        <Ionicons name="flag" style={{ color: 'black'}} size={25}/>
+                        <TouchableOpacity style={{marginLeft: 15, marginTop: -5}} mode="text" onPress={onReportPostPressed}>
+                        <Ionicons name="flag" style={{ color: 'black'}} size={18}/>
                         </TouchableOpacity>
                         
-                        <Text style={{marginLeft: 20, marginTop: 3}} >Last edit: {moment(post.publish_time).format('LT')}</Text>
+                        <Text style={{marginLeft: 5, marginTop: 3, fontSize:10, color:'grey', fontWeight:'bold'}} >Last Edited: {moment(post.publish_time).format('LT')}</Text>
                     </View>
 
                     {/* recommendation */}
-                    <View style={{marginBottom: -15}}>
-                        {recommendation && recommendation.length > 0 && <Text style={{marginLeft: 0, marginTop: 15, marginBottom: -10, fontSize: 15, fontWeight: 'bold'}}>Nearby Recommendations</Text>}
+                    <View style={{marginBottom: -15, marginTop:10}}>
+                        {recommendation && recommendation.length > 0 && <Text style={{marginLeft: 0, marginTop: 15, marginBottom: -10, fontSize: 13, fontWeight: 'bold'}}>Nearby Recommendations</Text>}
                         {recommendation.length > 0 && (
                             <ScrollView horizontal>
                                 <View style={{ flexDirection: 'row', height: 120}}>
@@ -522,7 +549,7 @@ const PostScreen = ({ navigation }) => {
                             <TextInput
                                 label="Add New Comment"
                                 returnKeyType="next"
-                                style={{width: 270, height: 30, marginLeft: 15}}
+                                style={{width: 275, height: 30, marginLeft: 15, fontSize:'10'}}
                                 value={formData.parentComment}
                                 onChangeText={(parentComment) => setFormData({...formData, parentComment })}
                                 autoCapitalize="none"
@@ -553,33 +580,33 @@ const PostScreen = ({ navigation }) => {
                             renderItem={({ item, isSelect, isOpen, onOpen, onClose, onSelect }) => (
                                 <TouchableOpacity style={styles.commentContainer} onPress={isOpen ? onClose : onOpen}>
                                     <View style={{flexDirection: 'column',}}>
-                                        {item.tourist_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.tourist_user.user_id)}>{item.tourist_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
-                                        {item.local_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.local_user.user_id)}>{item.local_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
-                                        {item.vendor_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.vendor_staff_user.user_id)}>{item.vendor_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
-                                        {item.internal_staff_user && <Text style={{fontSize: 15, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.internal_staff_user.user_id)}>{item.internal_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
-                                        <Text style={{fontSize: 15, marginBottom: 10, marginTop: 5}}>{item.content}</Text>
+                                        {item.tourist_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.tourist_user.user_id)}>{item.tourist_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        {item.local_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.local_user.user_id)}>{item.local_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        {item.vendor_staff_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.vendor_staff_user.user_id)}>{item.vendor_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        {item.internal_staff_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.internal_staff_user.user_id)}>{item.internal_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
+                                        <Text style={{fontSize: 14, marginBottom: 10, marginTop: 5}}>{item.content}</Text>
 
                                         <View style={{flexDirection: 'row',}}>
                                             { item.is_published && (
                                                 <>
-                                                    <Ionicons name="arrow-up" size={20} color={item && item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onUpvoteCommentPressed(item.comment_id)} />
+                                                    <Ionicons name="arrow-up" size={18} color={item && item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onUpvoteCommentPressed(item.comment_id)} />
                                                     <Text style={{marginLeft: 5, marginRight: 4, marginTop: 2, color: item.upvoted_user_id_list && item.upvoted_user_id_list.includes(user.user_id) ? "red" : "black"}} >{item.upvoted_user_id_list ? item.upvoted_user_id_list.length : 0}</Text>
-                                                    <Ionicons name="arrow-down" size={20} color={item && item.upvoted_user_id_list && item.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onDownvoteCommentPressed(item.comment_id)} />
+                                                    <Ionicons name="arrow-down" size={18} color={item && item.upvoted_user_id_list && item.downvoted_user_id_list.includes(user.user_id) ? "red" : "black"} onPress={() => onDownvoteCommentPressed(item.comment_id)} />
                                                 </>
                                             )}
                                             
-                                            <Text style={{marginLeft: 5, marginRight: 10, marginTop: 2}}>{item.child_comment_list ? item.child_comment_list.length : 0} Replies</Text>
-                                            {item.is_published &&  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => addChildComment(item)}>Reply</Text>}
+                                            <Text style={{marginLeft: 5, marginRight: 10, marginTop: 5, fontSize:10}}>{item.child_comment_list ? item.child_comment_list.length : 0} Replies</Text>
+                                            {item.is_published &&  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => addChildComment(item)}>Reply</Text>}
 
-                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold',fontSize:10}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
 
-                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
 
-                                            {item.local_user && item.local_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold'}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.local_user && item.local_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
 
                                         </View>
                                     </View>
@@ -589,7 +616,7 @@ const PostScreen = ({ navigation }) => {
                         }
                     </View>
                 </View>
-            </View>
+            </ScrollView>
 
             {/* create child comment modal */}
             <View style={styles.centeredView}>
@@ -722,6 +749,14 @@ const styles = StyleSheet.create({
         borderRadius: 300 / 2,
         width: 30,
         height: 30,
+    },
+    badgeImage: {
+        marginTop: 0,
+        marginLeft:3,
+        marginBottom: -4,
+        borderRadius: 300 / 2,
+        width: 20,
+        height: 20,
     },
     icon: {
         marginLeft: -5,

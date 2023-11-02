@@ -19,8 +19,10 @@ import ForumAttractionRecom from './ForumRecommendation/ForumAttractionRecom';
 import { theme } from '../../core/theme'
 import ForumRestaurantRecom from './ForumRecommendation/ForumRestaurantRecom';
 import ForumAccommodationRecom from './ForumRecommendation/ForumAccommodationRecom';
+import { getPrimaryBadge } from '../../redux/userRedux';
 
 const PostScreen = ({ navigation }) => {
+    const [badge, setBadge] = useState();
 
     // post attributes
     const [user, setUser] = useState('');
@@ -47,6 +49,11 @@ const PostScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
+
+        const b = await getPrimaryBadge(userData.user_id)
+        if (b.status) {
+            setBadge(b.data)
+        }
     }
 
     // fetch post
@@ -386,7 +393,7 @@ const PostScreen = ({ navigation }) => {
 
     return post ? (
         <Background>
-            <View style={{height: 750}}>
+            <ScrollView style={{height: 750}}>
                 <Card>
                     {post.local_user && 
                         <View style={{flexDirection: 'row'}}>
@@ -395,7 +402,15 @@ const PostScreen = ({ navigation }) => {
                                     style={styles.profileImage}
                                     source={{uri: post.local_user.profile_pic ? post.local_user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                 />
-                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>{post.local_user.name}</Text>
+                                <Text style={{marginLeft: 10, marginTop: 6, fontSize: 15, fontWeight: 'bold'}}>
+                                    {post.local_user.name}
+                                    {badge && (
+                                        <Image
+                                        style={styles.badgeImage}
+                                        source={{uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }}
+                                        />
+                                    )}
+                                </Text>
                             </TouchableOpacity>
 
                             {post.local_user.user_id === user.user_id && 
@@ -589,7 +604,7 @@ const PostScreen = ({ navigation }) => {
                         }
                     </View>
                 </View>
-            </View>
+            </ScrollView>
 
             {/* create child comment modal */}
             <View style={styles.centeredView}>
@@ -722,6 +737,14 @@ const styles = StyleSheet.create({
         borderRadius: 300 / 2,
         width: 30,
         height: 30,
+    },
+    badgeImage: {
+        marginTop: 0,
+        marginLeft:3,
+        marginBottom: -4,
+        borderRadius: 300 / 2,
+        width: 20,
+        height: 20,
     },
     icon: {
         marginLeft: -5,

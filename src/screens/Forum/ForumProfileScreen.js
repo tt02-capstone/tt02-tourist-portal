@@ -4,12 +4,13 @@ import { Card } from '@rneui/themed';
 import { useRoute } from '@react-navigation/native';
 import Background from '../../components/Background'
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { viewUserProfile } from '../../redux/userRedux';
+import { viewUserProfile, getPrimaryBadge } from '../../redux/userRedux';
 
 export const ForumProfileScreen = ({navigation}) => {
 
     const route = useRoute();
     const [user, setUser] = useState('');
+    const [badge, setBadge] = useState('');
     const { catId, postId, userId } = route.params;
 
     async function fetchUser() {
@@ -21,15 +22,46 @@ export const ForumProfileScreen = ({navigation}) => {
         }
     }
 
+    async function fetchBadge() {
+        const response = await getPrimaryBadge(userId)
+        if (response.status) {
+            setBadge(response.data);
+        } else {
+            console.log("Badge not fetched!");
+        }
+    }
+
     useEffect(() => {
         fetchUser();
+        fetchBadge();
     }, []);
+
+    function formatBadgeName(name) {
+        const words = name.split('_');
+        const formattedName = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        return formattedName;
+    }
+
+    function badgeDetails(name) {
+        if (name == "FOODIE") {
+            return "Unlocked After Creating 2 Restaurant Related Posts"
+        } else if (name == "ATTRACTION_EXPERT") {
+            return "Unlocked After Creating 2 Attraction Related Posts"
+        } else if (name == "ACCOMMODATION_EXPERT") {
+            return "Unlocked After Creating 2 Accommodation Related Posts"
+        } else if (name == "TELECOM_EXPERT") {
+            return "Unlocked After Creating 2 Telecom Related Posts"
+        } else {
+            return "Unlocked After Creating 4 Posts on Forum"
+        }
+    }
 
     const [index, setIndex] = React.useState(0);
     const layout = useWindowDimensions();
     const [routes] = React.useState([
-        { key: 'first', title: 'Posts' },
-        { key: 'second', title: 'Comments' },
+        { key: 'first', title: 'Post' },
+        { key: 'second', title: 'Comment' },
+        { key: 'third', title: 'Badge' },
     ]);
 
     return user ? (
@@ -92,6 +124,18 @@ export const ForumProfileScreen = ({navigation}) => {
                             </View>
                             ))
                         }
+                    </View>
+                }
+
+                {/* badge */}
+                {index === 2 && badge && 
+                    <View>
+                        <Text style={{marginTop: 10, marginLeft: 15, fontWeight: 'bold', fontSize: 15}} >Primary Badge</Text>
+                        <Card>
+                            <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 250, height: 200 }} />
+                            <Text style={{ fontSize: 20 ,textAlign: 'center', fontWeight:'bold', marginTop:10}}>{formatBadgeName(badge.badge_type)}</Text>
+                            <Text style={{ fontSize: 8 ,textAlign: 'center', fontWeight:'bold', marginTop:6, color:'grey'}}> {badgeDetails(badge.badge_type)} </Text>
+                        </Card>
                     </View>
                 }
 

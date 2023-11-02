@@ -69,6 +69,7 @@ import CreateTelecomDIYEventScreen from './src/screens/Telecom/CreateTelecomDIYE
 import EditDIYEventScreen from './src/screens/Itinerary/EditDIYEventScreen';
 import ItineraryRecommendationsScreen from './src/screens/Itinerary/ItineraryRecommendationsScreen';
 import CreateRestaurantDIYEventScreen from './src/screens/Restaurant/CreateRestaurantDIYEventScreen';
+import EventSuggestionsScreen from './src/screens/Itinerary/EventSuggestionsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -181,6 +182,7 @@ export const Layout = () => {
                         <Stack.Screen name="CreateRestaurantDIYEventScreen" component={CreateRestaurantDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
                         <Stack.Screen name="EditDIYEventScreen" component={EditDIYEventScreen} options={{ title : 'Edit Event' }} />
                         <Stack.Screen name="ItineraryRecommendationsScreen" component={ItineraryRecommendationsScreen} options={{ title : 'Recommendations' }} />
+                        <Stack.Screen name="EventSuggestionsScreen" component={EventSuggestionsScreen} options={{ title : 'Event Suggestions' }} />
                     </>
                 ) : (
                     <>

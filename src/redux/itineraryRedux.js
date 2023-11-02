@@ -80,3 +80,13 @@ export async function getRestaurantRecommendationsForItinerary(itineraryId, date
     return {status: false, data: error.message};
   }
 }
+
+export async function getSuggestedEventsBasedOnTimeslot(startTime, endTime) {
+  try {
+    const response = await itineraryApi.get(`/getSuggestedEventsBasedOnTimeslot/${startTime}/${endTime}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getSuggestedEventsBasedOnTimeslot Error : ", error);
+    return {status: false, data: error.message};
+  }
+}

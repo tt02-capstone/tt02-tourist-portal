@@ -42,14 +42,14 @@ export default function ForumAccommodationRecom({ item }) {
 const styles = StyleSheet.create({
     rCard: {
         flex: 1,
-        width: 320,
+        width: 290,
         height: 80,
         borderRadius: 4,
         margin: 2
     },
     header: {
         textAlign: 'left',
-        fontSize: 13,
+        fontSize: 12,
         color: '#044537',
         flexDirection: 'row'
     },

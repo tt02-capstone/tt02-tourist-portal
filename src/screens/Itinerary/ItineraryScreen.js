@@ -449,7 +449,7 @@ const ItineraryScreen = ({ navigation }) => {
 
                     <Modal visible={showOptions} animationType="slide" transparent={true}>
                         <View style={styles.modalContainer}>
-                            <View style={[styles.modalContent, { height: windowHeight * 0.3 }]}>
+                            <View style={[styles.modalContent, { height: windowHeight * 0.4 }]}>
                                 <Button
                                     text="Create DIY Event"
                                     style={{ width: '90%' }}
@@ -464,6 +464,17 @@ const ItineraryScreen = ({ navigation }) => {
                                     onPress={() => {
                                         setShowOptions(false);
                                         navigation.navigate('ItineraryRecommendationsScreen', {
+                                            date: selectedDate ? selectedDate : itinerary.start_date.split('T')[0],
+                                            itineraryId: itinerary.itinerary_id,
+                                        });
+                                    }}
+                                />
+                                <Button
+                                    text="Get Event Suggestions by Time"
+                                    style={{ width: '90%' }}
+                                    onPress={() => {
+                                        setShowOptions(false);
+                                        navigation.navigate('EventSuggestionsScreen', {
                                             date: selectedDate ? selectedDate : itinerary.start_date.split('T')[0],
                                             itineraryId: itinerary.itinerary_id,
                                         });

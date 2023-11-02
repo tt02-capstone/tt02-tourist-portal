@@ -10,7 +10,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useIsFocused } from "@react-navigation/native";
 import { DatePickerModal } from 'react-native-paper-dates';
 import CreateItineraryScreen from './CreateItineraryScreen';
-import { IconButton } from 'react-native-paper';
+import { Icon, IconButton } from 'react-native-paper';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
@@ -321,17 +321,38 @@ const ItineraryScreen = ({ navigation }) => {
                 </View>
             ) : (
                 <>
+                    <View>
+                        {showMinorOverlap && showMinorOverlap.length > 1 && (
+                            <View style={styles.overlapTextContainer}>
+                                <IconButton
+                                    icon="alert"
+                                    size={20}
+                                    iconColor={'crimson'}
+                                    onPress={null}
+                                />
+                                <Text style={styles.overlapText}>{showMinorOverlap}</Text>
+                            </View>
+                        )}
+                        {showMajorOverlap && showMajorOverlap.length > 1 && (
+                            <View style={styles.overlapTextContainer}>
+                                <IconButton
+                                    icon="alert"
+                                    size={20}
+                                    iconColor={'crimson'}
+                                    onPress={null}
+                                />
+                                <Text style={styles.overlapText}>{showMajorOverlap}</Text>
+                            </View>
+                        )}
+                    </View>
+
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: 10, marginTop: 10, marginBottom: 10, marginLeft: 10 }}>
-                        {/* Container for Duration, Number of Pax, and Remarks */}
                         <View>
-                            {showMinorOverlap && showMinorOverlap.length > 1 && <Text style={{ fontWeight: 'bold', color: 'red' }}>{showMinorOverlap}</Text>}
-                            {showMajorOverlap && showMajorOverlap.length > 1 && <Text style={{ fontWeight: 'bold', color: 'red' }}>{showMajorOverlap}</Text>}
                             <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
                             <Text><Text style={{ fontWeight: 'bold' }}>Number of Pax:</Text> {itinerary.number_of_pax}</Text>
                             <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
                         </View>
 
-                        {/* Container for Edit (Pencil) and Delete Icons */}
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
                             {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
                                 <IconButton
@@ -507,8 +528,6 @@ const styles = StyleSheet.create({
         marginTop: -5,
         marginRight: 3,
     },
-
-
     centeredView: {
         flex: 1,
         justifyContent: 'center',
@@ -656,6 +675,24 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    overlapText: {
+        flex: 1,
+        fontWeight: 'bold',
+        color: 'crimson',
+    },
+    overlapTextContainer: {
+        backgroundColor: 'mistyrose',
+        padding: 4,
+        borderRadius: 5,
+        marginTop: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        marginBottom: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
     },
 });

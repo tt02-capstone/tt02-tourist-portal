@@ -254,13 +254,35 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     const renderScene = ({ route }) => {
-        // console.log("renderScene called with route key:", route.key);
         const dayNum = route.key === '1' ? 1 : parseInt(route.key.replace('day', ''));
+
+        // Separate events with event types "accommodation" from the rest
+        const accommodationEvents = currentDiyEvents.filter(
+            (event) => event.accommodation !== null || event.booking && event.booking.room !== null
+        );
+
+        // Separate events with event types "accommodation" and "telecom" from the rest
+        const telecomEvents = currentDiyEvents.filter(
+            (event) => event.telecom !== null || event.booking && event.booking.telecom !== null
+        );
+
+        // Sort the remaining events by start_datetime
+        const sortedNonAccommodationTelecomEvents = currentDiyEvents
+            .filter((event) => event.accommodation == null && event.telecom == null && event.booking?.room == null && event.booking?.telecom == null)
+            .slice()
+            .sort((a, b) => {
+                const startTimeA = new Date(a.start_datetime).getTime();
+                const startTimeB = new Date(b.start_datetime).getTime();
+                return startTimeA - startTimeB;
+            });
+
+        // Combine both sorted event lists
+        const sortedEvents = [...accommodationEvents, ...telecomEvents, ...sortedNonAccommodationTelecomEvents];
 
         return (
             <ScrollView style={{ flex: 1, marginBottom: 40 }}>
-                {currentDiyEvents.length > 0 ? (
-                    currentDiyEvents.map(event => (
+                {sortedEvents.length > 0 ? (
+                    sortedEvents.map(event => (
                         <Card style={{ flex: 1 }}>
                             <View style={styles.rowContainer} key={event.diy_event_id}>
                                 <View>
@@ -268,12 +290,6 @@ const ItineraryScreen = ({ navigation }) => {
                                     <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
                                     <Text>{event.location}</Text>
                                     <Text>{event.remarks}</Text>
-                                    {/* {event.attraction && <Text>Attraction: {event.attraction.attraction_id}</Text>}
-                            {event.accommodation && <Text>Accommodation: {event.accommodation.accommodation_id}</Text>}
-                            {event.telecom && <Text>Telecom: {event.telecom.telecom_id}</Text>}
-                            {event.restaurant && <Text>Restaurant: {event.restaurant.restaurant_id}</Text>}
-                            {event.booking && <Text>Booking: {event.booking.booking_id}</Text>}
-                            {!event.attraction && !event.accommodation && !event.telecom && !event.restaurant && !event.booking && <Text>DIY: {event.diy_event_id}</Text>} */}
                                 </View>
 
                                 <View style={styles.chevronContainer}>
@@ -323,25 +339,25 @@ const ItineraryScreen = ({ navigation }) => {
                 <>
                     <View>
                         {showMinorOverlap && showMinorOverlap.length > 1 && (
-                            <View style={styles.overlapTextContainer}>
+                            <View style={styles.minorOverlapTextContainer}>
                                 <IconButton
-                                    icon="alert"
+                                    icon="alert-circle"
                                     size={20}
-                                    iconColor={'crimson'}
+                                    iconColor={'#d47b15'}
                                     onPress={null}
                                 />
-                                <Text style={styles.overlapText}>{showMinorOverlap}</Text>
+                                <Text style={styles.minorOverlapText}>{showMinorOverlap}</Text>
                             </View>
                         )}
                         {showMajorOverlap && showMajorOverlap.length > 1 && (
-                            <View style={styles.overlapTextContainer}>
+                            <View style={styles.majorOverlapTextContainer}>
                                 <IconButton
                                     icon="alert"
                                     size={20}
                                     iconColor={'crimson'}
                                     onPress={null}
                                 />
-                                <Text style={styles.overlapText}>{showMajorOverlap}</Text>
+                                <Text style={styles.majorOverlapText}>{showMajorOverlap}</Text>
                             </View>
                         )}
                     </View>
@@ -354,14 +370,12 @@ const ItineraryScreen = ({ navigation }) => {
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
-                            {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
-                                <IconButton
-                                    icon="pencil"
-                                    size={20}
-                                    style={styles.icon}
-                                    onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
-                                />
-                            )}
+                            <IconButton
+                                icon="pencil"
+                                size={20}
+                                style={styles.icon}
+                                onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
+                            />
                             <IconButton
                                 icon="delete"
                                 size={20}
@@ -677,19 +691,35 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    overlapText: {
+    minorOverlapText: {
+        flex: 1,
+        fontWeight: 'bold',
+        color: '#d47b15',
+    },
+    minorOverlapTextContainer: {
+        backgroundColor: 'papayawhip',
+        padding: 4,
+        borderRadius: 5,
+        marginTop: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    majorOverlapText: {
         flex: 1,
         fontWeight: 'bold',
         color: 'crimson',
     },
-    overlapTextContainer: {
+    majorOverlapTextContainer: {
         backgroundColor: 'mistyrose',
         padding: 4,
         borderRadius: 5,
         marginTop: 10,
         marginLeft: 10,
         marginRight: 10,
-        marginBottom: 10,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',

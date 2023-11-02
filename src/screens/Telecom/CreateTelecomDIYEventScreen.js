@@ -111,7 +111,7 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
         if (response.status) {
             Toast.show({
                 type: 'success',
-                text1: 'Restaurant added to itinerary!'
+                text1: 'Telecom Package added to itinerary!'
             })
 
             navigation.reset({

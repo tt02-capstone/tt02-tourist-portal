@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, Image } from 'react-native'
+import { StyleSheet, View, Image, ScrollView } from 'react-native'
 import { useIsFocused } from "@react-navigation/native";
-import { theme } from '../../core/theme';
-import Button from "../../components/Button";
 import { storeUser, getUser } from '../../helpers/LocalStorage'
-import Toast from "react-native-toast-message";
-import moment from 'moment';
 import Background from '../../components/Background';
-import { Divider } from 'react-native-paper';
-import { retrieveBadgesByUserId } from '../../redux/userRedux';
+import { retrieveBadgesByUserId, markBadgeAsPrimary, getPrimaryBadge } from '../../redux/userRedux';
+import { Button } from 'react-native-paper';
+import { Text, Card } from '@rneui/themed';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from "react-native-toast-message";
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -18,11 +17,11 @@ export const BadgesScreen = ({ route, navigation }) => {
     const isFocused = useIsFocused();
     const [user, setUser] = useState();
     const [badges, setBadges] = useState();
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         async function fetchData() {
             const userData = await getUser()
-            console.log('gab', userData);
             setUser(userData)
             let badgeResponse = await retrieveBadgesByUserId(userData.user_id);
             if (badgeResponse.status) {
@@ -33,38 +32,80 @@ export const BadgesScreen = ({ route, navigation }) => {
             }
         }
 
-        if (isFocused || fetchBadge) {
+        if (isFocused || fetchBadge || refresh) {
             fetchData();
+            setRefresh(false);
         }
-    }, [isFocused, fetchBadge])
+    }, [isFocused, fetchBadge, refresh])
 
     function formatBadgeName(name) {
         const words = name.split('_');
-
         const formattedName = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-
         return formattedName;
+    }
+
+    function badgeDetails(name) {
+        if (name == "FOODIE") {
+            return "Unlocked After Creating 2 Restaurant Related Posts"
+        } else if (name == "ATTRACTION_EXPERT") {
+            return "Unlocked After Creating 2 Attraction Related Posts"
+        } else if (name == "ACCOMMODATION_EXPERT") {
+            return "Unlocked After Creating 2 Accommodation Related Posts"
+        } else if (name == "TELECOM_EXPERT") {
+            return "Unlocked After Creating 2 Telecom Related Posts"
+        } else {
+            return "Unlocked After Creating 4 Posts on Forum"
+        }
+    }
+
+    const setPrimary = async (badge_id, userId) => { 
+        let response = await markBadgeAsPrimary(badge_id, userId);
+        let response2 = await getPrimaryBadge(userId);
+        console.log(response2)
+        if (response.status) {
+            Toast.show({
+                type: 'success',
+                text1: 'Badge has been set as primary!'
+            });
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: response.data.errorMessage
+            })
+        }
+        setRefresh(true)
     }
 
     return user ? (
         <Background>
-            <View>
-                {badges &&
-                    badges.length > 0 && <View style={styles.badgeContainer}>
-                        {badges.map((badge, index) => (
-                            <View key={index} style={styles.badgeItem}>
-                                <Image source={{ uri: badge.badge_icon }} style={{ width: 250, height: 170 }} />
-                                <Text style={styles.badgeText}>{formatBadgeName(badge.badge_type)}</Text>
-                            </View>
-                        ))}
-                    </View>}
-                {!badges ||
-                    badges.length == 0 && <View style={styles.emptyContainer}>
+            <ScrollView>
+                {badges && badges.length > 0 && user && 
+                <View>
+                    {badges.map((badge, index) => (
+                        <Card key={index} style={styles.badgeItem}>
+                            { !badge.is_primary ? (
+                                <Button mode="text" onPress={() => setPrimary(badge.badge_id, user.user_id)} style={{width:"50%", marginTop:-12, marginLeft:-10}}> 
+                                    <Icon name="bookmark" size={12} color='#044537'/>
+                                    <Text style={{ color:'#044537', fontSize:10, fontWeight:'bold'}}> Mark as Primary </Text>
+                                </Button>
+                            ) : (
+                                <Text style={{color:'red', fontSize:10, fontWeight:'bold'}}> PRIMARY BADGE </Text>
+                            )
+                            }
+                            <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 250, height: 200 }} />
+                            <Text style={{ fontSize: 20 ,textAlign: 'center', fontWeight:'bold', marginTop:10}}>{formatBadgeName(badge.badge_type)}</Text>
+                            <Text style={{ fontSize: 8 ,textAlign: 'center', fontWeight:'bold', marginTop:6, color:'grey'}}> {badgeDetails(badge.badge_type)} </Text>
+                        </Card>
+                    ))}
+                </View>
+                }
+
+                {!badges || badges.length == 0 && 
+                    <View style={styles.emptyContainer}>
                         <Text style={styles.emptyMessage}>No badges received</Text>
                     </View>
                 }
-
-            </View>
+            </ScrollView>
         </Background>
     ) :
         (<Text></Text>)
@@ -80,10 +121,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         margin: 10,
-    },
-    badgeText: {
-        fontSize: 24,
-        textAlign: 'center',
     },
     emptyContainer: {
         backgroundColor: 'white',

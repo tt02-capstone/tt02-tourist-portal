@@ -11,10 +11,11 @@ import InputValidator from '../../helpers/InputValidator';
 import { createDiyEvent } from '../../redux/diyEventRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { DatePickerModal } from 'react-native-paper-dates';
+import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 import { useIsFocused } from "@react-navigation/native";
+import moment from 'moment';
 
 const CreateTelecomDIYEventScreen = ({ navigation }) => {
 
@@ -24,6 +25,9 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
 
     const [user, setUser] = useState(null);
     const [itinerary, setItinerary] = useState(null);
+
+    const [startTime, setStartTime] = useState(null);
+    const [openStartTime, setOpenStartTime] = useState(false);
 
     const [values, setValues] = useState({
         remarks: '',
@@ -55,6 +59,26 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
 
     }, [isFocused]);
 
+    // start time form
+    const onStartTimeDismiss = useCallback(() => {
+        setOpenStartTime(false);
+    }, [setOpenStartTime]);
+
+    const onStartTimeConfirm = useCallback(
+        (formStartTime) => {
+            setStartTime(formStartTime);
+            setOpenStartTime(false);
+        },
+        [setOpenStartTime, setStartTime]
+    );
+
+    function formatTimePicker(obj) {
+        let date = new Date();
+        date.setHours(obj.hours);
+        date.setMinutes(obj.minutes);
+        return moment(date).format('LT');
+    }
+
     async function onSubmit() {
 
         if (date == null) {
@@ -66,13 +90,13 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
         }
 
         let tempStartDate = new Date(date);
-        tempStartDate.setHours(0);
-        tempStartDate.setMinutes(0);
+        tempStartDate.setHours(startTime.hours);
+        tempStartDate.setMinutes(startTime.minutes);
         tempStartDate.setSeconds(0);
         tempStartDate.setHours(tempStartDate.getHours() + timeZoneOffset);
 
         let tempEndDate = new Date(date);
-        tempEndDate.setDate(tempEndDate.getDate() + selectedTelecom.num_of_days_valid-1);
+        tempEndDate.setDate(tempEndDate.getDate() + selectedTelecom.num_of_days_valid - 1);
         tempEndDate.setHours(23);
         tempEndDate.setMinutes(59);
         tempEndDate.setSeconds(0);
@@ -202,14 +226,14 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                         <Card.Title style={styles.header}>{selectedTelecom.name} </Card.Title>
 
                         <Card.Image
-                            style={{ padding: 0, height: 200, marginBottom: 20}}
+                            style={{ padding: 0, height: 200, marginBottom: 20 }}
                             source={{
-                            uri: selectedTelecom.image
+                                uri: selectedTelecom.image
                             }}
                         />
-                                    
+
                         <Text style={styles.subtitle}>
-                            <Text style={{fontWeight: 'bold'}}>Duration: </Text><Text>{selectedTelecom.num_of_days_valid} day(s)</Text>
+                            <Text style={{ fontWeight: 'bold' }}>Duration: </Text><Text>{selectedTelecom.num_of_days_valid} day(s)</Text>
                         </Text>
 
                         <View style={styles.tagContainer}>
@@ -219,12 +243,12 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                         </View>
                     </Card>
                 </View>
-                
+
                 {/* itinerary form */}
-                <View style={{ alignItems: 'center', marginTop: 100}}>
+                <View style={{ alignItems: 'center', marginTop: 130 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -100 }}>
-                        
-                        <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{marginTop: 0, marginBottom: 0, marginLeft: -5}}>
+
+                        <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
                             {date ? `${formatDatePicker(date)}` : 'Pick Start Date'}
                         </DateButton>
                         <DatePickerModal
@@ -235,6 +259,22 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                             onConfirm={onConfirm}
                             onDismiss={onDismiss}
                         />
+
+                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.label}>Start Time</Text>
+                                <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115 }}>
+                                    {startTime ? `${formatTimePicker(startTime)}` : 'From'}
+                                </DateButton>
+                                <TimePickerModal
+                                    visible={openStartTime}
+                                    onDismiss={onStartTimeDismiss}
+                                    onConfirm={onStartTimeConfirm}
+                                    hours={8}
+                                    minutes={0}
+                                />
+                            </View>
+                        </View>
 
                         <TextInput
                             style={styles.inputFormRemarks}
@@ -265,7 +305,7 @@ const styles = StyleSheet.create({
     topCard: {
         height: 410,
     },
-    header:{
+    header: {
         textAlign: 'left',
         fontSize: 20,
         color: '#044537',

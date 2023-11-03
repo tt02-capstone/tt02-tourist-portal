@@ -111,8 +111,11 @@ const CreateItineraryScreen = ({ navigation }) => {
         ({ startDate, endDate }) => {
             const currentDate = new Date();
 
+            console.log("startDate", startDate);
+            console.log("currentDate", currentDate);
+
             if (startDate && endDate) {
-                if (startDate < currentDate) {
+                if (startDate + 1 < currentDate) {
                     setValues({ start_date: null, end_date: null });
                     onDismiss();
                     Toast.show({

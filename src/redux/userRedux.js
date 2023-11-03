@@ -41,3 +41,23 @@ export async function retrieveBadgesByUserId(userId) {
       return { status: false, data: error.message };
   }
 }
+
+export async function markBadgeAsPrimary(badgeId,userId) {
+  try {
+      const response = await badgeApi.put(`/markBadgeAsPrimary/${badgeId}/${userId}`);
+      return handleApiErrors(response);
+  } catch (error) {
+      console.error("forumRedux markBadgeAsPrimary Error : ", error);
+      return { status: false, data: error.message };
+  }
+}
+
+export async function getPrimaryBadge(userId) {
+  try {
+      const response = await badgeApi.get(`/getPrimaryBadge/${userId}`);
+      return handleApiErrors(response);
+  } catch (error) {
+      console.error("forumRedux getPrimaryBadge Error : ", error);
+      return { status: false, data: error.message };
+  }
+}

@@ -3,7 +3,7 @@ import Background from '../../components/CardBackground'
 import { Button } from 'react-native-paper';
 import { theme } from '../../core/theme'
 import { getUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { getRestaurantById, saveRestaurantForUser , getRestaurantDish, getAllSavedRestaurantForUser , removeSavedRestaurantForUser} from '../../redux/restaurantRedux';
@@ -15,6 +15,7 @@ import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { getRecommendation } from '../../redux/recommendationRedux';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
+import { getItineraryByUser } from '../../redux/itineraryRedux';
 
 const RestaurantDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -29,9 +30,22 @@ const RestaurantDetailsScreen = ({ navigation }) => {
     const [recommendation, setRecommendation] = useState([]);
     const [imageActiveSlide, setImageActiveSlide] = useState(0);
 
+    // itinerary
+    const [itinerary, setItinerary] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
+    }
+
+    async function fetchItinerary() {
+        const response = await getItineraryByUser(user.user_id);
+        if (response.status) {
+            setItinerary(response.data);
+        } else {
+            console.log("itinerary not created / found!");
+        }
     }
 
     const getRestaurant = async () => {        
@@ -145,7 +159,9 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                     setIsSaved(saved);
                 }
             }
+
             fetchSaved();
+            fetchItinerary();
         }
     }, [user])
 
@@ -206,15 +222,26 @@ const RestaurantDetailsScreen = ({ navigation }) => {
         return labelColorMap[label] || 'gray';
     };
 
+    const onItineraryPressed = () => {
+        if (itinerary) {
+            navigation.navigate('CreateRestaurantDIYEventScreen', { typeId: restaurant.restaurant_id });
+        } else {
+            setShowModal(true); // show cannot navigate modal
+        }
+    }
+
     return (
         <Background>
                 <ScrollView>
                     <Card>
                         <Card.Title style={styles.header}>
                             {restaurant.name} 
-                            <Button mode="text" style={{ marginTop: -13}} onPress={saveRest} >
-                                {isSaved && <Icon name="heart" size={15} color='red' />}
-                                {!isSaved && <Icon name="heart" size={15} color='grey'/>}
+                            <Button mode="text" style={{ marginTop: -13, marginRight: -15}} onPress={saveRest} >
+                                {isSaved && <Icon name="heart" size={20} color='red' />}
+                                {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                            </Button>
+                            <Button mode="text" style={{ marginTop: -13, marginLeft: -5 }} onPress={onItineraryPressed} >
+                                <Icon name="calendar" size={20} color='grey' />
                             </Button>
                         </Card.Title>
 
@@ -310,6 +337,36 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                             </ScrollView>
                         </Card>
                         )}
+                    </View>
+
+                    <View style={styles.centeredView}>
+                        <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={showModal}
+                            onRequestClose={() => {
+                                setShowModal(false);
+                            }}
+                        >
+
+                        <View style={styles.centeredView}>
+                                <View style={styles.modalView}>
+                                    <Text style={styles.modalText}>You have not created an itinerary!</Text>
+                                    <Text style={styles.modalText}>Please create one before adding!</Text>
+
+                                    <View style={{flexDirection: 'row'}}>
+                                        {/* close modal button */}
+                                        <Pressable
+                                            style={[styles.modalButton, styles.buttonClose]}
+                                            onPress={() => {
+                                                setShowModal(false);
+                                            }}>
+                                            <Text style={styles.textStyle}>Close</Text>
+                                        </Pressable>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
                     </View>
                 </ScrollView>
             </Background>
@@ -412,6 +469,54 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
         resizeMode: 'cover',
+    },
+
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 160,
+        width: 300,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 10,
+        marginRight: 10,
+        backgroundColor: '#044537',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    buttonClose: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
     },
 });
 

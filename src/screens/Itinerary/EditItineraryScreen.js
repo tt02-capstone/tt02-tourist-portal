@@ -47,8 +47,8 @@ const EditItineraryScreen = ({ navigation }) => {
                 setItinerary(response.data);
 
                 setValues({
-                    // start_date: response.data.start_date,
-                    // end_date: response.data.end_date,
+                    start_date: new Date(response.data.start_date),
+                    end_date: new Date(response.data.end_date),
                     number_of_pax: response.data.number_of_pax.toString(),
                     remarks: response.data.remarks,
                 })
@@ -168,24 +168,33 @@ const EditItineraryScreen = ({ navigation }) => {
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
                 <View style={{ alignItems: 'center', minHeight: '100%', marginLeft: 20, marginTop: -120 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 }}>
-                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginBottom: -5, marginLeft: -15 }}>
-                            {values.start_date && values.end_date ? `${formatDatePicker(values.start_date)} - ${formatDatePicker(values.end_date)}` : 'Pick range'}
-                        </DateButton>
-                        <DatePickerModal
-                            locale='en-GB'
-                            mode="range"
-                            format
-                            label="Itinerary Date Range"
-                            visible={open}
-                            startDate={values.start_date}
-                            endDate={values.end_date}
-                            onConfirm={onConfirm}
-                            onDismiss={onDismiss}
-                            inputMode="start"
-                        />
+                        {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length === 0 && (
+                            <View>
+                                <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginBottom: -5, marginLeft: -15 }}>
+                                    {values.start_date && values.end_date ? `${formatDatePicker(values.start_date)} - ${formatDatePicker(values.end_date)}` : 'Pick range'}
+                                </DateButton>
+                                <DatePickerModal
+                                    locale='en-GB'
+                                    mode="range"
+                                    format
+                                    label="Itinerary Date Range"
+                                    visible={open}
+                                    startDate={values.start_date}
+                                    endDate={values.end_date}
+                                    onConfirm={onConfirm}
+                                    onDismiss={onDismiss}
+                                    inputMode="start"
+                                />
+                            </View>)}
+                        {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length > 0 && (
+                            <View>
+                                <Text style={{marginLeft: -20 }}>{formatDatePicker(values.start_date)} - {formatDatePicker(values.end_date)}</Text>
+                            </View>
+                        )}
 
                         <TextInput
                             style={styles.input}
+                            label="Number of Pax"
                             value={values.number_of_pax}
                             onChangeText={(value) => setValues({ ...values, number_of_pax: value })}
                             errorText={values.number_of_pax ? InputValidator.text(values.number_of_pax) : ''}

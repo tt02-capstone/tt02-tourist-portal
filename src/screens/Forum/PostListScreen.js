@@ -90,13 +90,15 @@ const PostListScreen = ({ navigation }) => {
                     </View>
 
                     {data.map((item, index) => (
-                        <TouchableOpacity key={index} onPress={() => viewPost(item.post_id)}>
-                            <Card>
-                                <Card.Title style={styles.header}>
-                                    {item.title}
-                                </Card.Title>
-                            </Card>
-                        </TouchableOpacity>
+                        item.is_published && (
+                            <TouchableOpacity key={index} onPress={() => viewPost(item.post_id)}>
+                                <Card>
+                                    <Card.Title style={styles.header}>
+                                        {item.title}
+                                    </Card.Title>
+                                </Card>
+                            </TouchableOpacity>
+                        )
                     ))
                     }
 

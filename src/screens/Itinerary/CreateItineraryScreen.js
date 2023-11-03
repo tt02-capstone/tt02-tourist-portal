@@ -3,12 +3,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import { Button as DateButton } from 'react-native-paper';
-import Header from '../../components/Header';
 import TextInput from '../../components/TextInput';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
-import { Text, Card, CheckBox, Tab, TabView } from '@rneui/themed';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { Text } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
 import { createItinerary } from '../../redux/itineraryRedux';
 import { useRoute } from '@react-navigation/native';
@@ -19,14 +17,12 @@ import { timeZoneOffset } from "../../helpers/DateFormat";
 
 const CreateItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
-    const [loading, setLoading] = useState(false);
     const [values, setValues] = useState({
         start_date: undefined,
         end_date: undefined,
         number_of_pax: undefined,
         remarks: '',
     });
-    const [isSubmit, setIsSubmit] = useState(false);
     const [open, setOpen] = useState(false);
 
     const route = useRoute();
@@ -34,8 +30,6 @@ const CreateItineraryScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser();
         setUser(userData);
-
-        const userType = await getUserType();
     }
 
     useEffect(() => {
@@ -44,27 +38,45 @@ const CreateItineraryScreen = ({ navigation }) => {
 
     async function onSubmit() {
 
-        setLoading(true);
-        setIsSubmit(true);
+        if (values.start_date == undefined) {
+            Toast.show({
+                type: 'error',
+                text1: 'Please select a start date!'
+            })
+            return;
+        } else  if (values.end_date == undefined) {
+            Toast.show({
+                type: 'error',
+                text1: 'Please select an end date!'
+            })
+            return;
+        } else if (values.number_of_pax == undefined) {
+            Toast.show({
+                type: 'error',
+                text1: 'Please enter the number of people!'
+            })
+            return;
+        }
 
         let itineraryObj;
 
-        console.log("values", values);
+        // console.log("values", values);
 
-        const time = '00:01:00';
+        const startTime = '00:00:00';
+        const endTime = '23:59:59';
 
         const itineraryStartDate = new Date(values.start_date);
         itineraryStartDate.setHours(itineraryStartDate.getHours() + timeZoneOffset);
-        const itineraryStartDateInLocalDateTime = `${itineraryStartDate.toISOString().split('T')[0]}T${time}Z`;
+        const itineraryStartDateInLocalDateTime = `${itineraryStartDate.toISOString().split('T')[0]}T${startTime}Z`;
 
         const itineraryEndDate = new Date(values.end_date);
-        const itineraryEndDateInLocalDateTime = `${itineraryEndDate.toISOString().split('T')[0]}T${time}Z`;
+        const itineraryEndDateInLocalDateTime = `${itineraryEndDate.toISOString().split('T')[0]}T${endTime}Z`;
 
         itineraryObj = {
             start_date: itineraryStartDateInLocalDateTime,
             end_date: itineraryEndDateInLocalDateTime,
             number_of_pax: values.number_of_pax,
-            remarks: values.remarks,
+            remarks: values.remarks ? values.remarks : '',
         }
 
         console.log("user.user_id", user.user_id);
@@ -72,7 +84,6 @@ const CreateItineraryScreen = ({ navigation }) => {
 
         let response = await createItinerary(user.user_id, itineraryObj);
         if (response.status) {
-            setIsSubmit(false);
             Toast.show({
                 type: 'success',
                 text1: 'Itinerary created!'
@@ -85,7 +96,6 @@ const CreateItineraryScreen = ({ navigation }) => {
 
         } else {
             console.log('error')
-            setIsSubmit(false);
             Toast.show({
                 type: 'error',
                 text1: response.data.errorMessage
@@ -101,8 +111,11 @@ const CreateItineraryScreen = ({ navigation }) => {
         ({ startDate, endDate }) => {
             const currentDate = new Date();
 
+            console.log("startDate", startDate);
+            console.log("currentDate", currentDate);
+
             if (startDate && endDate) {
-                if (startDate < currentDate) {
+                if (startDate + 1 < currentDate) {
                     setValues({ start_date: null, end_date: null });
                     onDismiss();
                     Toast.show({
@@ -169,7 +182,7 @@ const CreateItineraryScreen = ({ navigation }) => {
 
                         <TextInput
                             style={styles.description}
-                            label="Write your remarks here"
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}
@@ -178,12 +191,11 @@ const CreateItineraryScreen = ({ navigation }) => {
                     </View>
                     <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                         <Button
-                            style={{ width: 150, paddingTop: -100, marginTop: -250, marginLeft: -20 }}
+                            style={{ width: 150, paddingTop: -100, marginTop: -310, marginLeft: -20 }}
                             mode="contained"
                             text={"Submit"}
                             onPress={onSubmit}
                         />
-                        {/* <View style={{ marginLeft: 30 }}><ActivityIndicator size='large' animating={isSubmit} color='green' /></View> */}
                     </View>
                 </View>
             </ScrollView>
@@ -216,7 +228,7 @@ const styles = StyleSheet.create({
     },
     description: {
         width: 320,
-        height: 200,
+        height: 170,
         marginTop: -15,
         textAlignVertical: 'top'
     },

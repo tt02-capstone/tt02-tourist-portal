@@ -17,23 +17,23 @@ import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 import { useIsFocused } from "@react-navigation/native";
-import { getAttraction } from '../../redux/reduxAttraction';
+import { getRestaurantById } from '../../redux/restaurantRedux';
 
-const CreateAttractionDIYEventScreen = ({ navigation }) => {
+const CreateRestaurantDIYEventScreen = ({ navigation }) => {
 
     const isFocused = useIsFocused();
     const route = useRoute();
     const { typeId } = route.params;
 
     const [user, setUser] = useState(null);
-    const [attraction, setAttraction] = useState(null);
+    const [rest, setRest] = useState(null);
     const [itinerary, setItinerary] = useState(null);
     const [imgList, setImgList] = useState([]);
     const [imageActiveSlide, setImageActiveSlide] = useState(0);
 
     const [values, setValues] = useState({
         remarks: '',
-        // name and location given by attraction by default
+        // name and location given by restaurant by default
     });
 
     const [date, setDate] = useState(null);
@@ -60,13 +60,13 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                 console.log("itinerary not fetched!");
             }
 
-            // get attraction
-            let responseAttraction = await getAttraction(typeId);
-            if (responseAttraction) {
-                setAttraction(responseAttraction);
-                setImgList(responseAttraction.attraction_image_list);
+            // get restaurant
+            let responseRest = await getRestaurantById(typeId);
+            if (responseRest.status) {
+                setRest(responseRest.data);
+                setImgList(responseRest.data.restaurant_image_list);
             } else {
-                console.log("attraction not fetched!");
+                console.log("restaurant not fetched!");
             }
         }
 
@@ -76,19 +76,19 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
 
     }, [isFocused]);
 
+    // restaurant card functions
     const getColorForType = (label) => {
         const labelColorMap = {
-            'HISTORICAL': 'lightblue',
-            'CULTURAL': 'lightgreen',
-            'NATURE': 'orange',
-            'ADVENTURE': 'yellow',
-            'SHOPPING': 'turquoise',
-            'ENTERTAINMENT': 'lightpink'
+            'KOREAN': 'lightblue',
+            'MEXICAN': 'lightgreen',
+            'CHINESE': 'orange',
+            'WESTERN': 'gold',
+            'FAST_FOOD': 'turquoise',
+            'JAPANESE': 'lightpink'
         };
 
         return labelColorMap[label] || 'gray';
     };
-
 
     async function onSubmit() {
 
@@ -142,10 +142,10 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
         }
 
         let diyEventObj = {
-            name: attraction.name,
+            name: rest.name,
             start_datetime: tempStartDate,
             end_datetime: tempEndDate,
-            location: attraction.address,
+            location: rest.address,
             remarks: values.remarks ? values.remarks : '',
         }
 
@@ -153,11 +153,11 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
         // console.log("typeId", typeId);
         // console.log("diyEventObj", diyEventObj);
 
-        let response = await createDiyEvent(itinerary.itinerary_id, typeId, "attraction", diyEventObj);
+        let response = await createDiyEvent(itinerary.itinerary_id, typeId, "restaurant", diyEventObj);
         if (response.status) {
             Toast.show({
                 type: 'success',
-                text1: 'Attraction added to itinerary!'
+                text1: 'Restaurant added to itinerary!'
             })
 
             navigation.reset({
@@ -224,23 +224,23 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
         return moment(date).format('LT');
     }
 
-    return user && itinerary && attraction ? (
+    return user && itinerary && rest ? (
         <Background style={{ alignItems: 'center' }}>
-            {/* attraction details */}
+            {/* restaurant details */}
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
                 <View style={styles.topCard}>
                     <Card>
-                        <Card.Title style={styles.header}>{attraction.name} </Card.Title>
+                        <Card.Title style={styles.header}>{rest.name} </Card.Title>
 
                         <View style={styles.tagContainer}>
-                            <Text style={[ styles.typeTag,{ backgroundColor: getColorForType(attraction.attraction_category)},{ textAlign: 'center' }]}>
-                                {attraction.attraction_category}
+                            <Text style={[ styles.typeTag,{ backgroundColor: getColorForType(rest.restaurant_type)},{ textAlign: 'center' }]}>
+                                {rest.restaurant_type}
                             </Text>
                             <Text style={[styles.tierTag,{ backgroundColor: 'purple', color: 'white' },{ textAlign: 'center' },]}>
-                                {attraction.estimated_price_tier ? attraction.estimated_price_tier.replace(/_/g, ' ') : ''}
+                                {rest.estimated_price_tier ? rest.estimated_price_tier.replace(/_/g, ' ') : ''}
                             </Text>
                             <Text style={[ styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' },]}>
-                                {attraction.generic_location ? attraction.generic_location.replace(/_/g, ' ') : ''}
+                                {rest.generic_location ? rest.generic_location.replace(/_/g, ' ') : ''}
                             </Text>
                         </View>
 
@@ -270,12 +270,12 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                     
                         <Text style={{ fontSize: 12 }}>
                             <Text style={{ fontWeight: 'bold' }}>Address:</Text>{' '}
-                            {attraction.address}
+                            {rest.address}
                         </Text>
 
                         <Text style={{ fontSize: 12 }}>
                             <Text style={{ fontWeight: 'bold' }}>Operating Hours:</Text>{' '}
-                            {attraction.opening_hours}
+                            {rest.opening_hours}
                         </Text>
                     </Card>
                 </View>
@@ -323,7 +323,7 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                         </View>
 
                         <TextInput
-                            style={styles.description}
+                            style={styles.inputFormRemarks}
                             label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         margin: 5,
         width: 85,
-        fontSize: 7,
+        fontSize: 9,
         fontWeight: 'bold',
     },
     tierTag: {
@@ -411,4 +411,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default CreateAttractionDIYEventScreen
+export default CreateRestaurantDIYEventScreen

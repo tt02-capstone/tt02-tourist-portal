@@ -239,7 +239,7 @@ const EditDIYEventScreen = ({ navigation }) => {
                             errorText={formData.name ? InputValidator.text(formData.name) : ''}
                         />
 
-                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ backgroundColor: 'lightgray', marginTop: 10, marginBottom: -5, marginLeft: -5 }}>
+                        <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: -5 }}>
                             {formStartDate && formEndDate ? `${formatDatePicker(formStartDate)} - ${formatDatePicker(formEndDate)}` : 'Pick range'}
                         </DateButton>
                         <DatePickerModal
@@ -255,7 +255,7 @@ const EditDIYEventScreen = ({ navigation }) => {
                             inputMode="start"
                         />
 
-                        <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{ backgroundColor: 'lightgray', marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200 }}>
+                        <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200 }}>
                             {formStartTime ? `${formatTimePicker(formStartTime)}` : 'Pick Start Time'}
                         </DateButton>
                         <TimePickerModal
@@ -266,7 +266,7 @@ const EditDIYEventScreen = ({ navigation }) => {
                             minutes={0}
                         />
 
-                        <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{ backgroundColor: 'lightgray', marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200 }}>
+                        <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: -5, width: 200 }}>
                             {formEndTime ? `${formatTimePicker(formEndTime)}` : 'Pick End Time'}
                         </DateButton>
                         <TimePickerModal
@@ -287,7 +287,7 @@ const EditDIYEventScreen = ({ navigation }) => {
 
                         <TextInput
                             style={styles.description}
-                            label="Write your remarks here"
+                            label="Remarks (Optional)"
                             multiline={true}
                             value={formData.remarks}
                             onChangeText={(value) => setFormData({ ...formData, remarks: value })}

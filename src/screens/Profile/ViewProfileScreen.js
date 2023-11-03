@@ -10,6 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { S3 } from 'aws-sdk';
 import { uploadNewProfilePic } from '../../redux/userRedux';
 import Background from '../../components/Background';
+import { ScrollView } from 'react-native-gesture-handler';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -124,33 +125,35 @@ export const ViewProfileScreen = ({route, navigation}) => {
 
     return user ? (
         <Background>
-            <View style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <Image
-                    style={styles.image}
-                    source={{uri: user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
-                />
-            </View>
+            <ScrollView>
+                <View style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flex:'1'}}>
+                    <Image
+                        style={styles.image}
+                        source={{uri: user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                    />
+                </View>
 
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={styles.mainContent} >
-                    {user.name}
-                </Text>
-                <Text style={styles.mainContent} >
-                    {user.email}
-                </Text>
-                <Text style={styles.mainContent} >
-                    {moment(user.date_of_birth).format('LL')}
-                </Text>
-                <Text style={styles.mainContent} >
-                    {user.country_code + " " + user.mobile_num}
-                </Text>
-                <Button text="Enter Photo Gallery" style={styles.button} onPress={onImagePicker} />
-                
-                <Button text="View Badges" style={styles.button} onPress={() => navigation.navigate('BadgesScreen')} />
-                <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
-                <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
-                <Button text="View Payment Methods" style={styles.button} onPress={() => navigation.navigate('CreditCardsScreen')} />
-            </View>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={styles.mainContent} >
+                        {user.name}
+                    </Text>
+                    <Text style={styles.mainContent} >
+                        {user.email}
+                    </Text>
+                    <Text style={styles.mainContent} >
+                        {moment(user.date_of_birth).format('LL')}
+                    </Text>
+                    <Text style={styles.mainContent} >
+                        {user.country_code + " " + user.mobile_num}
+                    </Text>
+                    <Button text="Enter Photo Gallery" style={styles.button} onPress={onImagePicker} />
+                    
+                    <Button text="View Badges" style={styles.button} onPress={() => navigation.navigate('BadgesScreen')} />
+                    <Button text="Edit Profile" style={styles.button} onPress={() => navigation.navigate('EditProfileScreen')} />
+                    <Button text="Edit Password" style={styles.button} onPress={() => navigation.navigate('EditPasswordScreen')} />
+                    <Button text="View Payment Methods" style={styles.button} onPress={() => navigation.navigate('CreditCardsScreen')} />
+                </View>
+            </ScrollView>
         </Background>
     ) : 
     (<Text></Text>)
@@ -158,8 +161,8 @@ export const ViewProfileScreen = ({route, navigation}) => {
 
 const styles = StyleSheet.create({
     image: {
-        marginTop: 30,
-        marginBottom: 50,
+        marginTop: 20,
+        marginBottom: 10,
         borderRadius: 300 / 2,
         minWidth: 260,
         minHeight: 260,

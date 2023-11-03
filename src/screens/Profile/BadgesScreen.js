@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Image, ScrollView } from 'react-native'
 import { useIsFocused } from "@react-navigation/native";
 import { storeUser, getUser } from '../../helpers/LocalStorage'
-import Background from '../../components/Background';
+import Background from '../../components/CardBackground'
 import { retrieveBadgesByUserId, markBadgeAsPrimary, getPrimaryBadge } from '../../redux/userRedux';
 import { Button } from 'react-native-paper';
 import { Text, Card } from '@rneui/themed';
@@ -26,7 +26,7 @@ export const BadgesScreen = ({ route, navigation }) => {
             let badgeResponse = await retrieveBadgesByUserId(userData.user_id);
             if (badgeResponse.status) {
                 setBadges(badgeResponse.data);
-                console.log('gab2', badgeResponse);
+                // console.log('gab2', badgeResponse);
             } else {
                 console.log("Badges not shown!");
             }
@@ -41,6 +41,9 @@ export const BadgesScreen = ({ route, navigation }) => {
     function formatBadgeName(name) {
         const words = name.split('_');
         const formattedName = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        if (formattedName == "Foodie") {
+            return "Foodie Expert"
+        }
         return formattedName;
     }
 
@@ -80,20 +83,20 @@ export const BadgesScreen = ({ route, navigation }) => {
         <Background>
             <ScrollView>
                 {badges && badges.length > 0 && user && 
-                <View>
+                <View style={styles.container}>
                     {badges.map((badge, index) => (
-                        <Card key={index} style={styles.badgeItem}>
+                        <Card key={index}>
                             { !badge.is_primary ? (
-                                <Button mode="text" onPress={() => setPrimary(badge.badge_id, user.user_id)} style={{width:"50%", marginTop:-12, marginLeft:-10}}> 
+                                <Button mode="text" onPress={() => setPrimary(badge.badge_id, user.user_id)} style={{width:"50%", marginTop:-10, marginLeft:-25}}> 
                                     <Icon name="bookmark" size={12} color='#044537'/>
                                     <Text style={{ color:'#044537', fontSize:10, fontWeight:'bold'}}> Mark as Primary </Text>
                                 </Button>
                             ) : (
-                                <Text style={{color:'red', fontSize:10, fontWeight:'bold'}}> PRIMARY BADGE </Text>
+                                <Text style={{color:'red', fontSize:10, fontWeight:'bold'}}> PRIMARY </Text>
                             )
                             }
-                            <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 250, height: 200 }} />
-                            <Text style={{ fontSize: 20 ,textAlign: 'center', fontWeight:'bold', marginTop:10}}>{formatBadgeName(badge.badge_type)}</Text>
+                            <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 200, height: 200, marginLeft:55,marginBottom:-50, marginTop:-10 }} />
+                            <Text style={{ fontSize: 20 ,textAlign: 'center', fontWeight:'bold', marginTop:23, marginLeft:-3}}>{formatBadgeName(badge.badge_type)}</Text>
                             <Text style={{ fontSize: 8 ,textAlign: 'center', fontWeight:'bold', marginTop:6, color:'grey'}}> {badgeDetails(badge.badge_type)} </Text>
                         </Card>
                     ))}
@@ -108,20 +111,10 @@ export const BadgesScreen = ({ route, navigation }) => {
             </ScrollView>
         </Background>
     ) :
-        (<Text></Text>)
+    (<Text></Text>)
 }
 
 const styles = StyleSheet.create({
-    badgeContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-    },
-    badgeItem: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        margin: 10,
-    },
     emptyContainer: {
         backgroundColor: 'white',
         padding: 16,

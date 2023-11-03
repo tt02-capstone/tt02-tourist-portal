@@ -254,18 +254,26 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     const renderEventContent = (event, dayNum) => {
-        if (event.accommodation) {
+        if (event.accommodation || event.booking?.room) {
             return (
-                <Card style={{ flex: 1 }}>
+                <Card style={{ flex: 1 }} wrapperStyle={{ height: 65 }}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
-                        <View>
-                            <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
-                            <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
-                            <Text>{event.location}</Text>
-                            <Text>{event.remarks}</Text>
+                        <View style={styles.accommCardContainer}>
+                            <IconButton
+                                icon="bed"
+                                size={20}
+                                // iconColor={event.booking && event.booking.room ? 'green' : undefined}
+                                onPress={null}
+                            />
+                            <View>
+                                <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
+                                {dayNum === 1 && (<Text>Check In Time: {moment(event.start_datetime).format('LT')}</Text>)}
+                                <Text>{event.location}</Text>
+                                <Text>{event.remarks}</Text>
+                            </View>
                         </View>
 
-                        <View style={styles.chevronContainer}>
+                        <View>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <IconButton
                                     icon="pencil"
@@ -280,13 +288,11 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
-                            </View>
 
-                            <View style={{ alignItems: 'flex-end' }}>
                                 <IconButton
                                     icon="chevron-right"
                                     size={35}
-                                    style={[styles.icon, styles.chevronButton]}
+                                    style={styles.arrowIcon}
                                     onPress={() => navigateFunction(event)}
                                 />
                             </View>
@@ -294,7 +300,7 @@ const ItineraryScreen = ({ navigation }) => {
                     </View>
                 </Card>
             );
-        } else if (event.telecom) {
+        } else if (event.telecom || event.booking?.telecom) {
             return (
                 <Card style={{ flex: 1 }} wrapperStyle={{ height: 50 }}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
@@ -305,7 +311,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 onPress={null}
                             />
                             <View>
-                                <Text style={{ fontWeight: 'bold', marginTop: 10 }}>{event.name} Telecom Package</Text>
+                                <Text style={{ fontWeight: 'bold' }}>{event.name} Telecom Package</Text>
                                 {dayNum === 1 && (<Text>Start Time: {moment(event.start_datetime).format('LT')}</Text>)}
                                 <Text>{event.remarks}</Text>
                             </View>
@@ -648,9 +654,9 @@ const styles = StyleSheet.create({
         marginRight: 3,
     },
     arrowIcon: {
-        marginLeft: -10,
+        marginLeft: -15,
         marginTop: -5,
-        marginRight: 3,
+        marginRight: -10,
     },
     centeredView: {
         flex: 1,
@@ -836,6 +842,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     telecomCardContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: -10,
+    },
+    accommCardContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',

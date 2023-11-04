@@ -49,11 +49,6 @@ const PostScreen = ({ navigation }) => {
     async function fetchUser() {
         const userData = await getUser()
         setUser(userData)
-
-        const b = await getPrimaryBadge(userData.user_id)
-        if (b.status) {
-            setBadge(b.data)
-        }
     }
 
     // fetch post
@@ -61,7 +56,15 @@ const PostScreen = ({ navigation }) => {
         const fetchData = async (id) => {
             let response = await getPost(id);
             if (response.status) {
-                setPost(response.data);
+                let item = response.data;
+                const user = item.internal_staff_user || item.local_user || item.tourist_user || item.vendor_staff_user;
+                setPost(item);
+
+                const b = await getPrimaryBadge(user.user_id)
+                if (b.status) {
+                    setBadge(b.data)
+                }
+
             } else {
                 console.log("Post not fetch!");
             }

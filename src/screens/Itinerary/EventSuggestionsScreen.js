@@ -146,7 +146,7 @@ const EventSuggestionsScreen = ({ navigation }) => {
                 <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 20, marginBottom: 30 }}>
                     <Button
                         mode="contained"
-                        text={"Get Suggestions"}
+                        text={"Get Recommendations"}
                         onPress={onSubmit}
                     />
                 </View>

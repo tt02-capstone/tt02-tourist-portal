@@ -182,7 +182,7 @@ export const Layout = () => {
                         <Stack.Screen name="CreateRestaurantDIYEventScreen" component={CreateRestaurantDIYEventScreen} options={{ title : 'Add to Itinerary' }} />
                         <Stack.Screen name="EditDIYEventScreen" component={EditDIYEventScreen} options={{ title : 'Edit Event' }} />
                         <Stack.Screen name="ItineraryRecommendationsScreen" component={ItineraryRecommendationsScreen} options={{ title : 'Recommendations' }} />
-                        <Stack.Screen name="EventSuggestionsScreen" component={EventSuggestionsScreen} options={{ title : 'Event Suggestions' }} />
+                        <Stack.Screen name="EventSuggestionsScreen" component={EventSuggestionsScreen} options={{ title : 'Recommendations By Time' }} />
                     </>
                 ) : (
                     <>

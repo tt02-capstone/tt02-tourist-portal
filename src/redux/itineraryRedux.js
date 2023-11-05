@@ -53,6 +53,7 @@ export async function getTelecomRecommendations(itineraryId) {
 
 export async function getAttractionRecommendationsByDate(itineraryId, dateTime) {
   try {
+    console.log("HERE!!!")
     const response = await itineraryApi.get(`/getAttractionRecommendationsByDate/${itineraryId}/${dateTime}`);
     return handleApiErrors(response);
   } catch (error) {
@@ -87,6 +88,26 @@ export async function getSuggestedEventsBasedOnTimeslot(startTime, endTime) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("itineraryRedux getSuggestedEventsBasedOnTimeslot Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function existingAccommodationInItinerary(itineraryId) {
+  try {
+    const response = await itineraryApi.get(`/existingAccommodationInItinerary/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux existingAccommodationInItinerary Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function existingTelecomInItinerary(itineraryId) {
+  try {
+    const response = await itineraryApi.get(`/existingTelecomInItinerary/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux existingTelecomInItinerary Error : ", error);
     return {status: false, data: error.message};
   }
 }

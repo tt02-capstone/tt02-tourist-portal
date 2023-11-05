@@ -233,13 +233,13 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                         <Card.Title style={styles.header}>{attraction.name} </Card.Title>
 
                         <View style={styles.tagContainer}>
-                            <Text style={[ styles.typeTag,{ backgroundColor: getColorForType(attraction.attraction_category)},{ textAlign: 'center' }]}>
+                            <Text style={[styles.typeTag, { backgroundColor: getColorForType(attraction.attraction_category) }, { textAlign: 'center' }]}>
                                 {attraction.attraction_category}
                             </Text>
-                            <Text style={[styles.tierTag,{ backgroundColor: 'purple', color: 'white' },{ textAlign: 'center' },]}>
+                            <Text style={[styles.tierTag, { backgroundColor: 'purple', color: 'white' }, { textAlign: 'center' },]}>
                                 {attraction.estimated_price_tier ? attraction.estimated_price_tier.replace(/_/g, ' ') : ''}
                             </Text>
-                            <Text style={[ styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' },]}>
+                            <Text style={[styles.locationTag, { backgroundColor: 'green', color: 'white', textAlign: 'center' },]}>
                                 {attraction.generic_location ? attraction.generic_location.replace(/_/g, ' ') : ''}
                             </Text>
                         </View>
@@ -267,7 +267,7 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                                 inactiveDotScale={0.6}
                             />
                         </View>
-                    
+
                         <Text style={{ fontSize: 12 }}>
                             <Text style={{ fontWeight: 'bold' }}>Address:</Text>{' '}
                             {attraction.address}
@@ -279,12 +279,14 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                         </Text>
                     </Card>
                 </View>
-                
+
                 {/* itinerary form */}
-                <View style={{ alignItems: 'center', marginTop: 120}}>
+                <View style={{ alignItems: 'center', marginTop: 120 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -80 }}>
-                        
-                        <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{marginTop: 0, marginBottom: 0, marginLeft: -5}}>
+
+                        <Text style={{ marginTop: 50, fontWeight: 'bold' }}>Itinerary Dates:</Text>
+                        <Text style={{marginBottom: 20 }}>{formatDatePicker(itinerary.start_date)} - {formatDatePicker(itinerary.end_date)}</Text>
+                        <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
                             {date ? `${formatDatePicker(date)}` : 'Pick Date'}
                         </DateButton>
                         <DatePickerModal
@@ -296,9 +298,9 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                             onDismiss={onDismiss}
                         />
 
-                        <View style={{flexDirection: 'row'}}>
+                        <View style={{ flexDirection: 'row' }}>
                             <Text style={styles.label}>From</Text>
-                            <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115}}>
+                            <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115 }}>
                                 {startTime ? `${formatTimePicker(startTime)}` : 'Start'}
                             </DateButton>
                             <TimePickerModal
@@ -310,7 +312,7 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                             />
 
                             <Text style={styles.label}>To</Text>
-                            <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115}}>
+                            <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115 }}>
                                 {endTime ? `${formatTimePicker(endTime)}` : 'End'}
                             </DateButton>
                             <TimePickerModal
@@ -332,7 +334,7 @@ const CreateAttractionDIYEventScreen = ({ navigation }) => {
                         />
                     </View>
 
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 30 }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 80 }}>
                         <Button
                             mode="contained"
                             text={"Submit"}
@@ -351,7 +353,7 @@ const styles = StyleSheet.create({
     topCard: {
         height: 410,
     },
-    header:{
+    header: {
         textAlign: 'left',
         fontSize: 13,
         color: '#044537',

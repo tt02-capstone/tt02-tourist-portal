@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 import CartButton from '../../components/Button';
 import { theme } from '../../core/theme'
 import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
@@ -22,6 +22,7 @@ import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import CreateAttractionDIYEventScreen from './CreateAttractionDIYEventScreen';
+import { getItineraryByUser } from '../../redux/itineraryRedux';
 
 const AttractionDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
@@ -39,6 +40,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
     const route = useRoute();
     const { attractionId } = route.params;
     const [tours, setTours] = useState([]);
+    const [itinerary, setItinerary] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     async function fetchUser() {
         const userData = await getUser()
@@ -46,6 +49,21 @@ const AttractionDetailsScreen = ({ navigation }) => {
 
         const usertype = await getUserType()
     }
+
+    async function fetchItinerary() {
+        const response = await getItineraryByUser(user.user_id);
+        if (response.status) {
+            setItinerary(response.data);
+        } else {
+            console.log("itinerary not created / found!");
+        }
+    }
+
+    useEffect(() => {
+        if (user) {
+            fetchItinerary()
+        }
+    }, [user])
 
     const handleIncrease = (ticketType) => {
         setQuantityByTicketType((prevQuantity) => {
@@ -425,6 +443,14 @@ const AttractionDetailsScreen = ({ navigation }) => {
         return labelColorMap[label] || 'gray';
     };
 
+    const onItineraryPressed = () => {
+        if (itinerary) {
+            navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction });
+        } else {
+            setShowModal(true); // show cannot navigate modal
+        }
+    }
+
     return (
         <Background>
             <ScrollView>
@@ -434,8 +460,8 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         <Button mode="text" style={{ marginTop: -15, marginRight: -20 }} onPress={saveAttr} >
                             <Icon name="heart" size={20} color='grey' />
                         </Button>
-                        
-                        <Button mode="text" style={{ marginTop: -15, marginLeft: -5 }} onPress={() => navigation.navigate('CreateAttractionDIYEventScreen', { typeId: attraction.attraction_id, selectedAttraction: attraction })} >
+
+                        <Button mode="text" style={{ marginTop: -15, marginLeft: -5 }} onPress={onItineraryPressed} >
                             <Icon name="calendar" size={20} color='grey' />
                         </Button>
                     </Card.Title>
@@ -593,6 +619,34 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         </Card>
                     )}
                 </View>
+
+                <View style={styles.centeredView}>
+                        <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={showModal}
+                            onRequestClose={() => {
+                                setShowModal(false);
+                            }}
+                        >
+
+                        <View style={styles.centeredView}>
+                                <View style={styles.modalView}>
+                                    <Text style={styles.modalText}>You have not created an itinerary!</Text>
+                                    <Text style={styles.modalText}>Please create one before adding!</Text>
+
+                                    <View style={{flexDirection: 'row'}}>
+                                        <Pressable style={styles.modalButton} onPress={() => { setShowModal(false); navigation.navigate('CreateItineraryScreen');}}>
+                                            <Text style={styles.textStyle}>Create</Text>
+                                        </Pressable>
+                                        <Pressable style={styles.modalButton} onPress={() => { setShowModal(false); }}>
+                                            <Text style={styles.textStyle}>Close</Text>
+                                        </Pressable>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                    </View>
             </ScrollView>
         </Background>
     )
@@ -710,6 +764,56 @@ const styles = StyleSheet.create({
         marginRight: '30%',
         backgroundColor: '#5f80e3',
         fontSize: 10,
+    },
+
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: 160,
+        width: 300,
+        marginTop: -100
+    },
+    modalButton: {
+        borderRadius: 10,
+        padding: 10,
+        elevation: 2,
+        marginLeft: 5,
+        marginRight: 10,
+        backgroundColor: '#044537',
+        marginTop: 3,
+        height: 38,
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center',
+    },
+    buttonOpen: {
+        backgroundColor: '#044537',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
     },
 });
 

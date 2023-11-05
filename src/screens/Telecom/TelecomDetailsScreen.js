@@ -1,11 +1,11 @@
-import React , { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useIsFocused } from "@react-navigation/native";
 import Background from '../../components/CardBackground'
 import { Button } from 'react-native-paper';
 import CartButton from '../../components/Button';
 import { theme } from '../../core/theme'
 import { getUser, storeUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, Modal, Pressable} from 'react-native';
+import { View, ScrollView, StyleSheet, Modal, Pressable } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DatePickerInput } from 'react-native-paper-dates';
@@ -14,7 +14,7 @@ import Toast from "react-native-toast-message";
 import { getTelecomById, toggleSaveTelecom } from '../../redux/telecomRedux';
 import { addTelecomToCart } from '../../redux/cartRedux';
 import moment from 'moment-timezone';
-import {timeZoneOffset} from "../../helpers/DateFormat";
+import { timeZoneOffset } from "../../helpers/DateFormat";
 import CreateTelecomDIYEventScreen from './CreateTelecomDIYEventScreen';
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 
@@ -48,7 +48,7 @@ const TelecomDetailsScreen = ({ navigation }) => {
         }
     }
 
-    const fetchTelecom = async () => {        
+    const fetchTelecom = async () => {
         let response = await getTelecomById(id);
         if (response.status) {
             setTelecom(response.data);
@@ -70,10 +70,10 @@ const TelecomDetailsScreen = ({ navigation }) => {
         if (user) {
             let saved = false;
             for (var i = 0; i < user.telecom_list.length; i++) {
-                if(user.telecom_list[i].telecom_id == id) {
+                if (user.telecom_list[i].telecom_id == id) {
                     saved = true;
                     break;
-                } 
+                }
             }
             setIsSaved(saved);
 
@@ -118,14 +118,14 @@ const TelecomDetailsScreen = ({ navigation }) => {
             })
         }
     }
-    
+
     const handleIncrease = (prev) => {
-        setTicketQuantity(prev+1);
+        setTicketQuantity(prev + 1);
     };
-    
+
     const handleDecrease = (prev) => {
         if (prev >= 1) {
-            setTicketQuantity(prev-1);
+            setTicketQuantity(prev - 1);
         }
     };
 
@@ -141,7 +141,7 @@ const TelecomDetailsScreen = ({ navigation }) => {
                 type: 'error',
                 text1: "Please select a date!"
             })
-        } else if (selectedDate.getYear() == new Date().getYear() && selectedDate.getMonth() == new Date().getMonth() && selectedDate.getDate() < new Date().getDate() ) {
+        } else if (selectedDate.getYear() == new Date().getYear() && selectedDate.getMonth() == new Date().getMonth() && selectedDate.getDate() < new Date().getDate()) {
             Toast.show({
                 type: 'error',
                 text1: "Please select a future date!"
@@ -155,7 +155,7 @@ const TelecomDetailsScreen = ({ navigation }) => {
         } else {
             selectedDate.setHours(selectedDate.getHours() + timeZoneOffset);
             let endDate = new Date(selectedDate);
-            endDate.setDate(endDate.getDate() + telecom.num_of_days_valid-1);
+            endDate.setDate(endDate.getDate() + telecom.num_of_days_valid - 1);
 
             let cartBooking = {
                 activity_name: telecom.name,
@@ -206,10 +206,10 @@ const TelecomDetailsScreen = ({ navigation }) => {
             <ScrollView>
                 <Card>
                     <Card.Title style={styles.header}>
-                        {telecom.name} 
-                        <Button mode="text" style={{ marginTop: -10, marginRight: -10}} onPress={save} >
+                        {telecom.name}
+                        <Button mode="text" style={{ marginTop: -10, marginRight: -10 }} onPress={save} >
                             {isSaved && <Icon name="heart" size={20} color='red' />}
-                            {!isSaved && <Icon name="heart" size={20} color='grey'/>}
+                            {!isSaved && <Icon name="heart" size={20} color='grey' />}
                         </Button>
                         <Button mode="text" style={{ marginTop: -10 }} onPress={onItineraryPressed} >
                             <Icon name="calendar" size={20} color='grey' />
@@ -217,27 +217,27 @@ const TelecomDetailsScreen = ({ navigation }) => {
                     </Card.Title>
 
                     <Card.Image
-                        style={{ padding: 0, height: 200, marginBottom: 20}}
+                        style={{ padding: 0, height: 200, marginBottom: 20 }}
                         source={{
-                        uri: telecom.image
+                            uri: telecom.image
                         }}
                     />
-                                
+
                     <Text style={styles.subtitle}>
-                        <Text style={{fontWeight: 'bold'}}>Price: </Text><Text>${telecom.price}     </Text>
-                        <Text style={{fontWeight: 'bold'}}>Duration: </Text><Text>{telecom.num_of_days_valid} day(s)    </Text>
-                        <Text style={{fontWeight: 'bold'}}>Data Limit: </Text><Text>{telecom.data_limit}GB</Text>
+                        <Text style={{ fontWeight: 'bold' }}>Price: </Text><Text>${telecom.price}     </Text>
+                        <Text style={{ fontWeight: 'bold' }}>Duration: </Text><Text>{telecom.num_of_days_valid} day(s)    </Text>
+                        <Text style={{ fontWeight: 'bold' }}>Data Limit: </Text><Text>{telecom.data_limit}GB</Text>
                     </Text>
 
                     <Text style={styles.description}>{telecom.description}</Text>
                 </Card>
-                
+
                 <Card containerStyle={styles.dropBorder}>
                     <Card.Title style={styles.header}>
                         Purchase
                     </Card.Title>
 
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100 , marginTop: -15}}>
+                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -15 }}>
                         <DatePickerInput
                             locale='en-GB'
                             format
@@ -249,22 +249,22 @@ const TelecomDetailsScreen = ({ navigation }) => {
                     </View>
 
                     <View>
-                        <View key={ticketQuantity} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30}}>
-                            <Text style={{fontSize: 20}} >Quantity: </Text>
-                            <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleDecrease(ticketQuantity)}>-</Button>
+                        <View key={ticketQuantity} style={{ flexDirection: 'row', alignItems: 'center', width: 400, marginLeft: 10, marginBottom: 30 }}>
+                            <Text style={{ fontSize: 20 }} >Quantity: </Text>
+                            <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleDecrease(ticketQuantity)}>-</Button>
                             <Text style={{ fontSize: 15, marginLeft: 20 }}>{ticketQuantity ? ticketQuantity : 0}</Text>
-                            <Button mode="contained" style={{backgroundColor: '#044537', color: "white", marginLeft: 20}} onPress={() => handleIncrease(ticketQuantity)}>+</Button>
+                            <Button mode="contained" style={{ backgroundColor: '#044537', color: "white", marginLeft: 20 }} onPress={() => handleIncrease(ticketQuantity)}>+</Button>
 
                         </View>
-                        
+
                     </View>
                 </Card>
 
-                <View style={styles.cartOut}> 
-                    <CartButton 
-                        style = {styles.cartButton}
-                        text = "Add to Cart" 
-                        mode="contained" 
+                <View style={styles.cartOut}>
+                    <CartButton
+                        style={styles.cartButton}
+                        text="Add to Cart"
+                        mode="contained"
                         onPress={addToCart}
                     />
                 </View>
@@ -279,18 +279,16 @@ const TelecomDetailsScreen = ({ navigation }) => {
                         }}
                     >
 
-                    <View style={styles.centeredView}>
+                        <View style={styles.centeredView}>
                             <View style={styles.modalView}>
                                 <Text style={styles.modalText}>You have not created an itinerary!</Text>
                                 <Text style={styles.modalText}>Please create one before adding!</Text>
 
-                                <View style={{flexDirection: 'row'}}>
-                                    {/* close modal button */}
-                                    <Pressable
-                                        style={[styles.modalButton, styles.buttonClose]}
-                                        onPress={() => {
-                                            setShowModal(false);
-                                        }}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Pressable style={styles.modalButton} onPress={() => { setShowModal(false); navigation.navigate('CreateItineraryScreen'); }}>
+                                        <Text style={styles.textStyle}>Create</Text>
+                                    </Pressable>
+                                    <Pressable style={styles.modalButton} onPress={() => { setShowModal(false); }}>
                                         <Text style={styles.textStyle}>Close</Text>
                                     </Pressable>
                                 </View>
@@ -300,49 +298,49 @@ const TelecomDetailsScreen = ({ navigation }) => {
                 </View>
             </ScrollView>
         </Background>
-    ) 
+    )
 }
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1
+    container: {
+        flex: 1
     },
-    rCard:{
-        flex:1,
+    rCard: {
+        flex: 1,
         width: 320,
         height: 100,
         borderRadius: 4,
         margin: 2
     },
-    header:{
+    header: {
         textAlign: 'left',
         fontSize: 20,
         color: '#044537',
         flexDirection: 'row'
     },
     image: {
-        width: 30,height: 30,marginRight: 10,
+        width: 30, height: 30, marginRight: 10,
     },
     name: {
-        fontSize: 16,marginTop: 5,
+        fontSize: 16, marginTop: 5,
     },
     subtitle: {
         marginBottom: 5, fontSize: 12, color: 'grey'
     },
     description: {
-        marginBottom: 10, fontSize: 12, marginTop : 10 
+        marginBottom: 10, fontSize: 12, marginTop: 10
     },
     activityHeader: {
-        marginBottom: 5, fontSize: 12,  fontWeight: "bold"
+        marginBottom: 5, fontSize: 12, fontWeight: "bold"
     },
     activity: {
         marginBottom: 5, fontSize: 11
     },
     pricing: {
-        marginBottom: 0, fontSize: 12, marginTop : 0
+        marginBottom: 0, fontSize: 12, marginTop: 0
     },
-    recommendation:{
-        marginBottom: 10, textAlign: 'center', marginTop : 10 
+    recommendation: {
+        marginBottom: 10, textAlign: 'center', marginTop: 10
     },
     tag: {
         color: 'black',
@@ -355,7 +353,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     dropBorder: {
-        borderWidth: 0, 
+        borderWidth: 0,
         shadowColor: 'rgba(0,0,0, 0.0)',
         shadowOffset: { height: 0, width: 0 },
         shadowOpacity: 0,
@@ -369,7 +367,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    cartButton:{
+    cartButton: {
         marginTop: -5,
         width: '100%',
         alignSelf: 'center',
@@ -381,7 +379,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#5f80e3',
         color: 'black'
     },
-    
+
     centeredView: {
         flex: 1,
         justifyContent: 'center',
@@ -391,7 +389,7 @@ const styles = StyleSheet.create({
     modalView: {
         margin: 20,
         backgroundColor: 'white',
-        borderRadius: 20,
+        borderRadius: 10,
         padding: 35,
         alignItems: 'center',
         shadowColor: '#000',
@@ -407,17 +405,19 @@ const styles = StyleSheet.create({
         marginTop: -100
     },
     modalButton: {
-        borderRadius: 20,
+        borderRadius: 10,
         padding: 10,
         elevation: 2,
-        marginLeft: 10,
+        marginLeft: 5,
         marginRight: 10,
         backgroundColor: '#044537',
+        marginTop: 3,
+        height: 38,
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center',
     },
     buttonOpen: {
-        backgroundColor: '#044537',
-    },
-    buttonClose: {
         backgroundColor: '#044537',
     },
     textStyle: {

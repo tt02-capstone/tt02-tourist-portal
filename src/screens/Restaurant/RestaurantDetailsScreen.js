@@ -355,12 +355,10 @@ const RestaurantDetailsScreen = ({ navigation }) => {
                                     <Text style={styles.modalText}>Please create one before adding!</Text>
 
                                     <View style={{flexDirection: 'row'}}>
-                                        {/* close modal button */}
-                                        <Pressable
-                                            style={[styles.modalButton, styles.buttonClose]}
-                                            onPress={() => {
-                                                setShowModal(false);
-                                            }}>
+                                        <Pressable style={styles.modalButton} onPress={() => { setShowModal(false); navigation.navigate('CreateItineraryScreen');}}>
+                                            <Text style={styles.textStyle}>Create</Text>
+                                        </Pressable>
+                                        <Pressable style={styles.modalButton} onPress={() => { setShowModal(false); }}>
                                             <Text style={styles.textStyle}>Close</Text>
                                         </Pressable>
                                     </View>
@@ -480,7 +478,7 @@ const styles = StyleSheet.create({
     modalView: {
         margin: 20,
         backgroundColor: 'white',
-        borderRadius: 20,
+        borderRadius: 10,
         padding: 35,
         alignItems: 'center',
         shadowColor: '#000',
@@ -496,17 +494,19 @@ const styles = StyleSheet.create({
         marginTop: -100
     },
     modalButton: {
-        borderRadius: 20,
+        borderRadius: 10,
         padding: 10,
         elevation: 2,
-        marginLeft: 10,
+        marginLeft: 5,
         marginRight: 10,
         backgroundColor: '#044537',
+        marginTop: 3,
+        height: 38,
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center',
     },
     buttonOpen: {
-        backgroundColor: '#044537',
-    },
-    buttonClose: {
         backgroundColor: '#044537',
     },
     textStyle: {

@@ -563,14 +563,14 @@ const ItineraryScreen = ({ navigation }) => {
                     <Modal visible={showOptions} animationType="slide" transparent={true}>
                         <View style={styles.modalContainer}>
                             <View style={[styles.modalContent, { height: windowHeight * 0.4 }]}>
-                                <Button
+                                {itinerary.master_id === user.user_id && <Button
                                     text="Invite Friends"
                                     style={{ width: '90%' }}
                                     onPress={() => {
                                         setShowOptions(false);
                                         navigation.navigate('InviteFriendScreen', { itineraryId: itinerary.itinerary_id });
                                     }}
-                                />
+                                />}
                                 <Button
                                     text="Create Event"
                                     style={{ width: '90%' }}

@@ -225,7 +225,7 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     const handleEditDiyEventPress = (event) => {
-        navigation.navigate('EditDIYEventScreen', { diyEventData: event });
+        navigation.navigate('EditDIYEventScreen', { diyEventData: event, currentItinerary: itinerary });
     };
 
     const handleDeleteDiyEvent = async (eventId) => {
@@ -254,9 +254,14 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     const renderEventContent = (event, dayNum) => {
+        const containerStyle = event.booking
+                ? { borderWidth: 1.2, borderColor: 'darkgreen' }
+                : {};
+
         if (event.accommodation || event.booking?.room) {
+
             return (
-                <Card style={{ flex: 1 }} wrapperStyle={{ height: 65 }}>
+                <View style={{ flex: 1 }} wrapperStyle={{ height: 65 }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.accommCardContainer}>
                             <IconButton
@@ -268,6 +273,7 @@ const ItineraryScreen = ({ navigation }) => {
                             <View>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
                                 {dayNum === 1 && (<Text>Check In Time: {moment(event.start_datetime).format('LT')}</Text>)}
+                                {dayNum === routes.length && (<Text>Check Out Time: {moment(event.end_datetime).format('LT')}</Text>)}
                                 <Text>{event.location}</Text>
                                 <Text>{event.remarks}</Text>
                             </View>
@@ -298,11 +304,11 @@ const ItineraryScreen = ({ navigation }) => {
                             </View>
                         </View>
                     </View>
-                </Card>
+                </View>
             );
         } else if (event.telecom || event.booking?.telecom) {
             return (
-                <Card style={{ flex: 1 }} wrapperStyle={{ height: 50 }}>
+                <Card style={{ flex: 1 }} wrapperStyle={{ height: 50 }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.telecomCardContainer}>
                             <IconButton
@@ -313,6 +319,7 @@ const ItineraryScreen = ({ navigation }) => {
                             <View>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name} Telecom Package</Text>
                                 {dayNum === 1 && (<Text>Start Time: {moment(event.start_datetime).format('LT')}</Text>)}
+                                {dayNum === routes.length && (<Text>End Time: {moment(event.end_datetime).format('LT')}</Text>)}
                                 <Text>{event.remarks}</Text>
                             </View>
                         </View>
@@ -346,7 +353,7 @@ const ItineraryScreen = ({ navigation }) => {
             );
         } else {
             return (
-                <Card style={{ flex: 1 }}>
+                <Card style={{ flex: 1 }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View>
                             <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
@@ -551,7 +558,7 @@ const ItineraryScreen = ({ navigation }) => {
                         <View style={styles.modalContainer}>
                             <View style={[styles.modalContent, { height: windowHeight * 0.4 }]}>
                                 <Button
-                                    text="Create DIY Event"
+                                    text="Create Event"
                                     style={{ width: '90%' }}
                                     onPress={() => {
                                         setShowOptions(false);
@@ -559,7 +566,7 @@ const ItineraryScreen = ({ navigation }) => {
                                     }}
                                 />
                                 <Button
-                                    text="View Recommendations"
+                                    text="View All Recommendations"
                                     style={{ width: '90%' }}
                                     onPress={() => {
                                         setShowOptions(false);
@@ -570,7 +577,7 @@ const ItineraryScreen = ({ navigation }) => {
                                     }}
                                 />
                                 <Button
-                                    text="Get Event Suggestions by Time"
+                                    text="Get Recommendations by Time"
                                     style={{ width: '90%' }}
                                     onPress={() => {
                                         setShowOptions(false);

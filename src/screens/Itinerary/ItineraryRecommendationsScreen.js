@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getTelecomRecommendations, getAttractionRecommendationsByDate, getAccommodationRecommendationsForItinerary, getRestaurantRecommendationsForItinerary } from '../../redux/itineraryRedux';
+import { getTelecomRecommendations, getAttractionRecommendationsByDate, getAccommodationRecommendationsForItinerary, getRestaurantRecommendationsForItinerary, existingAccommodationInItinerary, existingTelecomInItinerary } from '../../redux/itineraryRedux';
 import { useRoute } from '@react-navigation/native';
 import AttractionRecom from '../Recommendation/AttractionRecom';
 import RestaurantRecom from '../Recommendation/RestaurantRecom';
 import AccommodationRecom from '../Recommendation/AccommodationRecom';
 import TelecomRecom from '../Recommendation/TelecomRecom';
+import { ActivityIndicator } from 'react-native-paper';
 
 const ItineraryRecommendationsScreen = ({ navigation }) => {
     const route = useRoute();
@@ -15,12 +16,17 @@ const ItineraryRecommendationsScreen = ({ navigation }) => {
     const [accommodationRecommendations, setAccommodationRecommendations] = useState([]);
     const [attractionRecommendations, setAttractionRecommendations] = useState([]);
     const [restaurantRecommendations, setRestaurantRecommendations] = useState([]);
+    const [isFetching, setIsFetching] = useState(false);
+    const [existingAccomm, setExistingAccomm] = useState(false);
+    const [existingTelecom, setExistingTelecom] = useState(false);
 
     useEffect(() => {
         const fetchRecommendations = async () => {
+            setIsFetching(true);
             try {
                 console.log('itineraryId', itineraryId);
                 console.log('date', date);
+
                 const response1 = await getAccommodationRecommendationsForItinerary(itineraryId);
                 if (response1.status) {
                     setAccommodationRecommendations(response1.data);
@@ -41,12 +47,25 @@ const ItineraryRecommendationsScreen = ({ navigation }) => {
                     setRestaurantRecommendations(response4.data);
                 }
 
+                const response5 = await existingAccommodationInItinerary(itineraryId);
+                if (response5.status) {
+                    setExistingAccomm(response5.data);
+                }
+
+                const response6 = await existingTelecomInItinerary(itineraryId);
+                if (response6.status) {
+                    setExistingTelecom(response6.data);
+                }
+
                 console.log('response1', response1.data);
                 console.log('response2', response2.data);
                 console.log('response3', response3.data);
                 console.log('response4', response4.data);
+
+                setIsFetching(false);
             } catch (error) {
                 console.error('Error fetching recommendations: ', error);
+                setIsSubmit(false);
             }
         };
 
@@ -92,10 +111,10 @@ const ItineraryRecommendationsScreen = ({ navigation }) => {
         <View style={styles.container}>
             <Text>{'\n'}</Text>
             <ScrollView style={styles.scrollContainer}>
-                <Text style={styles.title}>Recommendations for your trip</Text>
+                {!existingAccomm && !existingTelecom && <Text style={styles.title}>Recommendations for your trip</Text>}
                 {/* Telecom Recommendations */}
-                {telecomRecommendations.length > 0 && <Text style={styles.subtitle}>Telecom Packages</Text>}
-                {telecomRecommendations.length > 0 && <View style={{ flexDirection: 'row', height: 300 }}>
+                {telecomRecommendations.length > 0 && !existingTelecom && <Text style={styles.subtitle}>Telecom Packages</Text>}
+                {telecomRecommendations.length > 0 && !existingTelecom && <View style={{ flexDirection: 'row', height: 300 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {
                             telecomRecommendations.map((item, index) => (
@@ -108,8 +127,8 @@ const ItineraryRecommendationsScreen = ({ navigation }) => {
                 </View>}
 
                 {/* Accommodation Recommendations */}
-                {accommodationRecommendations.length > 0 && <Text style={styles.subtitle}>Accommodations</Text>}
-                {accommodationRecommendations.length > 0 && <View style={{ flexDirection: 'row', height: 300 }}>
+                {accommodationRecommendations.length > 0 && !existingAccomm && <Text style={styles.subtitle}>Accommodations</Text>}
+                {accommodationRecommendations.length > 0 && !existingAccomm && <View style={{ flexDirection: 'row', height: 300 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {
                             accommodationRecommendations.map((item, index) => (
@@ -149,6 +168,12 @@ const ItineraryRecommendationsScreen = ({ navigation }) => {
                         }
                     </ScrollView>
                 </View>}
+
+                <Modal visible={isFetching} animationType="slide" transparent={true}>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.indicator}><ActivityIndicator size='large' animating={isFetching} color='green' /></View>
+                    </View>
+                </Modal>
             </ScrollView>
         </View>
     );
@@ -177,6 +202,17 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    indicator: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

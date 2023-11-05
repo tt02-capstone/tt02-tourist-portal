@@ -20,7 +20,7 @@ const EditDIYEventScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { diyEventData } = route.params;
+    const { diyEventData, currentItinerary } = route.params;
 
     const [formData, setFormData] = useState({
         name: diyEventData.name,
@@ -74,11 +74,6 @@ const EditDIYEventScreen = ({ navigation }) => {
             Toast.show({
                 type: 'error',
                 text1: "Please enter a location!"
-            })
-        } else if (formData.remarks === undefined || formData.remarks.length === 0) {
-            Toast.show({
-                type: 'error',
-                text1: "Please enter a remark!"
             })
         } else {
             setLoading(true);
@@ -148,8 +143,10 @@ const EditDIYEventScreen = ({ navigation }) => {
         ({ startDate, endDate }) => {
             const currentDate = new Date();
 
+            console.log("currentItinerary", currentItinerary);
+
             if (startDate && endDate) {
-                if (startDate < currentDate) {
+                if (startDate + 1 < currentDate) {
                     setFormStartDate(null);
                     setFormEndDate(null);
                     onDismiss();
@@ -158,7 +155,7 @@ const EditDIYEventScreen = ({ navigation }) => {
                         text1: 'Event cannot be created for past dates.'
                     });
 
-                } else if (new Date(endDate) < new Date(itinerary.start_date) || new Date(startDate) > new Date(itinerary.end_date)) {
+                } else if (new Date(endDate) < new Date(currentItinerary.start_date) || new Date(startDate) > new Date(currentItinerary.end_date)) {
                     setFormStartDate(null);
                     setFormEndDate(null);
                     onDismiss();

@@ -75,14 +75,15 @@ const EditItineraryScreen = ({ navigation }) => {
 
     async function handleEdit() {
 
-        const time = '00:01:00';
+        const startTime = '00:00:00';
+        const endTime = '23:59:59';
 
         const itineraryStartDate = new Date(values.start_date);
         itineraryStartDate.setHours(itineraryStartDate.getHours() + timeZoneOffset);
-        const itineraryStartDateInLocalDateTime = `${itineraryStartDate.toISOString().split('T')[0]}T${time}Z`;
+        const itineraryStartDateInLocalDateTime = `${itineraryStartDate.toISOString().split('T')[0]}T${startTime}Z`;
 
         const itineraryEndDate = new Date(values.end_date);
-        const itineraryEndDateInLocalDateTime = `${itineraryEndDate.toISOString().split('T')[0]}T${time}Z`;
+        const itineraryEndDateInLocalDateTime = `${itineraryEndDate.toISOString().split('T')[0]}T${endTime}Z`;
 
         let itineraryObj = {
             start_date: itineraryStartDateInLocalDateTime,
@@ -129,7 +130,7 @@ const EditItineraryScreen = ({ navigation }) => {
 
             if (startDate && endDate) {
                 if (startDate < currentDate) {
-                    setValues({ start_date: null, end_date: null });
+                    setValues({ ...values, start_date: null, end_date: null });
                     onDismiss();
                     Toast.show({
                         type: 'error',
@@ -138,11 +139,11 @@ const EditItineraryScreen = ({ navigation }) => {
                 } else {
                     setOpen(false);
                     // might cause issues
-                    setValues({ start_date: startDate, end_date: endDate });
+                    setValues({ ...values, start_date: startDate, end_date: endDate });
                 }
             } else {
                 setOpen(false);
-                setValues({ start_date: startDate, end_date: endDate });
+                setValues({ ...values, start_date: startDate, end_date: endDate });
                 onDismiss();
                 Toast.show({
                     type: 'error',
@@ -188,7 +189,7 @@ const EditItineraryScreen = ({ navigation }) => {
                             </View>)}
                         {itinerary && itinerary.diy_event_list && itinerary.diy_event_list.length > 0 && (
                             <View>
-                                <Text style={{marginLeft: -20 }}>{formatDatePicker(values.start_date)} - {formatDatePicker(values.end_date)}</Text>
+                                <Text style={{marginLeft: -20, fontWeight: 'bold' }}>{formatDatePicker(values.start_date)} - {formatDatePicker(values.end_date)}</Text>
                             </View>
                         )}
 

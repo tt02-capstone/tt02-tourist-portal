@@ -248,6 +248,8 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                 <View style={{ alignItems: 'center', marginTop: 130 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -100 }}>
 
+                        <Text style={{ marginTop: 50, fontWeight: 'bold' }}>Itinerary Dates:</Text>
+                        <Text style={{ marginBottom: 20 }}>{formatDatePicker(itinerary.start_date)} - {formatDatePicker(itinerary.end_date)}</Text>
                         <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
                             {date ? `${formatDatePicker(date)}` : 'Pick Start Date'}
                         </DateButton>
@@ -286,7 +288,7 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                         />
                     </View>
 
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 30 }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 80 }}>
                         <Button
                             mode="contained"
                             text={"Submit"}

@@ -223,6 +223,8 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
                 <View style={{ alignItems: 'center', marginTop: 120 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -80 }}>
 
+                        <Text style={{ marginTop: 50, fontWeight: 'bold' }}>Itinerary Dates:</Text>
+                        <Text style={{ marginBottom: 20 }}>{formatDatePicker(itinerary.start_date)} - {formatDatePicker(itinerary.end_date)}</Text>
                         <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
                             {startDate && endDate ? `${formatDatePicker(startDate)} - ${formatDatePicker(endDate)}` : 'Pick Date Range'}
                         </DateButton>
@@ -246,7 +248,7 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
                         />
                     </View>
 
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 30 }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 60 }}>
                         <Button
                             mode="contained"
                             text={"Submit"}

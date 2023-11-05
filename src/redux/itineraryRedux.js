@@ -111,3 +111,43 @@ export async function existingTelecomInItinerary(itineraryId) {
     return {status: false, data: error.message};
   }
 }
+
+export async function getUserWithEmailSimilarity(masterUserId, itineraryId, email) {
+  try {
+    const response = await itineraryApi.get(`/getUserWithEmailSimilarity/${masterUserId}/${itineraryId}/${email}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getUserWithEmailSimilarity Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function getInvitedUsers(itineraryId) {
+  try {
+    const response = await itineraryApi.get(`/getInvitedUsers/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getInvitedUsers Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function getAcceptedUsers(itineraryId) {
+  try {
+    const response = await itineraryApi.get(`/getAcceptedUsers/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getAcceptedUsers Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function toggleItineraryInvite(itineraryId, userIdToAddOrRemove) {
+  try {
+    const response = await itineraryApi.post(`/toggleItineraryInvite/${itineraryId}/${userIdToAddOrRemove}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux toggleItineraryInvite Error : ", error);
+    return {status: false, data: error.message};
+  }
+}

@@ -274,7 +274,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 {dayNum === 1 && (<Text>Check In Time: {moment(event.start_datetime).format('LT')}</Text>)}
                                 {dayNum === routes.length && (<Text>Check Out Time: {moment(event.end_datetime).format('LT')}</Text>)}
                                 <Text>{event.location}</Text>
-                                {event.remarks && <Text>{event.remarks}</Text>}
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 150, marginTop: 10  }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
@@ -308,7 +308,7 @@ const ItineraryScreen = ({ navigation }) => {
         } else if (event.telecom || event.booking?.telecom) {
             
             return (
-                <Card style={{ flex: 1 }} wrapperStyle={{ height: 50 }} containerStyle={containerStyle}>
+                <Card style={{ flex: 1 }} wrapperStyle={{ height: 60 }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
                             <View style={{ justifyContent: 'center' }}>
@@ -318,7 +318,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 <Text style={{ fontWeight: 'bold' }}>{event.name} Telecom Package</Text>
                                 {dayNum === 1 && (<Text>Start Time: {moment(event.start_datetime).format('LT')}</Text>)}
                                 {dayNum === routes.length && (<Text>End Time: {moment(event.end_datetime).format('LT')}</Text>)}
-                                {event.remarks && <Text>{event.remarks}</Text>}
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 150, marginTop: 10  }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
@@ -360,11 +360,11 @@ const ItineraryScreen = ({ navigation }) => {
                                 {(event.tourtype || event.booking?.tour) && <IconButton icon="human-greeting-variant" size={20} onPress={null} />}
                                 {(event.attraction == null && event.accommodation == null && event.telecom == null && event.restaurant == null && event.booking == null) && <IconButton icon="calendar" size={20} onPress={null} />}
                             </View>
-                            <View style={{ justifyContent: 'center' }}>
+                            <View style={{ justifyContent: 'center'}}>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
                                 <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
                                 <Text>{event.location}</Text>
-                                {event.remarks && <Text>{event.remarks}</Text>}
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10  }}>{event.remarks}</Text>}
                             </View>
                         </View>
 

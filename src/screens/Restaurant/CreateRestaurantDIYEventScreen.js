@@ -2,10 +2,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
+import { theme } from '../../core/theme'
 import TextInput from '../../components/TextInput';
 import { getUser } from '../../helpers/LocalStorage';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { Button as DateButton } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Text, Card } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
 import { createDiyEvent } from '../../redux/diyEventRedux';
@@ -17,7 +19,8 @@ import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 import { useIsFocused } from "@react-navigation/native";
-import { getRestaurantById } from '../../redux/restaurantRedux';
+import { getRestaurantById, getRestaurantDish } from '../../redux/restaurantRedux';
+import { IconButton } from 'react-native-paper';
 
 const CreateRestaurantDIYEventScreen = ({ navigation }) => {
 
@@ -27,6 +30,7 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
 
     const [user, setUser] = useState(null);
     const [rest, setRest] = useState(null);
+    const [dishList, setDishList] = useState([]);
     const [itinerary, setItinerary] = useState(null);
     const [imgList, setImgList] = useState([]);
     const [imageActiveSlide, setImageActiveSlide] = useState(0);
@@ -65,6 +69,23 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
             if (responseRest.status) {
                 setRest(responseRest.data);
                 setImgList(responseRest.data.restaurant_image_list);
+
+                let dishes = await getRestaurantDish(typeId)
+
+                if (dishes.status && dishes.data.length != 0) {
+                    const groupedDishes = dishes.data.reduce((acc, dish) => {
+                        const type = dish.dish_type;
+
+                        if (!acc[type]) {
+                            acc[type] = [];
+                        }
+
+                        acc[type].push(dish);
+                        return acc;
+                    }, {});
+
+                    setDishList(groupedDishes);
+                }
             } else {
                 console.log("restaurant not fetched!");
             }
@@ -75,6 +96,10 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
         }
 
     }, [isFocused]);
+
+    useEffect(() => {
+        console.log("dishList", dishList);
+    }, [dishList]);
 
     // restaurant card functions
     const getColorForType = (label) => {
@@ -224,11 +249,50 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
         return moment(date).format('LT');
     }
 
+    const handleAddToRemarks = (name) => {
+        if (!values.remarks) {
+            setValues({ ...values, remarks: name });
+        } else {
+            setValues({ ...values, remarks: values.remarks + ', ' + name });
+        }
+    };
+
+    const showDishList = Object.keys(dishList).map(type => (
+        <Card key={type}>
+            <View style={{ width: 305 }}>
+                <Text style={styles.header}>{type}</Text>
+                {dishList[type].map(dish => (
+                    <View key={dish.dish_id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ marginTop: 10, width: 220, flexDirection: 'row' }}>
+                            <Text style={{ fontSize: 12 }}>{dish.name}</Text>
+
+                            {/* buffer space */}
+                            <Text> </Text>
+
+                            {dish.spicy && <Text style={{ fontSize: 8, color: 'red', fontWeight: 'bold', marginTop: 2 }}>
+                                <Icon name="fire" size={10} />
+                            </Text>}
+
+                            {/* buffer space */}
+                            <Text> </Text>
+
+                            {dish.is_signature && <Text style={{ fontSize: 8, color: 'blue', fontWeight: 'bold', marginTop: 2 }}>
+                                <Icon name="thumbs-up" size={10} color='#044537' />
+                            </Text>}
+                        </View>
+                        <Text style={{ marginLeft: 30, marginTop: 10, fontSize: 12, fontWeight: 'bold' }}> $ {dish.price}</Text>
+                        <IconButton icon="plus-box" size={15} style={{ marginTop: 15, marginLeft: -1 }} onPress={() => handleAddToRemarks(dish.name)} />
+                    </View>
+                ))}
+            </View>
+        </Card>
+    ));
+
     return user && itinerary && rest ? (
         <Background style={{ alignItems: 'center' }}>
             {/* restaurant details */}
             <ScrollView automaticallyAdjustKeyboardInsets={true}>
-                <View style={styles.topCard}>
+                <View>
                     <Card>
                         <Card.Title style={styles.header}>{rest.name} </Card.Title>
 
@@ -266,6 +330,7 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
                                 inactiveDotOpacity={0.4}
                                 inactiveDotScale={0.6}
                             />
+
                         </View>
 
                         <Text style={{ fontSize: 12 }}>
@@ -278,13 +343,21 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
                             {rest.opening_hours}
                         </Text>
                     </Card>
-                </View>
 
-                {/* itinerary form */}
-                <View style={{ alignItems: 'center', marginTop: 120 }}>
-                    <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -80 }}>
+                    <Card containerStyle={styles.dropBorder}>
+                        <Card.Title style={styles.header}>
+                            Menu
+                        </Card.Title>
 
-                        <Text style={{ marginTop: 60, fontWeight: 'bold' }}>Itinerary Dates:</Text>
+                        {/* to display the menu  */}
+                        <View style={{ justifyContent: 'center', alignItems: 'left', marginLeft: -15, marginTop: -11 }}>
+                            {showDishList}
+                        </View>
+                    </Card>
+
+                    {/* itinerary form */}
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ marginTop: 20, fontWeight: 'bold' }}>Itinerary Dates:</Text>
                         <Text style={{ marginBottom: 20 }}>{formatDatePicker(itinerary.start_date)} - {formatDatePicker(itinerary.end_date)}</Text>
                         <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
                             {date ? `${formatDatePicker(date)}` : 'Pick Date'}
@@ -325,19 +398,18 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
                         </View>
 
                         <TextInput
-                            style={styles.inputFormRemarks}
+                            style={{ marginTop: 10, width: '80%', marginLeft: 40 }}
                             label="Remarks (Optional)"
                             multiline={true}
                             value={values.remarks}
                             onChangeText={(value) => setValues({ ...values, remarks: value })}
                             errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
                         />
-                    </View>
 
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 90 }}>
                         <Button
                             mode="contained"
                             text={"Submit"}
+                            style={{ marginBottom: 40 }}
                             onPress={onSubmit}
                         />
                     </View>
@@ -350,9 +422,6 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    topCard: {
-        height: 410,
-    },
     header: {
         textAlign: 'left',
         fontSize: 13,
@@ -399,18 +468,21 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 10,
     },
-
-    inputFormRemarks: {
-        width: 340,
-        marginTop: 5,
-        marginBottom: 10,
-    },
     label: {
         fontSize: 17,
         fontWeight: 'bold',
         marginTop: 20,
         marginLeft: 10,
-    }
+    },
+    dropBorder: {
+        borderWidth: 0,
+        shadowColor: 'rgba(0,0,0, 0.0)',
+        shadowOffset: { height: 0, width: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+        backgroundColor: theme.colors.surface,
+    },
 });
 
 export default CreateRestaurantDIYEventScreen

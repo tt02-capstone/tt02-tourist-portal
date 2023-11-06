@@ -71,6 +71,7 @@ import ItineraryRecommendationsScreen from './src/screens/Itinerary/ItineraryRec
 import CreateRestaurantDIYEventScreen from './src/screens/Restaurant/CreateRestaurantDIYEventScreen';
 import EventSuggestionsScreen from './src/screens/Itinerary/EventSuggestionsScreen';
 import InviteFriendScreen from './src/screens/Itinerary/InviteFriendScreen';
+import ViewInvitationsScreen from './src/screens/Itinerary/ViewInvitationsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -185,6 +186,7 @@ export const Layout = () => {
                         <Stack.Screen name="ItineraryRecommendationsScreen" component={ItineraryRecommendationsScreen} options={{ title : 'Recommendations' }} />
                         <Stack.Screen name="EventSuggestionsScreen" component={EventSuggestionsScreen} options={{ title : 'Recommendations By Time' }} />
                         <Stack.Screen name="InviteFriendScreen" component={InviteFriendScreen} options={{ title : 'Invitation' }} />
+                        <Stack.Screen name="ViewInvitationsScreen" component={ViewInvitationsScreen} options={{ title : 'Invitations' }} />
                     </>
                 ) : (
                     <>

@@ -151,3 +151,43 @@ export async function toggleItineraryInvite(itineraryId, userIdToAddOrRemove) {
     return {status: false, data: error.message};
   }
 }
+
+export async function getInvitationsByUser(userId) {
+  try {
+    const response = await itineraryApi.get(`/getInvitationsByUser/${userId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getInvitationsByUser Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function addUserToItinerary(itineraryId, userId) {
+  try {
+    const response = await itineraryApi.post(`/addUserToItinerary/${itineraryId}/${userId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux addUserToItinerary Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function removeUserFromItinerary(itineraryId, userId) {
+  try {
+    const response = await itineraryApi.post(`/removeUserFromItinerary/${itineraryId}/${userId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux removeUserFromItinerary Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function getItineraryMasterUserEmail(userId) {
+  try {
+    const response = await itineraryApi.get(`/getItineraryMasterUserEmail/${userId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getItineraryMasterUserEmail Error : ", error);
+    return {status: false, data: error.message};
+  }
+}

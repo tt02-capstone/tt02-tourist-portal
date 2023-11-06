@@ -3,7 +3,7 @@ import { theme } from '../../core/theme'
 import Button from '../../components/Button'
 import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity, Dimensions } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary } from '../../redux/itineraryRedux';
+import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary, removeUserFromItinerary } from '../../redux/itineraryRedux';
 import { getAllDiyEventsByDay, deleteDiyEvent, diyEventOverlap, diyEventBookingOverlap } from '../../redux/diyEventRedux';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -160,6 +160,52 @@ const ItineraryScreen = ({ navigation }) => {
 
         } else {
             console.log("Itinerary deletion failed!");
+            console.log(response.data);
+            Toast.show({
+                type: 'error',
+                text1: response.data.errorMessage
+            })
+        }
+    }
+
+    const handleOptOutOfItineraryPress = (itineraryId) => {
+
+        Alert.alert(
+            "Opt Out Confirmation",
+            "Are you sure you want to opt out of this itinerary?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Opt Out Cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => handleOptOutOfItinerary(itineraryId, user.user_id)
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    async function handleOptOutOfItinerary(itineraryId, userId) {
+
+        let response = await removeUserFromItinerary(itineraryId, userId);
+
+        if (response.status) {
+
+            Toast.show({
+                type: 'success',
+                text1: 'Successfully opted out!'
+            })
+
+            navigation.reset({
+                index: 2,
+                routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'ItineraryScreen' }],
+            });
+
+        } else {
+            console.log("Opt out failed!");
             console.log(response.data);
             Toast.show({
                 type: 'error',
@@ -447,6 +493,7 @@ const ItineraryScreen = ({ navigation }) => {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Text style={{ marginBottom: 5 }}>No itinerary available</Text>
                     <Button text="Create Itinerary" style={styles.button} onPress={() => navigation.navigate('CreateItineraryScreen')} />
+                    <Button text="View Invitations" style={styles.button} onPress={() => navigation.navigate('ViewInvitationsScreen')} />
                 </View>
             ) : (
                 <>
@@ -489,12 +536,8 @@ const ItineraryScreen = ({ navigation }) => {
                                 style={styles.icon}
                                 onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
                             />
-                            <IconButton
-                                icon="delete"
-                                size={20}
-                                style={styles.icon}
-                                onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}
-                            />
+                            {itinerary.master_id == user.user_id && <IconButton icon="delete" size={20} style={styles.icon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}/>}
+                            {itinerary.master_id != user.user_id && <IconButton icon="close" size={20} style={styles.icon} onPress={() => handleOptOutOfItineraryPress(itinerary.itinerary_id)}/>}
                         </View>
                     </View >
 
@@ -562,7 +605,7 @@ const ItineraryScreen = ({ navigation }) => {
 
                     <Modal visible={showOptions} animationType="slide" transparent={true}>
                         <View style={styles.modalContainer}>
-                            <View style={[styles.modalContent, { height: windowHeight * 0.4 }]}>
+                            <View style={[styles.modalContent, { height: windowHeight * 0.45 }]}>
                                 {itinerary.master_id === user.user_id && <Button
                                     text="Invite Friends"
                                     style={{ width: '90%' }}
@@ -648,7 +691,6 @@ const styles = StyleSheet.create({
         marginLeft: '30%',
         marginRight: '30%',
         backgroundColor: '#5f80e3',
-        marginBottom: 20
     },
     addEventButtonContainer: {
         justifyContent: 'flex-end',

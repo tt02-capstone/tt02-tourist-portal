@@ -609,7 +609,7 @@ const PostScreen = ({ navigation }) => {
 
                                             {item.local_user && item.local_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
                                             {item.tourist_user && item.tourist_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
 
                                         </View>
                                     </View>

@@ -490,7 +490,13 @@ const ItineraryScreen = ({ navigation }) => {
                         </>
                     ))
                 ) : (
-                    <Text style={{ marginLeft: 15, marginTop: 15 }}>No events available for this day.</Text>
+                    <View style={{alignItems: 'center', alignContent: 'center', justifyContent: 'center'}}>
+                        <Image
+                            style={styles.noEventsImage}
+                            source={{uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png'}}
+                        />
+                        <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>No events scehduled today!</Text>
+                    </View>
                 )}
             </ScrollView>
         );
@@ -535,17 +541,17 @@ const ItineraryScreen = ({ navigation }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: 10, marginTop: 10, marginBottom: 10, marginLeft: 10 }}>
                         <View style={{flexDirection: 'row'}}>
                             <View style={{ marginLeft: 5, marginRight: 10 }}>
-                                {involvedUserImageList.length > 0 && involvedUserImageList.map(url => (
+                                {involvedUserImageList.length > 0 && involvedUserImageList.map((url, index) => (
                                     <Image
-                                        style={styles.profileImageList}
+                                        style={{ marginTop: 0, marginBottom: -100, borderRadius: 40 / 2, minWidth: 35, minHeight: 40, marginLeft: index * 5}}
                                         source={{uri: url ? url : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
                                     />
                                 )) }
                             </View>
 
                             <View style={{ marginTop: 5 }}>
-                                <Text><Text style={{ fontWeight: 'bold' }}>Time:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
-                                <Text><Text style={{ fontWeight: 'bold' }}>Pax:</Text> {itinerary.number_of_pax}</Text>
+                                <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
+                                <Text><Text style={{ fontWeight: 'bold' }}>Recommended Pax:</Text> {itinerary.number_of_pax}</Text>
                                 {itinerary?.remarks && <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>}
                             </View>
                         </View>
@@ -844,6 +850,13 @@ const styles = StyleSheet.create({
         borderRadius: 40 / 2,
         minWidth: 40,
         minHeight: 40,
+    },
+    noEventsImage: {
+        marginTop: 160,
+        marginBottom: 20,
+        borderRadius: 130 / 2,
+        width: 130,
+        height: 130,
     },
 });
 

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import { getUser } from '../../helpers/LocalStorage';
 import { Card } from '@rneui/themed';
-import { View, ScrollView, StyleSheet, Image, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { getInvitationsByUser, addUserToItinerary, getItineraryMasterUserEmail } from '../../redux/itineraryRedux';
 import moment from 'moment';
 
@@ -44,14 +45,14 @@ const ViewInvitationsScreen = ({ navigation }) => {
     useEffect(() => {
         async function fetchMasterEmails() {
             // Iterate through invitations and fetch the master user's email for each itinerary
-            const emails = {};
+            const temp = {};
             for (const invitation of invitations) {
-                const email = await getItineraryMasterUserEmail(invitation.master_id);
-                if (email) {
-                    emails[invitation.itinerary_id] = email.data;
+                const response = await getItineraryMasterUserEmail(invitation.master_id);
+                if (response) {
+                    temp[invitation.itinerary_id] = response.data;
                 }
             }
-            setMasterUsers(emails);
+            setMasterUsers(temp);
         }
 
         if (invitations.length > 0) {
@@ -87,18 +88,20 @@ const ViewInvitationsScreen = ({ navigation }) => {
                             <Card.Image
                                 style={styles.image}
                                 source={{
-                                    uri: item.profile_pic ? item.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
+                                    uri: masterUsers[item.itinerary_id]?.profile_pic ? masterUsers[item.itinerary_id]?.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
                                 }}
                             />
                             <View style={{ flexDirection: 'column' }}>
-                                <Card.Title style={styles.header}>{masterUsers[item.itinerary_id]}</Card.Title>
+                                <Card.Title style={styles.header}>{masterUsers[item.itinerary_id]?.email}</Card.Title>
+                                <Text style={styles.description}>{masterUsers[item.itinerary_id]?.name}</Text>
                                 <Text style={styles.description}>{moment(item.start_date).format('ll')} - {moment(item.end_date).format('ll')}</Text>
                                 <Text style={styles.description}>{item.remarks}</Text>
                             </View>
 
-                            <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity style={{flexDirection: 'row', marginLeft: 17 }} onPress={() => onToggleItineraryInvitePressed(item.user_id)}>
+                                <Ionicons name="people-outline" style={{ color: '#044537', marginTop: 15}} size={20} />
                                 <Text style={styles.inviteButton} mode="contained" onPress={() => acceptInvitation(item.itinerary_id, user.user_id)}>Accept</Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     </Card>
                 ))}
@@ -126,13 +129,16 @@ const styles = StyleSheet.create({
         marginLeft: 30
     },
     invitationDescription: {
-        marginTop: 10,
-        marginLeft: 30
+        marginTop: 20,
+        marginLeft: 30,
+        fontWeight: 'bold',
+        color: '#044537',
     },
     image: {
         borderRadius: 50 / 2,
         width: 40,
         height: 40,
+        marginTop: 5,
     },
     title: {
         color: '#044537',
@@ -144,7 +150,7 @@ const styles = StyleSheet.create({
     },
     header: {
         color: '#044537',
-        marginBottom: 5,
+        marginBottom: 2,
         marginLeft: 14,
         textAlign: 'left',
         fontSize: 17,
@@ -153,8 +159,8 @@ const styles = StyleSheet.create({
         marginLeft: 15,
     },
     inviteButton: {
-        marginLeft: -70,
-        marginTop: 15,
+        marginLeft: -90,
+        marginTop: 17,
         height: 50,
         width: 150,
         fontSize: 16,

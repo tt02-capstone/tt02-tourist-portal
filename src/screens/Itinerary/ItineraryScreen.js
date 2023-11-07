@@ -58,7 +58,7 @@ const ItineraryScreen = ({ navigation }) => {
 
         let response = await getItineraryByUser(userId);
         if (response.status) {
-            console.log("getItineraryByUser response.data", response.data)
+            // console.log("getItineraryByUser response.data", response.data)
             setItinerary(response.data);
 
             let userImageResponse = await getProfileImageByIdList(response.data.itinerary_id);

@@ -47,7 +47,6 @@ const ViewInvitationsScreen = ({ navigation }) => {
             const emails = {};
             for (const invitation of invitations) {
                 const email = await getItineraryMasterUserEmail(invitation.master_id);
-                console.log("dd, ", email);
                 if (email) {
                     emails[invitation.itinerary_id] = email.data;
                 }

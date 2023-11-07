@@ -495,7 +495,7 @@ const ItineraryScreen = ({ navigation }) => {
                             style={styles.noEventsImage}
                             source={{uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png'}}
                         />
-                        <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>No events scehduled today!</Text>
+                        <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>No events scheduled today!</Text>
                     </View>
                 )}
             </ScrollView>

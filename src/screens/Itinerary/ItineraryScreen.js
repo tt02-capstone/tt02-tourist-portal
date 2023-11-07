@@ -575,7 +575,7 @@ const ItineraryScreen = ({ navigation }) => {
                                     {...props}
                                     scrollEnabled={true}
                                     tabStyle={{ width: calculateTabWidth() }}
-                                    style={{ backgroundColor: '#5f80e3' }}
+                                    style={{ backgroundColor: '#044537' }}
                                 />
                             )}
                         />

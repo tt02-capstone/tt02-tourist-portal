@@ -1,36 +1,34 @@
 import React, { useState, useEffect } from 'react'
-import { theme } from '../../core/theme'
 import Button from '../../components/Button'
-import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity, Dimensions } from 'react-native';
+import { View, ScrollView, StyleSheet, Modal, Alert, Pressable, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { Text, Card } from '@rneui/themed';
-import { getItineraryByUser, createItinerary, updateItinerary, deleteItinerary, removeUserFromItinerary } from '../../redux/itineraryRedux';
+import { getItineraryByUser, deleteItinerary, removeUserFromItinerary, getProfileImageByIdList } from '../../redux/itineraryRedux';
 import { getAllDiyEventsByDay, deleteDiyEvent, diyEventOverlap, diyEventBookingOverlap } from '../../redux/diyEventRedux';
-import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { useFocusEffect } from '@react-navigation/native';
+import { getUser } from '../../helpers/LocalStorage';
 import { useIsFocused } from "@react-navigation/native";
-import { DatePickerModal } from 'react-native-paper-dates';
-import CreateItineraryScreen from './CreateItineraryScreen';
-import { Icon, IconButton } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Toast from "react-native-toast-message";
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 import moment from 'moment';
 
 const ItineraryScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const isFocused = useIsFocused();
     const [itinerary, setItinerary] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [index, setIndex] = useState(0);
     const [routes, setRoutes] = useState([]);
     const [firstDayDiyEvents, setFirstDayDiyEvents] = useState([]);
     const [currentDiyEvents, setCurrentDiyEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
     const [fetchItinerary, setFetchItinerary] = useState(true);
+    
+    // people involved in itinerary
+    const [involvedUserImageList, setInvolvedUserImageList] = useState([]);
 
     // diy event overlap
     const [showMinorOverlap, setShowMinorOverlap] = useState(null);
     const [showMajorOverlap, setShowMajorOverlap] = useState(null);
-    const [showModal, setShowModal] = useState(false);
 
     // diy event modal
     const [showDiyModal, setShowDiyModal] = useState(false);
@@ -53,7 +51,6 @@ const ItineraryScreen = ({ navigation }) => {
     }, [isFocused, fetchItinerary]);
 
     async function onLoad() {
-        console.log("fetched!");
         const userData = await getUser();
         setUser(userData);
         const userId = userData.user_id;
@@ -61,8 +58,13 @@ const ItineraryScreen = ({ navigation }) => {
 
         let response = await getItineraryByUser(userId);
         if (response.status) {
-            // console.log("getItineraryByUser response.data", response.data)
+            console.log("getItineraryByUser response.data", response.data)
             setItinerary(response.data);
+
+            let userImageResponse = await getProfileImageByIdList(response.data.itinerary_id);
+            if (userImageResponse.status) {
+                setInvolvedUserImageList(userImageResponse.data);
+            }
 
             let minorOverlapResponse = await diyEventOverlap(response.data.itinerary_id);
             if (minorOverlapResponse.status) {
@@ -72,7 +74,6 @@ const ItineraryScreen = ({ navigation }) => {
             let majorOverlapResponse = await diyEventBookingOverlap(response.data.itinerary_id);
             if (majorOverlapResponse.status) {
                 setShowMajorOverlap(majorOverlapResponse.data);
-                setShowModal(majorOverlapResponse.data && majorOverlapResponse.data.length > 1 ? true : false);
             }
 
             const startDate = moment(response.data.start_date);
@@ -85,7 +86,7 @@ const ItineraryScreen = ({ navigation }) => {
                 generatedRoutes.push({ key: `${i + 1}`, title: currentDate.format('MMM Do') });
             }
             setRoutes(generatedRoutes);
-            console.log("generatedRoutes", generatedRoutes);
+            // console.log("generatedRoutes", generatedRoutes);
 
             getFirstDayDiyEvents(response.data);
 
@@ -93,8 +94,6 @@ const ItineraryScreen = ({ navigation }) => {
         } else {
             console.log('itinerary not created / fetched!');
         }
-
-        setLoading(false);
     }
 
     async function getFirstDayDiyEvents(retrievedItinerary) {
@@ -160,7 +159,6 @@ const ItineraryScreen = ({ navigation }) => {
 
         } else {
             console.log("Itinerary deletion failed!");
-            console.log(response.data);
             Toast.show({
                 type: 'error',
                 text1: response.data.errorMessage
@@ -206,7 +204,7 @@ const ItineraryScreen = ({ navigation }) => {
 
         } else {
             console.log("Opt out failed!");
-            console.log(response.data);
+            // console.log(response.data);
             Toast.show({
                 type: 'error',
                 text1: response.data.errorMessage
@@ -219,7 +217,7 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     const handleTabChange = async (newIndex) => {
-        console.log("Selected day:", newIndex + 1);
+        // console.log("Selected day:", newIndex + 1);
         setIndex(newIndex);
 
         const dateSelected = moment(itinerary.start_date).add(newIndex, 'days').format('YYYY-MM-DD');
@@ -291,7 +289,7 @@ const ItineraryScreen = ({ navigation }) => {
             }
         } else {
             console.log("Event deletion failed!");
-            console.log(response.data);
+            // console.log(response.data);
             Toast.show({
                 type: 'error',
                 text1: response.data.errorMessage
@@ -299,14 +297,24 @@ const ItineraryScreen = ({ navigation }) => {
         }
     };
 
+    const checkIfSameDay = (dayNum, eventDate) => {
+        let constFirstDay = new Date(itinerary.start_date).getDate();
+        for (var i = 1; i < dayNum; i++) {
+            constFirstDay++;
+        }
+        // console.log("event date:", new Date(eventDate).getDate());
+        // console.log("selected date: ", constFirstDay);
+        return new Date(eventDate).getDate() === constFirstDay;
+    }
+
     const renderEventContent = (event, dayNum) => {
         const containerStyle = event.booking
             ? { borderWidth: 1.2, borderColor: 'darkgreen' }
-            : {};
+            : { borderWidth: 0.8, borderColor: 'lightgreen' };
 
         if (event.accommodation || event.booking?.room) {
 
-            const cardHeight = event.remarks ? { height: 70 } : { height: 50};
+            const cardHeight = event.remarks ? { height: 90 } : { height: 60};
 
             return (
                 <Card style={{ flex: 1 }} wrapperStyle={cardHeight} containerStyle={containerStyle}>
@@ -317,8 +325,8 @@ const ItineraryScreen = ({ navigation }) => {
                             </View>
                             <View style={{ justifyContent: 'center' }}>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
-                                {dayNum === 1 && (<Text>Check In Time: {moment(event.start_datetime).format('LT')}</Text>)}
-                                {dayNum === routes.length && (<Text>Check Out Time: {moment(event.end_datetime).format('LT')}</Text>)}
+                                {checkIfSameDay(dayNum, event.start_datetime) ? (<Text>Check In Time: {moment(event.start_datetime).format('LT')}</Text>) : (<Text>Check in on {moment(event.start_datetime).format('Do MMM')}</Text>)}
+                                {checkIfSameDay(dayNum, event.end_datetime) ? (<Text>Check Out Time: {moment(event.end_datetime).format('LT')}</Text>) : (<Text>Check out on {moment(event.end_datetime).format('Do MMM')}</Text>)}
                                 <Text>{event.location}</Text>
                                 {event.remarks && <Text style={{ flexWrap: 'wrap', width: 150, marginTop: 10  }}>{event.remarks}</Text>}
                             </View>
@@ -362,8 +370,8 @@ const ItineraryScreen = ({ navigation }) => {
                             </View>
                             <View style={{ justifyContent: 'center' }}>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name} Telecom Package</Text>
-                                {dayNum === 1 && (<Text>Start Time: {moment(event.start_datetime).format('LT')}</Text>)}
-                                {dayNum === routes.length && (<Text>End Time: {moment(event.end_datetime).format('LT')}</Text>)}
+                                {checkIfSameDay(dayNum, event.start_datetime) ? (<Text>Activation Time: {moment(event.start_datetime).format('LT')}</Text>) : (<Text>Activated on: {moment(event.start_datetime).format('Do MMM')}</Text>)}
+                                {checkIfSameDay(dayNum, event.end_datetime) ? (<Text>Deactivation Time: {moment(event.end_datetime).format('LT')}</Text>) : (<Text>Deactivation Time: {moment(event.end_datetime).format('Do MMM')}</Text>)}
                                 {event.remarks && <Text style={{ flexWrap: 'wrap', width: 150, marginTop: 10  }}>{event.remarks}</Text>}
                             </View>
                         </View>
@@ -410,7 +418,8 @@ const ItineraryScreen = ({ navigation }) => {
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
                                 <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
                                 <Text>{event.location}</Text>
-                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10  }}>{event.remarks}</Text>}
+                                {event.remarks && !event.booking && !event.telecom && !event.attraction && !event.accommodation && !event.restaurant && 
+                                <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10 }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
@@ -507,6 +516,7 @@ const ItineraryScreen = ({ navigation }) => {
                                     onPress={null}
                                 />
                                 <Text style={styles.minorOverlapText}>{showMinorOverlap}</Text>
+                                <Ionicons name="close-outline" size={30} color='red' style={{marginRight: 10}} onPress={() => setShowMinorOverlap(false)}/>
                             </View>
                         )}
                         {showMajorOverlap && showMajorOverlap.length > 1 && (
@@ -523,21 +533,27 @@ const ItineraryScreen = ({ navigation }) => {
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: 10, marginTop: 10, marginBottom: 10, marginLeft: 10 }}>
-                        <View>
-                            <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
-                            <Text><Text style={{ fontWeight: 'bold' }}>Number of Pax:</Text> {itinerary.number_of_pax}</Text>
-                            <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>
+                        <View style={{flexDirection: 'row'}}>
+                            <View style={{ marginLeft: 5, marginRight: 10 }}>
+                                {involvedUserImageList.length > 0 && involvedUserImageList.map(url => (
+                                    <Image
+                                        style={styles.profileImageList}
+                                        source={{uri: url ? url : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                                    />
+                                )) }
+                            </View>
+
+                            <View style={{ marginTop: 5 }}>
+                                <Text><Text style={{ fontWeight: 'bold' }}>Time:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
+                                <Text><Text style={{ fontWeight: 'bold' }}>Pax:</Text> {itinerary.number_of_pax}</Text>
+                                {itinerary?.remarks && <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>}
+                            </View>
                         </View>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
-                            <IconButton
-                                icon="pencil"
-                                size={20}
-                                style={styles.icon}
-                                onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })}
-                            />
-                            {itinerary.master_id == user.user_id && <IconButton icon="delete" size={20} style={styles.icon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}/>}
-                            {itinerary.master_id != user.user_id && <IconButton icon="close" size={20} style={styles.icon} onPress={() => handleOptOutOfItineraryPress(itinerary.itinerary_id)}/>}
+                            <IconButton icon="pencil" size={25} style={styles.icon} onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })} />
+                            {itinerary.master_id == user.user_id && <IconButton icon="delete" size={25} style={styles.icon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}/>}
+                            {itinerary.master_id != user.user_id && <IconButton icon="close" size={25} style={styles.icon} onPress={() => handleOptOutOfItineraryPress(itinerary.itinerary_id)}/>}
                         </View>
                     </View >
 
@@ -563,6 +579,7 @@ const ItineraryScreen = ({ navigation }) => {
                     {showDiyModal && (
                         <View style={styles.centeredView}>
                             <Modal
+                                style={{}}
                                 animationType="slide"
                                 transparent={true}
                                 visible={showDiyModal}
@@ -572,15 +589,19 @@ const ItineraryScreen = ({ navigation }) => {
                             >
                                 <View style={styles.centeredView}>
                                     <View style={styles.modalView}>
-                                        <Text style={styles.modalText}>DIY Event {diyObject?.name}</Text>
+                                        <View style={{flexDirection: 'row'}}>
+                                            <IconButton icon="calendar" size={20} onPress={null} />
+                                            <Text style={styles.modalText}>{diyObject?.name}</Text>
+                                        </View>
+
                                         <View>
                                             <Text><Text style={{ fontWeight: 'bold' }}>Start date:</Text> {moment(diyObject?.start_datetime).format('LLL')}</Text>
-                                            <Text><Text style={{ fontWeight: 'bold' }}>End date:</Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
+                                            <Text><Text style={{ fontWeight: 'bold' }}>End date: </Text> {moment(diyObject?.end_datetime).format('LLL')}</Text>
                                             <Text><Text style={{ fontWeight: 'bold' }}>Location:</Text> {diyObject?.location}</Text>
-                                            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>
-                                            <Text>{diyObject?.remarks}</Text>
+                                            {diyObject?.remarks && <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Remarks:</Text>}
+                                            {diyObject?.remarks && <Text>{diyObject?.remarks}</Text>}
                                         </View>
-                                        <View style={{ marginLeft: 75, marginTop: 20 }}>
+                                        <View style={{ marginTop: 20 }}>
                                             <Pressable
                                                 style={[styles.modalButton, styles.buttonClose]}
                                                 onPress={() => {
@@ -596,8 +617,6 @@ const ItineraryScreen = ({ navigation }) => {
                         </View>
                     )
                     }
-
-                    {/* <Button text="Add To Itinerary" style={styles.recommendationButton} onPress={handleMainButtonPress} /> */}
 
                     <TouchableOpacity style={styles.floatingButton} onPress={handleMainButtonPress}>
                         <Text style={styles.buttonText}>+</Text>
@@ -650,37 +669,6 @@ const ItineraryScreen = ({ navigation }) => {
                     </Modal>
                 </>
             )}
-
-            {/* booking overlap modal */}
-            {showDiyModal && (
-                <View style={styles.centeredView}>
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={showModal}
-                        onRequestClose={() => {
-                            setShowModal(false);
-                        }}
-                    >
-
-                        <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                                <Text style={styles.modalText}>{showMajorOverlap}</Text>
-
-                                <View style={{ flexDirection: 'row' }}>
-                                    {/* close modal button */}
-                                    <Pressable
-                                        style={[styles.modalButton, styles.buttonClose]}
-                                        onPress={() => {
-                                            setShowModal(false);
-                                        }}>
-                                        <Text style={styles.textStyle}>Close</Text>
-                                    </Pressable>
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
-                </View>)}
         </View >
     );
 }
@@ -721,72 +709,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
         marginRight: -10,
     },
-    centeredView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 22,
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        height: 250,
-        width: 350,
-        marginTop: -100
-    },
-    modalButton: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-        marginLeft: 10,
-        marginRight: 10,
-        width: 100,
-        backgroundColor: '#044537',
-    },
-    buttonOpen: {
-        backgroundColor: '#044537',
-    },
-    buttonClose: {
-        backgroundColor: '#044537',
-    },
-    textStyle: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: 'center',
-    },
-    dropBorder: {
-        borderWidth: 0,
-        shadowColor: 'rgba(0,0,0, 0.0)',
-        shadowOffset: { height: 0, width: 0 },
-        shadowOpacity: 0,
-        shadowRadius: 0,
-        elevation: 0,
-        backgroundColor: theme.colors.surface,
-    },
-    closeButton: {
-        position: 'absolute',
-        top: 5,
-        right: 5,
-    },
-    editButton: {
-        position: 'absolute',
-        top: 5,
-        right: 50,
-    },
+
     modalContainer: {
         flex: 1,
         justifyContent: 'flex-end',
@@ -816,17 +739,19 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+
     centeredView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 22,
+        marginBottom: -700
     },
     modalView: {
         margin: 20,
         backgroundColor: 'white',
         borderRadius: 20,
-        padding: 35,
+        padding: 20,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
@@ -836,9 +761,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        height: 160,
-        width: 300,
-        marginTop: -100
+        marginTop: -700,
     },
     modalButton: {
         borderRadius: 20,
@@ -860,9 +783,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     modalText: {
+        marginLeft: -7,
+        marginTop: 15,
         marginBottom: 15,
         textAlign: 'center',
-        color: 'red',
+        color: '#044537',
         fontWeight: 'bold'
     },
     rowContainer: {
@@ -874,6 +799,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontWeight: 'bold',
         color: '#d47b15',
+        marginRight: 20
     },
     minorOverlapTextContainer: {
         backgroundColor: 'papayawhip',
@@ -882,6 +808,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginLeft: 10,
         marginRight: 10,
+        paddingRight: 7,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
@@ -910,6 +837,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: -10,
+    },
+    profileImageList: {
+        marginTop: 0,
+        marginBottom: -100,
+        borderRadius: 40 / 2,
+        minWidth: 40,
+        minHeight: 40,
     },
 });
 

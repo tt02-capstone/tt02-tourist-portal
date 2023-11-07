@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import TextInput from '../../components/TextInput';
 import { getUser } from '../../helpers/LocalStorage';
 import { Card } from '@rneui/themed';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { theme } from '../../core/theme'
-import { Icon } from '@rneui/themed';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getAcceptedUsers, getInvitedUsers, getItineraryByUser, getUserWithEmailSimilarity, toggleItineraryInvite } from '../../redux/itineraryRedux';
 
@@ -95,17 +93,21 @@ const InviteFriendScreen = ({ navigation }) => {
     }, [itinerary]);
 
     const onSearchPressed = async () => {
+        setLoading(true);
         if (searchString.length === 0 || searchString === '') { // show all users
             setSearchData(originalSearchData);
+            setLoading(false);
 
         } else {
             let response = await getUserWithEmailSimilarity(user.user_id, itinerary.itinerary_id, searchString);
             if (response.status) {
-                console.log(response.data);
+                // console.log(response.data);
                 setSearchData(response.data);
+                setLoading(false);
 
             } else {
                 setSearchData(originalSearchData); // show all users
+                setLoading(false);
                 console.log("user data list not fetched!");
             }
         }
@@ -130,7 +132,7 @@ const InviteFriendScreen = ({ navigation }) => {
             <ScrollView automaticallyAdjustKeyboardInsets={true} >
                 {/* Already part of itinerary */}
                 <View>
-                    <Text style={styles.mainTitle} >Accepted Friends</Text>
+                    {acceptedUsers.length > 0 && <Text style={styles.mainTitle} >Accepted Friends</Text>}
                     {acceptedUsers.map((item, index) => (
                     <Card key={index} >
                         <Card.Title style={styles.title}>
@@ -156,24 +158,27 @@ const InviteFriendScreen = ({ navigation }) => {
 
                 {/* Already invited */}
                 <View>
-                    <Text style={styles.mainTitle}>Invited Friends</Text>
+                    {invitedUsers.length > 0 && <Text style={styles.mainTitle}>Invited Friends</Text>}
                     {invitedUsers.map((item, index) => (
                     <Card key={index} >
                         <Card.Title style={styles.title}>
                             <View style={{flexDirection: 'row'}}>
-                                <Card.Image
-                                        style={styles.image}
-                                        source={{uri: item.profile_pic ? item.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
-                                    }}
-                                />
-                                <View style={{flexDirection: 'column'}}>
-                                    <Card.Title style={styles.header}>{item.email}</Card.Title>
-                                    <Text style={styles.description}>{item.name}</Text>
+                                <View style={{width: '70%'}}>
+                                    <Card.Image
+                                            style={styles.image}
+                                            source={{uri: item.profile_pic ? item.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
+                                        }}
+                                    />
+                                    <View style={{flexDirection: 'column', marginTop: -40, marginLeft: 40 }}>
+                                        <Card.Title style={styles.header}>{item.email}</Card.Title>
+                                        <Text style={styles.description}>{item.name}</Text>
+                                    </View>
                                 </View>
 
-                                <View style={{flexDirection: 'row'}}>
-                                    <Text style={styles.inviteButton} mode="contained" onPress={() => onToggleItineraryInvitePressed(item.user_id)}>Remove</Text>
-                                </View>
+                                <TouchableOpacity style={{flexDirection: 'row', marginLeft: 7 }} onPress={() => onToggleItineraryInvitePressed(item.user_id)}>
+                                    <Ionicons name="person-remove-outline" style={{ color: '#044537', marginTop: 15}} size={18}/>
+                                    <Text style={styles.removeButton} mode="contained">Remove</Text>
+                                </TouchableOpacity>
                             </View>
                         </Card.Title>
                     </Card>
@@ -199,23 +204,34 @@ const InviteFriendScreen = ({ navigation }) => {
                 </View>
 
                 {/* user list */}
+                {searchData.length === 0 && 
+                <View style={{alignItems: 'center', alignContent: 'center', justifyContent: 'center'}}>
+                    <Image
+                        style={styles.noFriendImage}
+                        source={{uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png'}}
+                    />
+                    <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>No Such User!</Text>
+                </View>}
                 {searchData.map((item, index) => (
                     <Card key={index} >
                         <Card.Title style={styles.title}>
                             <View style={{flexDirection: 'row'}}>
-                                <Card.Image
-                                        style={styles.image}
-                                        source={{uri: item.profile_pic ? item.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
-                                    }}
-                                />
-                                <View style={{flexDirection: 'column'}}>
-                                    <Card.Title style={styles.header}>{item.email}</Card.Title>
-                                    <Text style={styles.description}>{item.name}</Text>
+                                <View style={{width: '70%'}}>
+                                    <Card.Image
+                                            style={styles.image}
+                                            source={{uri: item.profile_pic ? item.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
+                                        }}
+                                    />
+                                    <View style={{flexDirection: 'column', marginTop: -40, marginLeft: 40 }}>
+                                        <Card.Title style={styles.header}>{item.email}</Card.Title>
+                                        <Text style={styles.description}>{item.name}</Text>
+                                    </View>
                                 </View>
 
-                                <View style={{flexDirection: 'row'}}>
-                                    <Text style={styles.inviteButton} mode="contained" onPress={() => onToggleItineraryInvitePressed(item.user_id)}>Invite</Text>
-                                </View>
+                                <TouchableOpacity style={{flexDirection: 'row', marginLeft: 17 }} onPress={() => onToggleItineraryInvitePressed(item.user_id)}>
+                                    <Ionicons name="person-add-outline" style={{ color: '#044537', marginTop: 15}} size={18} />
+                                    <Text style={styles.inviteButton} mode="contained" >Invite</Text>
+                                </TouchableOpacity>
                             </View>
                         </Card.Title>
                     </Card>
@@ -246,7 +262,8 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         marginLeft: 0,
-        marginTop: 0
+        marginTop: 5,
+        marginRight: 0
     },
     title: {
         color: '#044537',
@@ -268,7 +285,7 @@ const styles = StyleSheet.create({
         marginBottom: -7,
     },
     inviteButton: {
-        marginLeft: -40,
+        marginLeft: -97,
         marginTop: 15,
         height: 50,
         width: 150,
@@ -276,6 +293,23 @@ const styles = StyleSheet.create({
         color: '#044537',
         fontWeight: 'bold',
         textAlign: 'right',
+    },
+    removeButton: {
+        marginLeft: -80,
+        marginTop: 15,
+        height: 50,
+        width: 150,
+        fontSize: 16,
+        color: '#044537',
+        fontWeight: 'bold',
+        textAlign: 'right',
+    },
+    noFriendImage: {
+        marginTop: 20,
+        marginBottom: 20,
+        borderRadius: 100 / 2,
+        width: 100,
+        height: 100,
     },
 });
 

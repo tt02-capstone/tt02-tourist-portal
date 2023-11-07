@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Background from '../../components/CardBackground'
-import Button from '../../components/Button'
-import TextInput from '../../components/TextInput';
 import { getUser } from '../../helpers/LocalStorage';
 import { Card } from '@rneui/themed';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, Image, Text } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { theme } from '../../core/theme'
-import { Icon } from '@rneui/themed';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { getInvitationsByUser, addUserToItinerary, getItineraryMasterUserEmail } from '../../redux/itineraryRedux';
 import moment from 'moment';
 
@@ -53,6 +47,7 @@ const ViewInvitationsScreen = ({ navigation }) => {
             const emails = {};
             for (const invitation of invitations) {
                 const email = await getItineraryMasterUserEmail(invitation.master_id);
+                console.log("dd, ", email);
                 if (email) {
                     emails[invitation.itinerary_id] = email.data;
                 }
@@ -85,8 +80,6 @@ const ViewInvitationsScreen = ({ navigation }) => {
     return (
         <Background>
             <ScrollView automaticallyAdjustKeyboardInsets={true} >
-
-                <Text style={styles.mainTitle}>Invitations</Text>
                 {invitations.length > 0 && <Text style={styles.invitationDescription}>You may only be a part of one itinerary at a time.</Text>}
 
                 {invitations.map((item, index) => (
@@ -110,7 +103,16 @@ const ViewInvitationsScreen = ({ navigation }) => {
                         </View>
                     </Card>
                 ))}
-                {invitations.length == 0 && <Text style={styles.invitationDescription}>You have no invitations.</Text>}
+
+                {invitations.length == 0 && 
+                <View style={{alignItems: 'center', alignContent: 'center', justifyContent: 'center'}}>
+                    <Image
+                        style={styles.noInviteImage}
+                        source={{uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png'}}
+                    />
+                    <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>You have no invites!</Text>
+                </View>
+                }
             </ScrollView>
         </Background>
     );
@@ -160,6 +162,13 @@ const styles = StyleSheet.create({
         color: '#044537',
         fontWeight: 'bold',
         textAlign: 'right',
+    },
+    noInviteImage: {
+        marginTop: 200,
+        marginBottom: 20,
+        borderRadius: 130 / 2,
+        width: 130,
+        height: 130,
     },
 });
 

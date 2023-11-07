@@ -64,7 +64,7 @@ export const CartScreen = ({ route, navigation }) => {
     itemChecked.forEach((value, key) => {
       let curr = 0;
       value.forEach((isChecked, index) => {
-        console.log('hereee',key, isChecked, index)
+        console.log('heree',key, isChecked, index)
         if(isChecked) {
           console.log('price', vendorCartMap.get(key)[index].price)
           curr += parseFloat(vendorCartMap.get(key)[index].price);

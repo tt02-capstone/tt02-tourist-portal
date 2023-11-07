@@ -59,10 +59,17 @@ const NotificationScreen = ({ navigation }) => {
         <Background style={{alignItems: 'center' }}>
             <ScrollView style={{marginTop: 15}}>
                 <View>
-                    {!dataList || (dataList && dataList.length) === 0 && <Text style={{fontSize: 20, marginTop: 10}}>No Notification Currently</Text>}
+                    {!dataList || (dataList && dataList.length) === 0 &&
+                    <View style={{alignItems: 'center', alignContent: 'center', justifyContent: 'center'}}>
+                        <Image
+                            style={styles.noNotificationImage}
+                            source={{uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png'}}
+                        />
+                        <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>No Notification, All Good To Go!</Text>
+                    </View>}
                     {dataList.map((item, index) => (
                         <TouchableOpacity key={index} style={styles.card} onPress={() => onPressed(item.notification_id)}>
-                            <Card>
+                            <Card containerStyle={{backgroundColor: !item.is_read ? '#DEECFF' : 'white'}}>
                                 <Card.Title style={styles.header}>
                                     <View style={{flexDirection: 'row'}}>
                                         <Card.Image
@@ -75,11 +82,7 @@ const NotificationScreen = ({ navigation }) => {
                                             <Text style={styles.description}>{item.body} is about to start. Are you excited?</Text>
 
                                             <View style={{flexDirection: 'row'}}>
-                                                {item.is_read && <Ionicons name="checkmark" size={20} color='#044537' style={{marginTop: 8, marginLeft: 130, marginRight: -12}} />}
-                                                {item.is_read && <Ionicons name="checkmark" size={20} color='#044537' style={{marginTop: 8 }} />}
-                                                {item.is_read && <Text style={{marginLeft: 10, marginTop: 10, fontSize: 12}}>{moment(item.created_datetime).format('dddd, LT')}</Text>}
-
-                                                {!item.is_read && <Text style={{marginLeft: 165, marginTop: 10, fontSize: 12}}>{moment(item.created_datetime).format('dddd, LT')}</Text>}
+                                                <Text style={{marginLeft: 165, marginTop: 10, fontSize: 12}}>{moment(item.created_datetime).format('dddd, LT')}</Text>
                                             </View>
                                         </View>
                                     </View>
@@ -97,7 +100,7 @@ const NotificationScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     card: {
         width: '100%',
-        height: 100,
+        paddingBottom: -10,
     },
     header: {
         color: '#044537',
@@ -115,7 +118,16 @@ const styles = StyleSheet.create({
     description: {
         marginLeft: 15,
         marginBottom: -7,
-    }
+        flexWrap: 'wrap',
+        marginRight: 30,
+    },
+    noNotificationImage: {
+        marginTop: 200,
+        marginBottom: 20,
+        borderRadius: 130 / 2,
+        width: 130,
+        height: 130,
+    },
 });
 
 export default NotificationScreen

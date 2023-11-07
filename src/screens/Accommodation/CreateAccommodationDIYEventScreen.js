@@ -4,7 +4,7 @@ import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import TextInput from '../../components/TextInput';
 import { getUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Button as DateButton } from 'react-native-paper';
 import { Text, Card } from '@rneui/themed';
 import InputValidator from '../../helpers/InputValidator';
@@ -23,13 +23,15 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
 
     const isFocused = useIsFocused();
     const route = useRoute();
-    const { typeId, selectedAccommodation } = route.params;
+    const { typeId, selectedAccommodation, roomList } = route.params;
 
     const [user, setUser] = useState(null);
     const [accommodation, setAccommodation] = useState(null);
     const [itinerary, setItinerary] = useState(null);
     const [imgList, setImgList] = useState([]);
     const [imageActiveSlide, setImageActiveSlide] = useState(0);
+    const [activeSlide, setActiveSlide] = useState(0);
+    const [selectedRoomList, setSelectedRoomList] = useState([]);
 
     const [values, setValues] = useState({
         remarks: '',
@@ -75,24 +77,36 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
         return labelColorMap[label] || 'gray';
     };
 
+    const timezoneConvert = (time, hour, min, sec) => {
+        let temp = new Date(time);
+        temp.setHours(hour);
+        temp.setMinutes(min);
+        temp.setSeconds(sec);
+        temp.setHours(temp.getHours() + timeZoneOffset);
+        return temp;
+    }
+
     async function onSubmit() {
 
-        let tempStartDate = new Date(startDate);
-        tempStartDate.setHours(new Date(selectedAccommodation.check_in_time).getHours());
-        tempStartDate.setMinutes(0);
-        tempStartDate.setSeconds(0);
-        tempStartDate.setHours(tempStartDate.getHours() + timeZoneOffset);
+        if (!startDate || !endDate) {
+            Toast.show({
+                type: 'error',
+                text1: 'Please select a date range!'
+            })
+            return;
+        }
 
-        let tempEndDate = new Date(endDate);
-        tempEndDate.setHours(new Date(selectedAccommodation.check_out_time).getHours());
-        tempEndDate.setMinutes(0);
-        tempEndDate.setSeconds(0);
-        tempEndDate.setHours(tempEndDate.getHours() + timeZoneOffset);
+        let tempStartDate = timezoneConvert(new Date(startDate), new Date(selectedAccommodation.check_in_time).getHours(), 0, 0);
+        let tempEndDate = timezoneConvert(new Date(new Date(endDate)), new Date(selectedAccommodation.check_out_time).getHours(), 0, 0);
+        let tempItiStart = timezoneConvert(new Date(itinerary.start_date), 0, 0, 0);
+        let tempItiEnd = timezoneConvert(new Date(itinerary.end_date), 23, 59, 59);
 
         // console.log('tempStartDate', tempStartDate);
         // console.log('tempEndDate', tempEndDate);
+        // console.log('iti start', tempItiStart);
+        // console.log('iti end', tempItiEnd);
 
-        if (new Date(tempEndDate) < new Date(itinerary.start_date) || new Date(tempStartDate) > new Date(itinerary.end_date)) {
+        if (tempStartDate < tempItiStart || tempEndDate < tempItiStart || tempStartDate > tempItiEnd || tempEndDate > tempItiEnd) {
             Toast.show({
                 type: 'error',
                 text1: 'Please select dates within your itinerary!'
@@ -105,12 +119,12 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
             start_datetime: tempStartDate,
             end_datetime: tempEndDate,
             location: selectedAccommodation ? selectedAccommodation.address : '',
-            remarks: values.remarks ? values.remarks : '',
+            remarks: selectedRoomList.length > 0 ? 'Considering ' + concatSelRoomList() + ' room(s)' : '',
         }
 
-        console.log("itinerary.itinerary_id", itinerary.itinerary_id);
-        console.log("typeId", typeId);
-        console.log("diyEventObj", diyEventObj);
+        // console.log("itinerary.itinerary_id", itinerary.itinerary_id);
+        // console.log("typeId", typeId);
+        // console.log("diyEventObj", diyEventObj);
 
         let response = await createDiyEvent(itinerary.itinerary_id, typeId, "accommodation", diyEventObj);
         if (response.status) {
@@ -157,6 +171,45 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
         const timeOptions = { hour: '2-digit', minute: '2-digit' };
         return dateTime.toLocaleTimeString([], timeOptions);
     }
+
+    function toggleRoomFromSelectedList(roomType) {
+        let temp = '';
+        if (roomType === 'STANDARD') {
+            temp = 'standard';
+        } else if (roomType === 'DOUBLE') {
+            temp = 'double';
+        } else if (roomType === 'SUITE') {
+            temp = 'suite';
+        } else if (roomType === 'JUNIOR_SUITE') {
+            temp = 'junior suite';
+        } else {
+            temp = 'deluxe suite';
+        }
+
+        if (selectedRoomList.includes(temp)) {
+            setSelectedRoomList(selectedRoomList.filter((item) => { return item !== temp}))
+        } else {
+            setSelectedRoomList([...selectedRoomList, temp]);
+        }
+    }
+
+    function concatSelRoomList() {
+        let temp = '';
+        for (var i = 0; i < selectedRoomList.length; i++) {
+            if (i == 0) {
+                temp = temp + selectedRoomList[0];
+            } else {
+                temp = temp + ' and ' + selectedRoomList[i];
+            }
+        }
+        return temp;
+    }
+
+    useEffect(() => {
+        if (selectedRoomList.length > 0) {
+            concatSelRoomList();
+        }
+    }, [selectedRoomList.length])
 
     return user && itinerary && accommodation ? (
         <Background style={{ alignItems: 'center' }}>
@@ -219,10 +272,9 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
                     </Card>
                 </View>
 
-                {/* itinerary form */}
-                <View style={{ alignItems: 'center', marginTop: 120 }}>
+                {/* date form */}
+                <View style={{ alignItems: 'center', marginTop: 50 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -80 }}>
-
                         <Text style={{ marginTop: 50, fontWeight: 'bold' }}>Itinerary Dates:</Text>
                         <Text style={{ marginBottom: 20 }}>{formatDatePicker(itinerary.start_date)} - {formatDatePicker(itinerary.end_date)}</Text>
                         <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
@@ -237,25 +289,59 @@ const CreateAccommodationDIYEventScreen = ({ navigation }) => {
                             onConfirm={onConfirm}
                             onDismiss={onDismiss}
                         />
-
-                        <TextInput
-                            style={styles.inputFormRemarks}
-                            label="Remarks (Optional)"
-                            multiline={true}
-                            value={values.remarks}
-                            onChangeText={(value) => setValues({ ...values, remarks: value })}
-                            errorText={values.remarks ? InputValidator.text(values.remarks) : ''}
-                        />
-                    </View>
-
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 60 }}>
-                        <Button
-                            mode="contained"
-                            text={"Submit"}
-                            onPress={onSubmit}
-                        />
                     </View>
                 </View>
+
+                {/* remarks */}
+                <View style={{ marginTop: 40 }}>
+                    <Text style={{marginLeft: 20, fontWeight: 'bold'}}>Please select rooms you are considering:</Text>
+                    <Carousel
+                        data={roomList}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity key={item.room_id} onPress={() => toggleRoomFromSelectedList(item.room_type)}>
+                                <Card containerStyle={styles.roomCard}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Image
+                                            source={{ uri: item.room_image }}
+                                            style={styles.roomImage}
+                                        />
+
+                                        <View style={{ flex: 1, marginLeft: 10 }}>
+                                            <Card.Title style={styles.header}>{item.room_type.replace(/_/g, ' ')}</Card.Title>
+                                            <Text style={styles.details}>
+                                                <Text style={styles.boldText}>Amenities:</Text>{' '}
+                                                {item.amenities_description}
+                                            </Text>
+                                            <Text style={styles.details}>
+                                                <Text style={styles.boldText}>Pax Capacity:</Text>{' '}
+                                                {item.num_of_pax}
+                                            </Text>
+                                            <Text style={styles.details}>
+                                                <Text style={styles.boldText}>Price per Night:</Text>{' '}
+                                                ${item.price}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </Card>
+                            </TouchableOpacity>
+                        )}
+                        sliderWidth={400}
+                        itemWidth={360}
+                        layout={'default'}
+                        onSnapToItem={(index) => setActiveSlide(index)}
+                    />
+                    {selectedRoomList.length > 0 && <Text style={{marginLeft: 30, marginTop: 10 }}>You have selected {concatSelRoomList()} room(s)</Text>}
+                </View>
+                
+                {/* submit button */}
+                <View style={{ width: 340, height: 100, marginLeft: 60, marginTop: 10}}>
+                    <Button
+                        mode="contained"
+                        text={"Submit"}
+                        onPress={onSubmit}
+                    />
+                </View>
+
             </ScrollView>
         </Background>
     ) : (
@@ -327,6 +413,18 @@ const styles = StyleSheet.create({
     },
     boldText: {
         fontWeight: 'bold',
+    },
+    roomImage: {
+        width: 100, 
+        height: 100, 
+        marginRight: 10,
+    },
+    roomCard: {
+        margin: 10,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        borderRadius: 8,
+        padding: 10,
     },
 });
 

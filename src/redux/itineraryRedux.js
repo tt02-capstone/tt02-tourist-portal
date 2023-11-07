@@ -53,7 +53,6 @@ export async function getTelecomRecommendations(itineraryId) {
 
 export async function getAttractionRecommendationsByDate(itineraryId, dateTime) {
   try {
-    console.log("HERE!!!")
     const response = await itineraryApi.get(`/getAttractionRecommendationsByDate/${itineraryId}/${dateTime}`);
     return handleApiErrors(response);
   } catch (error) {
@@ -188,6 +187,16 @@ export async function getItineraryMasterUserEmail(userId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("itineraryRedux getItineraryMasterUserEmail Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+export async function getProfileImageByIdList(itineraryId) {
+  try {
+    const response = await itineraryApi.get(`/getProfileImageByIdList/${itineraryId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itineraryRedux getProfileImageByIdList Error : ", error);
     return {status: false, data: error.message};
   }
 }

@@ -49,7 +49,6 @@ export const CommonHeader = () => {
             </View>
         );
     } else if (isNotificationScreen) {
-        console.log('here')
         return (
             <TouchableOpacity
                 onPress={() => {

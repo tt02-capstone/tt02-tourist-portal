@@ -11,7 +11,7 @@ import InputValidator from '../../helpers/InputValidator';
 import { createDiyEvent } from '../../redux/diyEventRedux';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
-import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
+import { DatePickerModal } from 'react-native-paper-dates';
 import { timeZoneOffset } from "../../helpers/DateFormat";
 import { getItineraryByUser } from '../../redux/itineraryRedux';
 import { useIsFocused } from "@react-navigation/native";
@@ -25,9 +25,6 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
 
     const [user, setUser] = useState(null);
     const [itinerary, setItinerary] = useState(null);
-
-    const [startTime, setStartTime] = useState(null);
-    const [openStartTime, setOpenStartTime] = useState(false);
 
     const [values, setValues] = useState({
         remarks: '',
@@ -59,19 +56,6 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
 
     }, [isFocused]);
 
-    // start time form
-    const onStartTimeDismiss = useCallback(() => {
-        setOpenStartTime(false);
-    }, [setOpenStartTime]);
-
-    const onStartTimeConfirm = useCallback(
-        (formStartTime) => {
-            setStartTime(formStartTime);
-            setOpenStartTime(false);
-        },
-        [setOpenStartTime, setStartTime]
-    );
-
     function formatTimePicker(obj) {
         let date = new Date();
         date.setHours(obj.hours);
@@ -90,8 +74,8 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
         }
 
         let tempStartDate = new Date(date);
-        tempStartDate.setHours(startTime.hours);
-        tempStartDate.setMinutes(startTime.minutes);
+        tempStartDate.setHours(0);
+        tempStartDate.setMinutes(0);
         tempStartDate.setSeconds(0);
         tempStartDate.setHours(tempStartDate.getHours() + timeZoneOffset);
 
@@ -102,16 +86,16 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
         tempEndDate.setSeconds(0);
         tempEndDate.setHours(tempEndDate.getHours() + timeZoneOffset);
 
-        console.log('tempStartDate', tempStartDate, itinerary.start_date);
-        console.log('tempEndDate', tempEndDate, itinerary.end_date);
-
         let tempItineraryStart = new Date(itinerary.start_date);
         tempItineraryStart.setHours(tempItineraryStart.getHours() + timeZoneOffset);
 
         let tempItineraryEnd = new Date(itinerary.end_date);
         tempItineraryEnd.setHours(tempItineraryEnd.getHours() + timeZoneOffset);
 
-        if (new Date(tempEndDate) < new Date(tempItineraryStart) || new Date(tempStartDate) > new Date(tempItineraryEnd)) {
+        // console.log('tempStartDate', tempStartDate, tempItineraryStart);
+        // console.log('tempEndDate', tempEndDate, tempItineraryEnd);
+
+        if (tempEndDate < tempItineraryStart || tempStartDate > tempItineraryEnd) {
             Toast.show({
                 type: 'error',
                 text1: 'Please select dates within your itinerary!'
@@ -127,9 +111,9 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
             remarks: values.remarks ? values.remarks : '',
         }
 
-        console.log("itinerary.itinerary_id", itinerary.itinerary_id);
-        console.log("typeId", typeId);
-        console.log("diyEventObj", diyEventObj);
+        // console.log("itinerary.itinerary_id", itinerary.itinerary_id);
+        // console.log("typeId", typeId);
+        // console.log("diyEventObj", diyEventObj);
 
         let response = await createDiyEvent(itinerary.itinerary_id, typeId, "telecom", diyEventObj);
         if (response.status) {
@@ -248,10 +232,10 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                 <View style={{ alignItems: 'center', marginTop: 130 }}>
                     <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center', width: 340, height: 100, marginTop: -100 }}>
 
-                        <Text style={{ marginTop: 50, fontWeight: 'bold' }}>Itinerary Dates:</Text>
+                        <Text style={{ marginTop: 0, fontWeight: 'bold' }}>Itinerary Dates:</Text>
                         <Text style={{ marginBottom: 20 }}>{formatDatePicker(itinerary.start_date)} - {formatDatePicker(itinerary.end_date)}</Text>
                         <DateButton onPress={() => setOpenDate(true)} uppercase={false} mode="outlined" style={{ marginTop: 0, marginBottom: 0, marginLeft: -5 }}>
-                            {date ? `${formatDatePicker(date)}` : 'Pick Start Date'}
+                            {date ? `${formatDatePicker(date)}` : 'Pick Date'}
                         </DateButton>
                         <DatePickerModal
                             locale="en"
@@ -261,22 +245,6 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                             onConfirm={onConfirm}
                             onDismiss={onDismiss}
                         />
-
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.label}>Start Time</Text>
-                                <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115 }}>
-                                    {startTime ? `${formatTimePicker(startTime)}` : 'From'}
-                                </DateButton>
-                                <TimePickerModal
-                                    visible={openStartTime}
-                                    onDismiss={onStartTimeDismiss}
-                                    onConfirm={onStartTimeConfirm}
-                                    hours={8}
-                                    minutes={0}
-                                />
-                            </View>
-                        </View>
 
                         <TextInput
                             style={styles.inputFormRemarks}
@@ -288,7 +256,7 @@ const CreateTelecomDIYEventScreen = ({ navigation }) => {
                         />
                     </View>
 
-                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 80 }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 40 }}>
                         <Button
                             mode="contained"
                             text={"Submit"}

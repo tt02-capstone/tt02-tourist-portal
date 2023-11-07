@@ -4,7 +4,7 @@ import Button from '../../components/Button'
 import { Button as DateButton } from 'react-native-paper';
 import TextInput from '../../components/TextInput';
 import { getUser } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import InputValidator from '../../helpers/InputValidator';
 import moment from 'moment';
 import { useRoute } from '@react-navigation/native';
@@ -72,20 +72,16 @@ const CreateDIYEventScreen = ({ navigation }) => {
         } else {
             setLoading(true);
 
-            let tempStartDate = new Date(formStartDate);
-            tempStartDate.setHours(formStartTime.hours);
-            tempStartDate.setMinutes(formStartTime.minutes);
-            tempStartDate.setHours(tempStartDate.getHours() + timeZoneOffset);
+            let tempStartDate = timezoneConvert(formStartDate, formStartTime.hours, formStartTime.minutes, 0);
+            // console.log("start: ", tempStartDate);
 
-            let tempEndDate = new Date(formEndDate);
-            tempEndDate.setHours(formEndTime.hours);
-            tempEndDate.setMinutes(formEndTime.minutes);
-            tempEndDate.setHours(tempEndDate.getHours() + timeZoneOffset);
+            let tempEndDate = timezoneConvert(formEndDate, formEndTime.hours, formEndTime.minutes, 0);
+            // console.log("end: ", tempEndDate);
 
             if (tempStartDate > tempEndDate) {
                 Toast.show({
                     type: 'error',
-                    text1: "Please ensure your events ends later than it starts!"
+                    text1: "Ensure that start time is before end time!"
                 })
             } else {
                 let obj = {
@@ -95,6 +91,8 @@ const CreateDIYEventScreen = ({ navigation }) => {
                     location: formData.location,
                     remarks: formData.remarks ? formData.remarks : '',
                 }
+
+                // console.log(obj.start_datetime, obj.end_datetime);
     
                 let response = await createDiyEvent(itinerary.itinerary_id, 0, "none", obj);
                 if (response.status) {
@@ -114,7 +112,10 @@ const CreateDIYEventScreen = ({ navigation }) => {
                     setFormStartTime(undefined);
                     setFormEndTime(undefined);
     
-                    navigation.navigate('ItineraryScreen');
+                    navigation.reset({
+                        index: 2,
+                        routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'ItineraryScreen' }],
+                    });
     
                 } else {
                     console.log('error')
@@ -132,12 +133,30 @@ const CreateDIYEventScreen = ({ navigation }) => {
         setOpen(false);
     }, [setOpen]);
 
+    const timezoneConvert = (time, hour, min, sec) => {
+        let temp = new Date(time);
+        temp.setHours(hour);
+        temp.setMinutes(min);
+        temp.setSeconds(sec);
+        temp.setHours(temp.getHours() + timeZoneOffset);
+        return temp;
+    }
+
     const onConfirm = useCallback(
         ({ startDate, endDate }) => {
-            const currentDate = new Date();
-
             if (startDate && endDate) {
-                if (startDate < currentDate) {
+                let currentDate = timezoneConvert(new Date(), 0, 0, 0);
+                // console.log("current: ", currentDate);
+                let tempStartDate = timezoneConvert(startDate, 0, 5, 0);
+                // console.log("startTempDate: ", tempStartDate);
+                let tempEndDate = timezoneConvert(endDate, 0, 5, 0);
+                // console.log("startEndDate: ", tempEndDate);
+                let tempItineraryStartDate = timezoneConvert(itinerary.start_date, 0, 0, 0);
+                // console.log("iti start: ", tempItineraryStartDate);
+                let tempItineraryEndDate = timezoneConvert(itinerary.end_date, 23, 59, 0);
+                // console.log("iti end: ", tempItineraryEndDate);
+
+                if (tempStartDate <= currentDate) {
                     setFormStartDate(null);
                     setFormEndDate(null);
                     onDismiss();
@@ -146,7 +165,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
                         text1: 'Event cannot be created for past dates.'
                     });
 
-                } else if (new Date(endDate) < new Date(itinerary.start_date) || new Date(startDate) > new Date(itinerary.end_date)) {
+                } else if (tempStartDate < tempItineraryStartDate || tempEndDate < tempItineraryStartDate || tempStartDate > tempItineraryEndDate || tempEndDate > tempItineraryEndDate) {
                     setFormStartDate(null);
                     setFormEndDate(null);
                     onDismiss();
@@ -228,7 +247,7 @@ const CreateDIYEventScreen = ({ navigation }) => {
                         />
 
                         <DateButton onPress={() => setOpen(true)} uppercase={false} mode="outlined" style={{marginTop: 10, marginBottom: -5, marginLeft: -5}}>
-                            {formStartDate && formEndDate ? `${formatDatePicker(formStartDate)} - ${formatDatePicker(formEndDate)}` : 'Pick range'}
+                            {formStartDate && formEndDate ? `${formatDatePicker(formStartDate)} - ${formatDatePicker(formEndDate)}` : '   Pick Date Range        '}
                         </DateButton>
                         <DatePickerModal
                             locale='en-GB'

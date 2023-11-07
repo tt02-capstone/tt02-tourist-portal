@@ -271,8 +271,8 @@ const AccommodationDetailsScreen = ({ navigation }) => {
                 checkOutDate.setDate(checkOutDate.getDate());
                 const checkOutDateInLocalDateTime = `${checkOutDate.toISOString().split('T')[0]}T${checkOutTime}Z`;
 
-                console.log("HERE checkInDateInLocalDateTime", checkInDateInLocalDateTime);
-                console.log("HERE checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
+                console.log("checkInDateInLocalDateTime", checkInDateInLocalDateTime);
+                console.log("checkOutDateInLocalDateTime", checkOutDateInLocalDateTime);
 
                 try {
                     const response = await getMinAvailableRoomsOnDateRange(accommodation.accommodation_id, room.room_type, checkInDateInLocalDateTime, checkOutDateInLocalDateTime);
@@ -470,7 +470,7 @@ const AccommodationDetailsScreen = ({ navigation }) => {
 
     const onItineraryPressed = () => {
         if (itinerary) {
-            navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation });
+            navigation.navigate('CreateAccommodationDIYEventScreen', { typeId: accommodation.accommodation_id, selectedAccommodation: accommodation, roomList: roomList });
         } else {
             setShowModal(true); // show cannot navigate modal
         }

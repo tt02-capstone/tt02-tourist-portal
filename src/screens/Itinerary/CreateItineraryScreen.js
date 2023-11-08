@@ -116,7 +116,7 @@ const CreateItineraryScreen = ({ navigation }) => {
 
             if (startDate && endDate) {
                 if (startDate + 1 < currentDate) {
-                    setValues({ start_date: null, end_date: null });
+                    setValues((prevValues) => ({ ...prevValues, start_date: null, end_date: null }));
                     onDismiss();
                     Toast.show({
                         type: 'error',
@@ -124,12 +124,11 @@ const CreateItineraryScreen = ({ navigation }) => {
                     });
                 } else {
                     setOpen(false);
-                    // might cause issues
-                    setValues({ start_date: startDate, end_date: endDate });
+                    setValues((prevValues) => ({ ...prevValues, start_date: startDate, end_date: endDate }));
                 }
             } else {
                 setOpen(false);
-                setValues({ start_date: startDate, end_date: endDate });
+                setValues((prevValues) => ({ ...prevValues, start_date: null, end_date: null }));
                 onDismiss();
                 Toast.show({
                     type: 'error',

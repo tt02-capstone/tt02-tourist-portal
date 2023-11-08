@@ -83,8 +83,8 @@ const ViewInvitationsScreen = ({ navigation }) => {
                 {invitations.length > 0 && <Text style={styles.invitationDescription}>You may only be a part of one itinerary at a time.</Text>}
 
                 {invitations.map((item, index) => (
-                    <Card key={index} wrapperStyle={{ height: 55 }} containerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <View style={{ flexDirection: 'row' }}>
+                    <Card key={index} wrapperStyle={{ height: 75 }} containerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Card.Image
                                 style={styles.image}
                                 source={{

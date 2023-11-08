@@ -22,7 +22,7 @@ const ItineraryScreen = ({ navigation }) => {
     const [currentDiyEvents, setCurrentDiyEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
     const [fetchItinerary, setFetchItinerary] = useState(true);
-    
+
     // people involved in itinerary
     const [involvedUserImageList, setInvolvedUserImageList] = useState([]);
 
@@ -310,11 +310,11 @@ const ItineraryScreen = ({ navigation }) => {
     const renderEventContent = (event, dayNum) => {
         const containerStyle = event.booking
             ? { borderWidth: 1.2, borderColor: 'darkgreen' }
-            : { borderWidth: 0.8, borderColor: 'lightgreen' };
+            : { };
 
         if (event.accommodation || event.booking?.room) {
 
-            const cardHeight = event.remarks ? { height: 90 } : { height: 60};
+            const cardHeight = event.remarks ? { height: 90 } : { height: 60 };
 
             return (
                 <Card style={{ flex: 1 }} wrapperStyle={cardHeight} containerStyle={containerStyle}>
@@ -328,7 +328,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 {checkIfSameDay(dayNum, event.start_datetime) ? (<Text>Check In Time: {moment(event.start_datetime).format('LT')}</Text>) : (<Text>Check in on {moment(event.start_datetime).format('Do MMM')}</Text>)}
                                 {checkIfSameDay(dayNum, event.end_datetime) ? (<Text>Check Out Time: {moment(event.end_datetime).format('LT')}</Text>) : (<Text>Check out on {moment(event.end_datetime).format('Do MMM')}</Text>)}
                                 <Text>{event.location}</Text>
-                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 150, marginTop: 10  }}>{event.remarks}</Text>}
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 200, marginTop: 10 }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
@@ -360,9 +360,11 @@ const ItineraryScreen = ({ navigation }) => {
                 </Card>
             );
         } else if (event.telecom || event.booking?.telecom) {
-            
+
+            const cardHeight = event.remarks ? { height: 80 } : { height: 60 };
+
             return (
-                <Card style={{ flex: 1 }} wrapperStyle={{ height: 60 }} containerStyle={containerStyle}>
+                <Card style={{ flex: 1 }} wrapperStyle={cardHeight} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
                             <View style={{ justifyContent: 'center' }}>
@@ -372,7 +374,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 <Text style={{ fontWeight: 'bold' }}>{event.name} Telecom Package</Text>
                                 {checkIfSameDay(dayNum, event.start_datetime) ? (<Text>Activation Time: {moment(event.start_datetime).format('LT')}</Text>) : (<Text>Activated on: {moment(event.start_datetime).format('Do MMM')}</Text>)}
                                 {checkIfSameDay(dayNum, event.end_datetime) ? (<Text>Deactivation Time: {moment(event.end_datetime).format('LT')}</Text>) : (<Text>Deactivation Time: {moment(event.end_datetime).format('Do MMM')}</Text>)}
-                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 150, marginTop: 10  }}>{event.remarks}</Text>}
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 200, marginTop: 10 }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
@@ -404,6 +406,7 @@ const ItineraryScreen = ({ navigation }) => {
                 </Card>
             );
         } else {
+
             return (
                 <Card style={{ flex: 1 }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
@@ -414,16 +417,16 @@ const ItineraryScreen = ({ navigation }) => {
                                 {(event.tourtype || event.booking?.tour) && <IconButton icon="human-greeting-variant" size={20} onPress={null} />}
                                 {(event.attraction == null && event.accommodation == null && event.telecom == null && event.restaurant == null && event.booking == null) && <IconButton icon="calendar" size={20} onPress={null} />}
                             </View>
-                            <View style={{ justifyContent: 'center'}}>
+                            <View style={{ justifyContent: 'center' }}>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
                                 <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
                                 <Text>{event.location}</Text>
-                                {event.remarks && !event.booking && !event.telecom && !event.attraction && !event.accommodation && !event.restaurant && 
-                                <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10 }}>{event.remarks}</Text>}
+                                {event.remarks && !event.booking && !event.telecom && !event.attraction && !event.accommodation && !event.restaurant &&
+                                    <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10 }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
-                        <View style={styles.chevronContainer}>
+                        <View>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <IconButton
                                     icon="pencil"
@@ -490,12 +493,12 @@ const ItineraryScreen = ({ navigation }) => {
                         </>
                     ))
                 ) : (
-                    <View style={{alignItems: 'center', alignContent: 'center', justifyContent: 'center'}}>
+                    <View style={{ alignItems: 'center', alignContent: 'center', justifyContent: 'center' }}>
                         <Image
                             style={styles.noEventsImage}
-                            source={{uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png'}}
+                            source={{ uri: 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/WithinSG_logo.png' }}
                         />
-                        <Text style={{fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537'}}>No events scheduled today!</Text>
+                        <Text style={{ fontSize: 20, marginTop: 10, fontWeight: 'bold', color: '#044537' }}>No events scheduled today!</Text>
                     </View>
                 )}
             </ScrollView>
@@ -522,7 +525,7 @@ const ItineraryScreen = ({ navigation }) => {
                                     onPress={null}
                                 />
                                 <Text style={styles.minorOverlapText}>{showMinorOverlap}</Text>
-                                <Ionicons name="close-outline" size={30} color='red' style={{marginRight: 10}} onPress={() => setShowMinorOverlap(false)}/>
+                                <Ionicons name="close-outline" size={30} color='#d47b15' style={{ marginRight: 10 }} onPress={() => setShowMinorOverlap(false)} />
                             </View>
                         )}
                         {showMajorOverlap && showMajorOverlap.length > 1 && (
@@ -539,27 +542,28 @@ const ItineraryScreen = ({ navigation }) => {
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingRight: 10, marginTop: 10, marginBottom: 10, marginLeft: 10 }}>
-                        <View style={{flexDirection: 'row'}}>
-                            <View style={{ marginLeft: 5, marginRight: 10 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ marginLeft: 5, marginRight: 10, flexDirection: 'row' }}>
                                 {involvedUserImageList.length > 0 && involvedUserImageList.map((url, index) => (
                                     <Image
-                                        style={{ marginTop: 0, marginBottom: -100, borderRadius: 40 / 2, minWidth: 35, minHeight: 40, marginLeft: index * 5}}
-                                        source={{uri: url ? url : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}}
+                                        style={{ borderRadius: 45 / 2, minWidth: 45, minHeight: 45, marginLeft: index * -20, borderColor: '#f2f2f2', borderWidth: 2.5, backgroundColor: 'white' }}
+                                        source={{ uri: url ? url : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg' }}
                                     />
-                                )) }
+                                ))}
                             </View>
 
-                            <View style={{ marginTop: 5 }}>
+                            <View style={{  }}>
                                 <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
                                 <Text><Text style={{ fontWeight: 'bold' }}>Recommended Pax:</Text> {itinerary.number_of_pax}</Text>
                                 {itinerary?.remarks && <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>}
                             </View>
-                        </View>
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 }}>
-                            <IconButton icon="pencil" size={25} style={styles.icon} onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })} />
-                            {itinerary.master_id == user.user_id && <IconButton icon="delete" size={25} style={styles.icon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)}/>}
-                            {itinerary.master_id != user.user_id && <IconButton icon="close" size={25} style={styles.icon} onPress={() => handleOptOutOfItineraryPress(itinerary.itinerary_id)}/>}
+
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <IconButton icon="pencil" size={22} style={styles.itineraryEditIcon} onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })} />
+                                {itinerary.master_id == user.user_id && <IconButton icon="delete" size={25} style={styles.itineraryIcon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)} />}
+                                {itinerary.master_id != user.user_id && <IconButton icon="close" size={25} style={styles.itineraryIcon} onPress={() => handleOptOutOfItineraryPress(itinerary.itinerary_id)} />}
+                            </View>
                         </View>
                     </View >
 
@@ -595,7 +599,7 @@ const ItineraryScreen = ({ navigation }) => {
                             >
                                 <View style={styles.centeredView}>
                                     <View style={styles.modalView}>
-                                        <View style={{flexDirection: 'row'}}>
+                                        <View style={{ flexDirection: 'row' }}>
                                             <IconButton icon="calendar" size={20} onPress={null} />
                                             <Text style={styles.modalText}>{diyObject?.name}</Text>
                                         </View>
@@ -709,6 +713,12 @@ const styles = StyleSheet.create({
         marginLeft: -5,
         marginTop: -5,
         marginRight: 3,
+    },
+    itineraryEditIcon: {
+        paddingLeft: 10
+    },
+    itineraryIcon: {
+        marginLeft: -10,
     },
     arrowIcon: {
         marginLeft: -15,
@@ -855,8 +865,8 @@ const styles = StyleSheet.create({
         marginTop: 160,
         marginBottom: 20,
         borderRadius: 130 / 2,
-        width: 130,
-        height: 130,
+        width: 100,
+        height: 100,
     },
 });
 

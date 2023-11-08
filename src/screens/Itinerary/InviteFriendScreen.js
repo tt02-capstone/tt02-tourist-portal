@@ -134,7 +134,7 @@ const InviteFriendScreen = ({ navigation }) => {
                 <View>
                     {acceptedUsers.length > 0 && <Text style={styles.mainTitle} >Accepted Friends</Text>}
                     {acceptedUsers.map((item, index) => (
-                    <Card key={index} >
+                    <Card key={index}>
                         <Card.Title style={styles.title}>
                             <View style={{flexDirection: 'row'}}>
                                 <Card.Image

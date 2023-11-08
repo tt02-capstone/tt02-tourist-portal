@@ -441,13 +441,11 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
-                            </View>
 
-                            <View style={{ alignItems: 'flex-end' }}>
                                 <IconButton
                                     icon="chevron-right"
                                     size={35}
-                                    style={[styles.icon, styles.chevronButton]}
+                                    style={styles.arrowIcon}
                                     onPress={() => navigateFunction(event)}
                                 />
                             </View>

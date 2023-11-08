@@ -61,3 +61,23 @@ export async function getPrimaryBadge(userId) {
       return { status: false, data: error.message };
   }
 }
+
+export async function getAllBadgeTypes() {
+  try {
+      const response = await badgeApi.get(`/getAllBadgeTypes`);
+      return handleApiErrors(response);
+  } catch (error) {
+      console.error("postRedux getAllBadgeTypes Error : ", error);
+      return { status: false, data: error.message };
+  }
+}
+
+export async function getBadgeProgress(userId) {
+  try {
+      const response = await badgeApi.get(`/getBadgeProgress/${userId}`);
+      return handleApiErrors(response);
+  } catch (error) {
+      console.error("postRedux getBadgeProgress Error : ", error);
+      return { status: false, data: error.message };
+  }
+}

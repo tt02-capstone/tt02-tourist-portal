@@ -37,51 +37,50 @@ export const BadgesScreen = ({ route, navigation }) => {
             let badgeResponse = await retrieveBadgesByUserId(userData.user_id);
             if (badgeResponse.status) {
                 setBadges(badgeResponse.data);
-                // console.log('gab2', badgeResponse);
+
+                let badgeTypesResponse = await getAllBadgeTypes(userData.user_id);
+                if (badgeTypesResponse.status) {
+                    const filteredBadgeTypes = badgeTypesResponse.data.filter(
+                        (type) => !badges || badges.length === 0 || !badges.some((badge) => badge.badge_type === type)
+                    );
+                    setBadgeTypes(filteredBadgeTypes);
+
+                    let badgeProgressResponse = await getBadgeProgress(userData.user_id);
+                    if (badgeProgressResponse.status) {
+                        setBadgeProgress(badgeProgressResponse.data);
+                        setProgressValues(prevValues => ({
+                            ...prevValues,
+                            FOODIE: badgeProgressResponse.data.foodie,
+                            ATTRACTION_EXPERT: badgeProgressResponse.data.attraction_EXPERT,
+                            ACCOMMODATION_EXPERT: badgeProgressResponse.data.accommodation_EXPERT,
+                            TELECOM_EXPERT: badgeProgressResponse.data.telecom_EXPERT,
+                            TOUR_EXPERT: badgeProgressResponse.data.tour_EXPERT,
+                            TOP_CONTRIBUTOR: badgeProgressResponse.data.top_CONTRIBUTOR
+                        }));
+
+                        const sortedBadgeTypes = badgeTypes.sort((a, b) => {
+                            const progressDiff = progressValues[b.toUpperCase()] - progressValues[a.toUpperCase()];
+                            if (progressDiff === 0) {
+                                if (a.toUpperCase() < b.toUpperCase()) {
+                                    return -1;
+                                }
+                                if (a.toUpperCase() > b.toUpperCase()) {
+                                    return 1;
+                                }
+                                return 0;
+                            } else {
+                                return progressDiff;
+                            }
+                        });
+                        setBadgeTypes(sortedBadgeTypes);
+                    } else {
+                        console.log("Error fetching badge progress!");
+                    }
+                } else {
+                    console.log("Error fetching badge types!");
+                }
             } else {
                 console.log("Badges not shown!");
-            }
-
-            let badgeTypesResponse = await getAllBadgeTypes();
-            if (badgeTypesResponse.status) {
-                const filteredBadgeTypes = badgeTypesResponse.data.filter(
-                    (type) => !badges || badges.length === 0 || !badges.some((badge) => badge.badge_type === type)
-                );
-                setBadgeTypes(filteredBadgeTypes);
-            } else {
-                console.log("Error fetching badge types!");
-            }
-
-            let badgeProgressResponse = await getBadgeProgress(userData.user_id);
-            if (badgeProgressResponse.status) {
-                setBadgeProgress(badgeProgressResponse.data);
-                setProgressValues(prevValues => ({
-                    ...prevValues,
-                    FOODIE: badgeProgressResponse.data.foodie,
-                    ATTRACTION_EXPERT: badgeProgressResponse.data.attraction_EXPERT,
-                    ACCOMMODATION_EXPERT: badgeProgressResponse.data.accommodation_EXPERT,
-                    TELECOM_EXPERT: badgeProgressResponse.data.telecom_EXPERT,
-                    TOUR_EXPERT: badgeProgressResponse.data.tour_EXPERT,
-                    TOP_CONTRIBUTOR: badgeProgressResponse.data.top_CONTRIBUTOR
-                }));
-
-                const sortedBadgeTypes = badgeTypes.sort((a, b) => {
-                    const progressDiff = progressValues[b.toUpperCase()] - progressValues[a.toUpperCase()];
-                    if (progressDiff === 0) {
-                        if (a.toUpperCase() < b.toUpperCase()) {
-                            return -1;
-                        }
-                        if (a.toUpperCase() > b.toUpperCase()) {
-                            return 1;
-                        }
-                        return 0;
-                    } else {
-                        return progressDiff;
-                    }
-                });
-                setBadgeTypes(sortedBadgeTypes);
-            } else {
-                console.log("Error fetching badge progress!");
             }
         }
 
@@ -192,7 +191,7 @@ export const BadgesScreen = ({ route, navigation }) => {
                                             progress={progressValues[formattedBadgeType]}
                                             width={280}
                                             height={8}
-                                            color={'#44C662'} 
+                                            color={'#44C662'}
                                         />
                                         <Text style={styles.progressBarText}>
                                             {`${(progressValues[formattedBadgeType] * 100).toFixed(0)}% Progress`}

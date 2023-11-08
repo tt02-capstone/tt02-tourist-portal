@@ -62,9 +62,9 @@ export async function getPrimaryBadge(userId) {
   }
 }
 
-export async function getAllBadgeTypes() {
+export async function getAllBadgeTypes(userId) {
   try {
-      const response = await badgeApi.get(`/getAllBadgeTypes`);
+      const response = await badgeApi.get(`/getAllBadgeTypes/${userId}`);
       return handleApiErrors(response);
   } catch (error) {
       console.error("postRedux getAllBadgeTypes Error : ", error);

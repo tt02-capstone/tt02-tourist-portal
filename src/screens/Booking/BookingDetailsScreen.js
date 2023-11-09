@@ -41,7 +41,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const fetchBooking = async () => {
         try {
             let booking = await getBookingByBookingId(bookingId);
-            console.log(booking);
+            // console.log(booking);
             setBooking(booking);
 
             if (booking.tour) {
@@ -66,7 +66,6 @@ const BookingDetailsScreen = ({ navigation }) => {
     }, []);
 
     const getNameForBooking = (item) => {
-        console.log("item", item);
         if (item.attraction != null) {
             return item.attraction.name;
         } else if (item.room != null) {
@@ -75,7 +74,9 @@ const BookingDetailsScreen = ({ navigation }) => {
             return item.booking_item_list[0].activity_selection;
         } else if (item.telecom != null) {
             return item.telecom.name;
-        } else {
+        } else if (item.item.name != null) {
+            return item.item.name;
+        }  else {
             return item.deal.name;
         }
     }
@@ -87,6 +88,8 @@ const BookingDetailsScreen = ({ navigation }) => {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
             return tourImage;
+        } else if (item.item != null) {
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/web/forum/Item.png';
         } else if (item.telecom.name != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
         } else {
@@ -123,13 +126,25 @@ const BookingDetailsScreen = ({ navigation }) => {
         return formattedDateTime;
     }
 
-    const getCancellationDate = (date) => {
-        let inputDate = new Date(date);
-        inputDate.setDate(inputDate.getDate() - 3);
-        let day = inputDate.getDate().toString().padStart(2, '0');
-        let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
-        let year = inputDate.getFullYear();
-        return `${day}/${month}/${year}`;
+    const getCancellationDate = (booking) => {
+        let date = booking.start_datetime
+        if (booking.type != "ITEM") {
+            let inputDate = new Date(date);
+            inputDate.setDate(inputDate.getDate() - 3);
+            let day = inputDate.getDate().toString().padStart(2, '0');
+            let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
+            let year = inputDate.getFullYear();
+            return `${day}/${month}/${year}`;
+        } else { 
+            // if it is a shopping item can oni cancelled it within a day frm the date of purchase??
+            let inputDate = new Date(date);
+            inputDate.setDate(inputDate.getDate() + 1);
+            let day = inputDate.getDate().toString().padStart(2, '0');
+            let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
+            let year = inputDate.getFullYear();
+            console.log(booking.item.item_id)
+            return `${day}/${month}/${year}`;
+        }
     }
 
     const getColorForStatus = (label) => {
@@ -137,7 +152,15 @@ const BookingDetailsScreen = ({ navigation }) => {
             'UPCOMING': 'lightgreen',
             'ONGOING': 'lightgreen',
             'COMPLETED': 'lightblue',
-            'CANCELLED': 'lightpink'
+            'CANCELLED': 'lightpink',
+            'PENDING_VENDOR_DELIVERY' : 'lightyellow',
+            'PENDING_VENDOR_PICKUP' : 'lightyellow', 
+            "PREPARE_FOR_SHIPMENT" : 'lightpurple',
+            "PREPARE_FOR_PICKUP" : 'lightpurple',
+            "SHIPPED_OUT" : "lightorange", 
+            "READY_FOR_PICKUP" : "lightorange", 
+            'DELIVERED': 'lightgreen',
+            'PICKED_UP': 'lightgreen',
         };
 
         return labelColorMap[label] || 'gray';
@@ -198,7 +221,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                     <Card.Title style={styles.header}>
                         Cancellation Policy
                     </Card.Title>
-                    <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking.start_datetime)}.</Text>
+                    <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
                     {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
                 </Card>
                 {booking.status != 'CANCELLED' && booking.qr_code_list.length > 1 && <Card>
@@ -280,8 +303,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
-        fontSize: 10,
+        width: 210,
+        fontSize: 12,
         fontWeight: 'bold'
     },
     dropBorder: {

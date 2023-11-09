@@ -73,6 +73,7 @@ import EventSuggestionsScreen from './src/screens/Itinerary/EventSuggestionsScre
 import InviteFriendScreen from './src/screens/Itinerary/InviteFriendScreen';
 import ViewInvitationsScreen from './src/screens/Itinerary/ViewInvitationsScreen';
 import ItemScreen from './src/screens/Items/ItemScreen';
+import ItemDetailsScreen from './src/screens/Items/ItemDetailsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -190,6 +191,7 @@ export const Layout = () => {
                         <Stack.Screen name="InviteFriendScreen" component={InviteFriendScreen} options={{ title : 'Invitation' }} />
                         <Stack.Screen name="ViewInvitationsScreen" component={ViewInvitationsScreen} options={{ title : 'Invitations' }} />
                         <Stack.Screen name="ItemListScreen" component={ItemScreen} options={{ title : 'Shop' }} />
+                        <Stack.Screen name="ItemDetailsScreen" component={ItemDetailsScreen} options={{ title : 'Shop' }} />
                     </>
                 ) : (
                     <>

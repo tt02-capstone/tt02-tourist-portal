@@ -1,4 +1,4 @@
-import { itemApi } from "../helpers/api";
+import { itemApi, cartApi } from "../helpers/api";
 import { handleApiErrors } from "../helpers/errorCatching";
 
 export async function retrieveAllItemsByVendor(vendorId) {
@@ -50,6 +50,38 @@ export async function getItemVendor(itemId) {
       return { status: false, data: error.message };
     }
 }
+
+export async function toggleSaveItem(userId,itemId) {
+    try {
+      const response = await itemApi.put(`/toggleSaveItem/${userId}/${itemId}`);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("itemRedux toggleSaveItem Error: ", error);
+      return { status: false, data: error.message };
+    }
+}
+
+export async function getUserSavedItems(userId) {
+    try {
+      const response = await itemApi.get(`/getUserSavedItems/${userId}`);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("itemRedux getUserSavedItems Error: ", error);
+      return { status: false, data: error.message };
+    }
+}
+
+export async function addItemToCart(userId,itemId,cartBooking) {
+    try {
+      const response = await cartApi.post(`/addItemToCart/${userId}/${itemId}`, cartBooking);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("itemRedux addItemToCart Error: ", error);
+      return { status: false, data: error.message };
+    }
+}
+
+
 
 
 

@@ -2,16 +2,19 @@ import React , { useState, useEffect } from 'react';
 import Background from '../../components/CardBackground';
 import Button from '../../components/Button';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, useWindowDimensions  } from 'react-native';
-import { Text, Card, Icon } from '@rneui/themed';
+import { Text, Card } from '@rneui/themed';
 import { getUser, getUserType, storeUser } from '../../helpers/LocalStorage';
 import { getSavedAttractionList, deleteSavedAttraction } from '../../redux/reduxAttraction';
 import { getAllSavedRestaurantForUser, removeSavedRestaurantForUser } from '../../redux/restaurantRedux';
 import { getUserSavedTelecom, toggleSaveTelecom } from '../../redux/telecomRedux';
+import { getUserSavedItems, toggleSaveItem } from '../../redux/itemRedux';
 import Toast from "react-native-toast-message";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import {getUserSavedDeal, toggleSaveDeal} from "../../redux/dealRedux";
 import {getAccommodationList, getUserSavedAccommodation, toggleSaveAccommodation} from "../../redux/reduxAccommodation";
 import {useIsFocused} from "@react-navigation/native";
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 const AttractionRoute = ({ data, removeListing, viewListing, getColorForType }) => (
     <Background>
@@ -263,12 +266,39 @@ const DealRoute = ({userType, data, removeDealListing}) => (
     </Background>
 );
 
+const ItemRoute = ({data, viewItemListing, removeItemListing}) => (
+    <Background>
+        <ScrollView>
+            <View style={styles.container}>
+                {
+                    data.map((item, index) => (
+                        <Card key={index} >
+                        <View>
+                            <Image source={{ uri: item.image }} style={{ width: 150, height: 150, marginLeft:80 }} />
+                            <View style={{marginLeft: 10, marginTop:3}}>
+                                <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {item.name} </Text>
+                                <Text style={{ fontSize: 11 , fontWeight:'bold', marginTop:3, color:'grey'}}> $ {item.price}.00 </Text>
+                            </View>
+                        </View>
+                        <View style={{ flexDirection: 'row'}}>
+                            <Button style={styles.button} text = "REMOVE" mode="contained" onPress={() => removeItemListing(item.item_id)} />
+                            <Button style={styles.button} text = "VIEW MORE" mode="contained" onPress={() => viewItemListing(item.item_id)}/>
+                        </View>
+                    </Card>
+                    ))
+                }
+            </View>
+        </ScrollView>
+    </Background>
+);
+
 const renderScene = SceneMap({
     first: AttractionRoute,
     second: RestaurantRoute,
     third: AccommodationRoute,
     fourth: TelecomRoute,
-    fifth: DealRoute
+    fifth: DealRoute,
+    sixth: ItemRoute
 });
 
 const SavedListingScreen = ({ navigation }) => {
@@ -293,13 +323,17 @@ const SavedListingScreen = ({ navigation }) => {
     //accommodation
     const [accommodationData, setAccommodationData] =useState([]);
 
+    //item
+    const [itemData, setItemData] =useState([]);
+
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: 'first', title: 'Attraction' },
-        { key: 'second', title: 'Restaurant' },
-        { key: 'third', title: 'Accoms' },
-        { key: 'fourth', title: 'Telecom' },
+        { key: 'first', title: 'Attr' },
+        { key: 'second', title: 'Rest' },
+        { key: 'third', title: 'Accom' },
+        { key: 'fourth', title: 'Tele' },
         { key: 'fifth', title: 'Deals' },
+        { key: 'sixth', title: 'Items' },
     ]);
 
     async function fetchUser() {
@@ -347,6 +381,12 @@ const SavedListingScreen = ({ navigation }) => {
                     if (savedAccommodations.status) {
                         setAccommodationData(savedAccommodations.data);
                     }
+
+                    let savedItems = await getUserSavedItems(userData.user_id);
+                    if (savedItems.status) {
+                        setItemData(savedItems.data);
+                    }
+
                     setFetchData(false);
                 }
 
@@ -380,14 +420,38 @@ const SavedListingScreen = ({ navigation }) => {
 
         return labelColorMap[label] || 'gray';
     };
+
     const viewListing = (attraction_id) => {
         navigation.navigate('AttractionDetailsScreen', {attractionId : attraction_id}); // set the attraction id here 
     }
 
     const viewAccommodationListing = (accommodation_id) => {
-        navigation.navigate('AccommodationDetailsScreen', {accommodationId : accommodation_id}); // set the attraction id here
+        navigation.navigate('AccommodationDetailsScreen', {accommodationId : accommodation_id}); 
     }
 
+    // shopping items 
+    const viewItemListing = (item_id) => {
+        navigation.navigate('ItemDetailsScreen', {itemId : item_id}); 
+    }
+
+    const removeItemListing = async (item_id) => {
+        let response = await toggleSaveItem(user.user_id, item_id);
+        if (response.status) {
+            let obj = {
+                ...user,
+                item_list: response.data
+            }
+            await storeUser(obj);
+            fetchUser();
+            setFetchData(true);
+            Toast.show({
+                type: 'success',
+                text1: 'Listing has been removed!'
+            });
+        } else {
+            console.log("Listing not removed!");
+        }
+    }
 
     const removeListing = async (attraction_id) => {
         let response = await deleteSavedAttraction(user.user_id,attraction_id);
@@ -528,6 +592,8 @@ const SavedListingScreen = ({ navigation }) => {
                         return <TelecomRoute data={telecomData} viewTelecomListing={viewTelecomListing} removeTelecomListing={removeTelecomListing} />;
                     case 'fifth':
                         return <DealRoute userType={userType} data={dealData} removeDealListing={removeDealListing} />;
+                    case 'sixth':
+                        return <ItemRoute data={itemData} viewItemListing={viewItemListing} removeItemListing={removeItemListing} />;
                     default:
                         return null;
                 }
@@ -539,7 +605,7 @@ const SavedListingScreen = ({ navigation }) => {
                   {...props}
                   indicatorStyle={{ backgroundColor: 'white' }} // the line below the tab
                   style={{ backgroundColor: 'rgba(4, 69, 55, 0.85)', height: 50  }} 
-                  labelStyle={{ fontSize: 6, fontWeight:'bold' }}
+                  labelStyle={{ fontSize: 9, fontWeight:'bold' }}
                 />
             )}
         />
@@ -581,7 +647,6 @@ const styles = StyleSheet.create({
     },
     button: {
         width: "50%",
-
     }
 });
 

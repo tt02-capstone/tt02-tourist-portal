@@ -98,7 +98,7 @@ const ViewInvitationsScreen = ({ navigation }) => {
                                 <Text style={styles.description}>{item.remarks}</Text>
                             </View>
 
-                            <TouchableOpacity style={{flexDirection: 'row', marginLeft: 17 }} onPress={() => onToggleItineraryInvitePressed(item.user_id)}>
+                            <TouchableOpacity style={{flexDirection: 'row', marginLeft: 17 }} onPress={() => acceptInvitation(item.itinerary_id, user.user_id)}>
                                 <Ionicons name="people-outline" style={{ color: '#044537', marginTop: 15}} size={20} />
                                 <Text style={styles.inviteButton} mode="contained" onPress={() => acceptInvitation(item.itinerary_id, user.user_id)}>Accept</Text>
                             </TouchableOpacity>

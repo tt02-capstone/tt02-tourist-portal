@@ -310,14 +310,12 @@ const ItineraryScreen = ({ navigation }) => {
     const renderEventContent = (event, dayNum) => {
         const containerStyle = event.booking
             ? { borderWidth: 1.2, borderColor: 'darkgreen' }
-            : { };
+            : {};
 
         if (event.accommodation || event.booking?.room) {
 
-            const cardHeight = event.remarks ? { height: 90 } : { height: 60 };
-
             return (
-                <Card style={{ flex: 1 }} wrapperStyle={cardHeight} containerStyle={containerStyle}>
+                <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
                             <View style={{ justifyContent: 'center' }}>
@@ -347,11 +345,13 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
+                            </View>
 
+                            <View style={{ alignItems: 'flex-end' }}>
                                 <IconButton
                                     icon="chevron-right"
                                     size={35}
-                                    style={styles.arrowIcon}
+                                    style={[styles.icon, styles.chevronButton]}
                                     onPress={() => navigateFunction(event)}
                                 />
                             </View>
@@ -361,10 +361,8 @@ const ItineraryScreen = ({ navigation }) => {
             );
         } else if (event.telecom || event.booking?.telecom) {
 
-            const cardHeight = event.remarks ? { height: 80 } : { height: 60 };
-
             return (
-                <Card style={{ flex: 1 }} wrapperStyle={cardHeight} containerStyle={containerStyle}>
+                <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
                             <View style={{ justifyContent: 'center' }}>
@@ -393,11 +391,13 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
+                            </View>
 
+                            <View style={{ alignItems: 'flex-end' }}>
                                 <IconButton
                                     icon="chevron-right"
                                     size={35}
-                                    style={styles.arrowIcon}
+                                    style={[styles.icon, styles.chevronButton]}
                                     onPress={() => navigateFunction(event)}
                                 />
                             </View>
@@ -408,7 +408,7 @@ const ItineraryScreen = ({ navigation }) => {
         } else {
 
             return (
-                <Card style={{ flex: 1 }} containerStyle={containerStyle}>
+                <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
                             <View style={{ justifyContent: 'center' }}>
@@ -421,8 +421,7 @@ const ItineraryScreen = ({ navigation }) => {
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
                                 <Text>{moment(event.start_datetime).format('LT')} - {moment(event.end_datetime).format('LT')}</Text>
                                 <Text>{event.location}</Text>
-                                {event.remarks && !event.booking && !event.telecom && !event.attraction && !event.accommodation && !event.restaurant &&
-                                    <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10 }}>{event.remarks}</Text>}
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10 }}>{event.remarks}</Text>}
                             </View>
                         </View>
 
@@ -441,15 +440,18 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
+                            </View>
 
+                            <View style={{ alignItems: 'flex-end' }}>
                                 <IconButton
                                     icon="chevron-right"
                                     size={35}
-                                    style={styles.arrowIcon}
+                                    style={[styles.icon, styles.chevronButton]}
                                     onPress={() => navigateFunction(event)}
                                 />
                             </View>
                         </View>
+
                     </View>
                 </Card>
             );
@@ -550,16 +552,16 @@ const ItineraryScreen = ({ navigation }) => {
                                 ))}
                             </View>
 
-                            <View style={{  }}>
+                            <View style={{}}>
                                 <Text><Text style={{ fontWeight: 'bold' }}>Duration:</Text> {moment(itinerary.start_date).format('MMM Do')} - {moment(itinerary.end_date).format('MMM Do')}</Text>
                                 <Text><Text style={{ fontWeight: 'bold' }}>Recommended Pax:</Text> {itinerary.number_of_pax}</Text>
                                 {itinerary?.remarks && <Text><Text style={{ fontWeight: 'bold' }}>Remarks:</Text> {itinerary.remarks}</Text>}
                             </View>
 
 
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginLeft: 15 }}>
                                 <IconButton icon="pencil" size={22} style={styles.itineraryEditIcon} onPress={() => navigation.navigate('EditItineraryScreen', { itineraryId: itinerary.itinerary_id })} />
-                                {itinerary.master_id == user.user_id && <IconButton icon="delete" size={25} style={styles.itineraryIcon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)} />}
+                                {itinerary.master_id == user.user_id && <IconButton icon="delete" size={22} style={styles.itineraryIcon} onPress={() => handleDeleteItineraryPress(itinerary.itinerary_id)} />}
                                 {itinerary.master_id != user.user_id && <IconButton icon="close" size={25} style={styles.itineraryIcon} onPress={() => handleOptOutOfItineraryPress(itinerary.itinerary_id)} />}
                             </View>
                         </View>
@@ -713,7 +715,7 @@ const styles = StyleSheet.create({
         marginRight: 3,
     },
     itineraryEditIcon: {
-        paddingLeft: 10
+        paddingLeft: 10,
     },
     itineraryIcon: {
         marginLeft: -10,

@@ -106,8 +106,12 @@ export const notificationApi = axios.create({
     baseURL: HOST_WITH_PORT + '/notification'
 })
 
+export const itemApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/item'
+})
+
 const instanceList = [userApi, localApi, bookingApi, touristApi, attractionApi, paymentsApi, cartApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi, 
-                        recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi, diyEventApi, notificationApi]
+                    recommendationApi, categoryApi, categoryItemApi, postApi, commentApi, reportApi, badgeApi, supportApi, itineraryApi, diyEventApi, notificationApi, itemApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( async (config) => {

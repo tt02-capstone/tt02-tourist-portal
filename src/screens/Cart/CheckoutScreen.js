@@ -19,8 +19,9 @@ export const CheckoutScreen = ({navigation}) => {
   const [cards, setCards] = useState([]); 
   const [itemChecked, setItemChecked] = useState([false]); 
   const [isCheckout, setIsCheckout] = useState(false);
-  const { booking_ids, priceList, selectedCartItems, totalPrice} = route.params;
+  const { booking_ids, priceList, selectedCartItems, totalPrice, isShoppingItem} = route.params;
   const isFocused = useIsFocused();
+  const [selectedDeliveryType, setSelectedDeliveryType] = useState(null);
 
   function formatDateAndTime(date) {
     const options = {
@@ -61,6 +62,7 @@ export const CheckoutScreen = ({navigation}) => {
       let tempObj = {
         booking_ids: booking_ids,
         priceList: priceList,
+        selectedDeliveryType: selectedDeliveryType
       }
       setIsCheckout(true);
       
@@ -149,6 +151,10 @@ export const CheckoutScreen = ({navigation}) => {
     onLoad();
   }, [isFocused]);
 
+  useEffect(() => {
+    console.log(selectedDeliveryType)
+  }, [selectedDeliveryType])
+
   return (
     <View>
       <ScrollView>
@@ -177,17 +183,22 @@ export const CheckoutScreen = ({navigation}) => {
             <ListItem.Content style={{padding: 0, margin: 0}}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
             <View style={{ flexDirection: "column", }}>
-              <ListItem.Title style={{fontSize: 16}}>{cartItem.item_name}</ListItem.Title>
-              <ListItem.Subtitle style={{fontSize: 14}}>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
+              <ListItem.Title style={{fontSize: 15, fontWeight:'bold', color:'#044537', marginBottom:2}}>{cartItem.item_name}</ListItem.Title>
+
+              <ListItem.Subtitle style={{fontSize: 12}}>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle>
               <View style={{ flexDirection: "column" }}>
               {
-              cartItem.items.map((item, index) => (
-                <Text key={index} style={{fontSize: 13}} >{item.activity_selection.replace(/_/g, ' ')} Qty: {item.quantity}</Text> 
-              ))
+                cartItem.items.map((item, index) => (
+                  item.type === "ITEM" ? (
+                    <Text key={index} style={{fontSize: 12, marginBottom: 5, marginTop:5}} >Qty: {item.quantity}</Text> 
+                  ) : (
+                    <Text key={index} style={{fontSize: 12, marginBottom: 5, marginTop:5}} >{item.activity_selection.replace(/_/g, ' ')} Qty: {item.quantity}</Text> 
+                  )
+                ))
               }
 
               </View>
-              <ListItem.Subtitle style={{fontSize: 14}}>${priceList[index]}</ListItem.Subtitle>
+              <ListItem.Subtitle style={{fontSize: 12}}>${priceList[index]}</ListItem.Subtitle>
             </View>
           </View>       
           </ListItem.Content>
@@ -195,9 +206,35 @@ export const CheckoutScreen = ({navigation}) => {
           </ListItem.Swipeable>
         ))}
         <ListItem containerStyle={padding= 20}>
+          
       
       <View>
-        <Text> Select Payment Method</Text>
+        { isShoppingItem && (
+          <View>
+              <Text style={{ color:'#044537', fontWeight:'bold', fontSize:13,}} > Select Delivery Type </Text>
+              <CheckBox
+                title='Delivery'
+                iconType="material-community"
+                checkedIcon="radiobox-marked"
+                uncheckedIcon="radiobox-blank"
+                containerStyle={{ marginLeft: 0, marginBottom: -8 }}
+                checked={selectedDeliveryType === 'DELIVERY'}
+                onPress={() => setSelectedDeliveryType('DELIVERY')}
+              />
+              <CheckBox
+                title='Pickup'
+                iconType="material-community"
+                checkedIcon="radiobox-marked"
+                uncheckedIcon="radiobox-blank"
+                containerStyle={{ marginLeft: 0, marginRight: -8}}
+                checked={selectedDeliveryType === 'PICKUP'}
+                onPress={() => setSelectedDeliveryType('PICKUP')}
+              />
+          </View>
+
+        )}
+        
+        <Text style={{ color:'#044537', fontWeight:'bold', fontSize:13, marginTop:8 }} > Select Payment Method</Text>
 
         <View style={{ flexDirection: "column"}}>
         {
@@ -214,7 +251,7 @@ export const CheckoutScreen = ({navigation}) => {
               iconType="material-community"
               checkedIcon="radiobox-marked"
               uncheckedIcon="radiobox-blank"
-              containerStyle={{ marginLeft: -10, marginRight: -10, padding: 0 }}
+              containerStyle={{ marginLeft: -8, marginRight: -8, padding: 0 }}
               checked={itemChecked[index]}
               onPress={() => handleCheckBoxToggle(index)}
             />
@@ -239,9 +276,9 @@ export const CheckoutScreen = ({navigation}) => {
               ))}
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Button 
-                  text="+ Add a Credit/ Debit Card" 
+                  text="+  Add a Credit / Debit Card" 
                   // type="outline"
-                  style={{width: 300}} 
+                  style={{width: 360}} 
                   onPress={() => navigation.navigate('AddCreditCardScreen', {
                     previousScreen: 'CheckoutScreen',
                     booking_ids: booking_ids,
@@ -251,19 +288,21 @@ export const CheckoutScreen = ({navigation}) => {
                 />
               </View>
             </View>
+
           </View>
         </ListItem>
       </View>
+
     </ScrollView>
 
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'lightgreen', padding: 10 }}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#DCF2DD', padding: 10 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text>Total Price: ${totalPrice.toFixed(2)}</Text>
+        <Text style={{ fontWeight:'bold', fontSize:16, marginLeft:10}}>Total Price: ${totalPrice.toFixed(2)}</Text>
       </View>
-        <View style={{marginRight: -90}}>
+        <View style={{marginRight: -80}}>
           <ActivityIndicator size='small' animating={isCheckout} color='green'/>
         </View>
-        <Button text="Book Now" style={{width: 100}} onPress={() => {checkout()}} />
+        <Button text="Book Now" style={{width:100}} onPress={() => {checkout()}} />
       </View>
     </View>
   );

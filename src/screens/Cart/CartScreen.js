@@ -1,7 +1,7 @@
 import React, { useState, useEffect, } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import {ListItem, CheckBox, Image, Text, Button, Icon} from '@rneui/themed';
-import CustomButton from '../../components/CustomButton';
+import { Button as CheckoutButton } from 'react-native-paper';
 import { getUser, getUserType } from '../../helpers/LocalStorage';
 import Toast from "react-native-toast-message";
 import { cartApi } from '../../helpers/api';
@@ -124,6 +124,8 @@ export const CartScreen = ({ route, navigation }) => {
     const booking_ids = [];
     const priceList = [];
     const selectedCartItems = [];
+    let isShoppingItem = false;
+
     itemChecked.forEach((value, key) => {
       const items_for_vendor = value.filter(value => value === true).length;
       let discount_per_item = 0;
@@ -138,13 +140,18 @@ export const CartScreen = ({ route, navigation }) => {
           booking_ids.push(vendorCartMap.get(key)[index].id);
           priceList.push(vendorCartMap.get(key)[index].price - discount_per_item);
           selectedCartItems.push(vendorCartMap.get(key)[index]);
+
+          if (vendorCartMap.get(key)[index].type == "ITEM") {
+            isShoppingItem = true;
+          }
         }
       });
     });
 
     console.log(booking_ids, priceList, selectedCartItems)
+
     if (selectedCartItems.length > 0) {
-      navigation.navigate('CheckoutScreen', { booking_ids, priceList, selectedCartItems, totalPrice });
+      navigation.navigate('CheckoutScreen', { booking_ids, priceList, selectedCartItems, totalPrice, isShoppingItem});
     } else {
       Toast.show({
         type: 'error',
@@ -290,7 +297,6 @@ export const CartScreen = ({ route, navigation }) => {
 
   const handleCheckAllToggle = () => {
     const isAllCheck = isAllChecked();
-    console.log('isAllChecked', isAllCheck);
 
     const updatedItemChecked = new Map(itemChecked);
     itemChecked.forEach((value, key) => {
@@ -299,7 +305,6 @@ export const CartScreen = ({ route, navigation }) => {
     });
 
     setItemChecked(updatedItemChecked);
-    console.log(updatedItemChecked);
   };
 
   useEffect(() => {
@@ -315,9 +320,10 @@ export const CartScreen = ({ route, navigation }) => {
     console.log('init', vendorId, cartItemIndex, itemIndex, delta)
     let tourPrice = 0
     const updatedMap = new Map(vendorCartMap);
-    console.log(updatedMap, vendorCartMap)
+    // console.log(updatedMap, vendorCartMap)
     let cartItems = updatedMap.get(vendorId)
     console.log(cartItems)
+
     if (cartItems[cartItemIndex].tour) { // ** FOR ATTRACTION if there is tour included in need to factor in the tour pricing changes
       tourPrice = parseFloat(cartItems[cartItemIndex].tour[0].price);
       let oldQ =  cartItems[cartItemIndex].tour[0].quantity 
@@ -443,7 +449,24 @@ export const CartScreen = ({ route, navigation }) => {
               };
               setVendorCartMapping(detail.vendor.vendor_id, attr)
               return attr
-            } else if (detail.type === 'ACCOMMODATION') {
+            } else if (detail.type === 'ITEM') {
+              const attr = {
+                id: parseInt(detail.cart_booking_id),
+                type: detail.type,
+                item_id: detail.item.item_id,
+                image: detail.item.image,
+                item_name: detail.activity_name,
+                activity_name: "",
+                startTime: "",
+                endTime: "",
+                items: detail.cart_item_list,
+                price: subtotal.toFixed(2),
+                quantity: quantities,
+              };
+              setVendorCartMapping(detail.vendor.vendor_id, attr)
+              return attr
+            } 
+            else if (detail.type === 'ACCOMMODATION') {
               try {
                 const accommodation = await retrieveAccommodationByRoom(detail.room.room_id);
 
@@ -482,7 +505,7 @@ export const CartScreen = ({ route, navigation }) => {
           }));
 
           // setCartItems(extractedDetails);
-          console.log(vendorCartMap)
+          // console.log(vendorCartMap)
           if (extractedDetails.length > 0) {
             setExpandedItems(Array.from(vendorCartMap).map(() => true));
           }
@@ -495,7 +518,7 @@ export const CartScreen = ({ route, navigation }) => {
 
           }
 
-          console.log('item checked', itemChecked)
+          // console.log('item checked', itemChecked)
         }
 
       } catch (error) {
@@ -551,8 +574,8 @@ export const CartScreen = ({ route, navigation }) => {
                   key = {key}
                   content={
                     <>
-                      <ListItem.Content>
-                        <ListItem.Title>Vendor {key} items </ListItem.Title>
+                      <ListItem.Content style={{marginBottom:-20}}>
+                        <ListItem.Title style={{fontSize:15, fontWeight:"bold", color:'#044537'}}>Vendor {key} Items </ListItem.Title>
                       </ListItem.Content>
                     </>
                   }
@@ -615,6 +638,17 @@ export const CartScreen = ({ route, navigation }) => {
                           </TouchableOpacity>
                       }
 
+                      {/* Item */}
+                      {cartItem.type === 'ITEM' &&
+                          <TouchableOpacity style={{ flexDirection: "row", marginTop:-15 }} onPress={() => { navigation.navigate('ItemDetailsScreen', { id: cartItem.item_id }); }}>
+                            <Image
+                                source={{
+                                  uri: cartItem.image
+                                }}
+                                style={{ width: 60, height: 60, borderRadius: 10, marginLeft: 5, marginRight: 0 }} />
+                          </TouchableOpacity>
+                      }
+
                       {/* Common */}
                       <ListItem.Content style={{ padding: 0, marginLeft: -10, height: 80,}}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -643,8 +677,6 @@ export const CartScreen = ({ route, navigation }) => {
                                 <ListItem.Subtitle style={{ fontSize: 10, color: 'red', fontWeight: 'bold' }}>
                                   Add Ons : {cartItem.tour[0].activity_selection}
                                 </ListItem.Subtitle> : <Text></Text>}
-                            {/* <ListItem.Subtitle>{cartItem.startTime} - {cartItem.endTime}</ListItem.Subtitle> */}
-                            {/* <ListItem.Subtitle>{cartItem.quantity}</ListItem.Subtitle> */}
                           </View>
 
                           <View style={{ flexDirection: "column" }}>
@@ -661,7 +693,7 @@ export const CartScreen = ({ route, navigation }) => {
                                           key={itemIndex} style={{ minWidth: 50, margin: 5, fontSize: 10, fontWeight: 'bold' }}>{formatAccommodation(item.activity_selection)} </Text>
                                   }
 
-                                  {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
+                                  {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM' || cartItem.type === 'ITEM') && (
                                       <TouchableOpacity
                                           style={{
                                             backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
@@ -676,7 +708,7 @@ export const CartScreen = ({ route, navigation }) => {
 
                                   <Text style={{ marginLeft: 10, marginRight: 10, marginTop: 2, fontSize: 15 }}>{item.quantity}</Text>
 
-                                  {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM') && (
+                                  {(cartItem.type === 'ATTRACTION' || cartItem.type === 'TELECOM' || cartItem.type === 'ITEM') && (
                                       <TouchableOpacity
                                           style={{
                                             backgroundColor: '#044537', height: 20, width: 20, justifyContent: 'center', alignItems: 'center',
@@ -696,12 +728,12 @@ export const CartScreen = ({ route, navigation }) => {
                 ))}
                 <ListItem key={key} onPress={() => { navigation.navigate('ApplyDealScreen', { vendorId: key, dealId: vendorDealMap.has(key)? vendorDealMap.get(key).data.deal_id : 0  })}} bottomDivider>
                     <ListItem.Content>
-                      <ListItem.Title style={{ color: 'purple' }}>Promo: {
+                      <ListItem.Title style={{ color: '#044537', fontWeight:"bold", fontSize:13, marginTop:-18 }}>Promo: {
                         vendorDealMap.has(key)? vendorDealMap.get(key).data.promo_code : 'None Applied'
                       }
                       </ListItem.Title>
-                      <ListItem.Subtitle>
-                        Subsection Total: {calcRawPrice(key) * (1- calcuDiscountByVendor(key))}
+                      <ListItem.Subtitle style={{ fontSize:11, color:'grey', fontWeight:'bold' }}>
+                        Subsection Total: S$ {calcRawPrice(key) * (1- calcuDiscountByVendor(key))}
                       </ListItem.Subtitle>
                     </ListItem.Content>
                     <ListItem.Chevron/>
@@ -712,7 +744,7 @@ export const CartScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#99e699', padding: 10, height: 70 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#DCF2DD', padding: 10, height: 70 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <CheckBox
             left
@@ -728,7 +760,7 @@ export const CartScreen = ({ route, navigation }) => {
         </View>
 
         {/* <Button title="Checkout" onPress={() => {checkout()}} /> */}
-        <Button color='#044537' style={{ borderRadius: '10' }} onPress={() => {checkout()}} >Checkout</Button>
+        <CheckoutButton mode="contained"  style={{ backgroundColor: '#044537', color: "white", marginLeft: 10, width:'38%' }} onPress={() => {checkout()}} > CHECKOUT </CheckoutButton>
       </View>
     </View>
   );

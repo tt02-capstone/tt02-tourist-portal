@@ -110,23 +110,33 @@ const BookingHistoryScreen = ({ navigation }) => {
             'UPCOMING': 'lightgreen',
             'ONGOING': 'lightgreen',
             'COMPLETED': 'lightblue',
-            'CANCELLED': 'lightpink'
+            'CANCELLED': 'lightpink',
+            'PENDING_VENDOR_DELIVERY' : 'lightyellow',
+            'PENDING_VENDOR_PICKUP' : 'lightyellow', 
+            "PREPARE_FOR_SHIPMENT" : 'lightpurple',
+            "PREPARE_FOR_PICKUP" : 'lightpurple',
+            "SHIPPED_OUT" : "lightorange", 
+            "READY_FOR_PICKUP" : "lightorange", 
+            'DELIVERED': 'lightgreen',
+            'PICKED_UP': 'lightgreen',
         };
 
         return labelColorMap[label] || 'gray';
     };
 
-    const getNameForBooking = (item) => {
-        if (item.attraction != null) {
-            return item.attraction.name;
-        } else if (item.room != null) {
-            return item.activity_name;
-        } else if (item.tour != null) {
-            return item.booking_item_list[0].activity_selection;
-        } else if (item.telecom.name != null) {
-            return item.telecom.name;
-        } else {
-            return item.deal.name;
+    const getNameForBooking = (items) => {
+        if (items.attraction != null) {
+            return items.attraction.name;
+        } else if (items.room != null) {
+            return items.activity_name;
+        } else if (items.tour != null) {
+            return items.booking_item_list[0].activity_selection;
+        } else if (items.telecom != null) {
+            return items.telecom.name;
+        }  else if (items.item.name != null) {
+            return items.item.name;
+        }  else {
+            return items.deal.name;
         }
     }
 
@@ -153,6 +163,8 @@ const BookingHistoryScreen = ({ navigation }) => {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/accoms.jpg';
         } else if (item.tour != null) {
             return 'https://tt02.s3.ap-southeast-1.amazonaws.com/static/mobile/tour.png';
+        } else if (item.item != null) {
+            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/web/forum/Item.png';
         } else if (item.telecom.name != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
         } else {
@@ -252,6 +264,13 @@ const BookingHistoryScreen = ({ navigation }) => {
                                                 { label: 'Ongoing', value: 'ONGOING' },
                                                 { label: 'Completed', value: 'COMPLETED' },
                                                 { label: 'Cancelled', value: 'CANCELLED' },
+                                                { label: 'Pending Vendor Delivery', value: 'PENDING_VENDOR_DELIVERY' },
+                                                { label: 'Pending Vendor Pickup', value: 'PENDING_VENDOR_PICKUP' },
+                                                { label: 'Prepare For Shipment', value: 'PREPARE_FOR_SHIPMENT' },
+                                                { label: 'Prepare For Pickup', value: 'PREPARE_FOR_PICKUP' },
+                                                { label: 'Shipped Out', value: 'SHIPPED_OUT' },
+                                                { label: 'Delivered', value: 'DELIVERED' },
+                                                { label: 'Picked Up', value: 'PICKED_UP' },
                                             ]}
                                             value={bookingStatusFilter}
                                             style={pickerSelectStyles}
@@ -345,8 +364,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
         margin: 5,
-        width: 90,
-        fontSize: 11,
+        width: 210,
+        fontSize: 12,
         fontWeight: 'bold'
     },
     header: {

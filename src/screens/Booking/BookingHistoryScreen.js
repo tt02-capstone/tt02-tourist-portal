@@ -125,7 +125,6 @@ const BookingHistoryScreen = ({ navigation }) => {
     };
 
     const getNameForBooking = (items) => {
-        console.log(items)
         if (items.attraction != null) {
             return items.attraction.name;
         } else if (items.room != null) {

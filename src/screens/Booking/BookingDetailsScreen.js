@@ -8,12 +8,14 @@ import { getBookingByBookingId, cancelBookingByBookingId, getTourImage } from '.
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
+import { getItemVendor } from '../../redux/itemRedux';
 
 const BookingDetailsScreen = ({ navigation }) => {
     const [user, setUser] = useState('');
     const [booking, setBooking] = useState('');
     const [loading, setLoading] = useState(false);
     const [tourImage, setTourImage] = useState('');
+    const [pickupLocation, setPickupLocation] = useState('');
 
     const route = useRoute();
     const { bookingId } = route.params;
@@ -53,6 +55,18 @@ const BookingDetailsScreen = ({ navigation }) => {
                 }                
             }
 
+            if (booking.item) {
+                if (booking.status == "PENDING_VENDOR_PICKUP" || booking.status == "PREPARE_FOR_PICKUP" || booking.status == "READY_FOR_PICKUP" || booking.status == "PICKED_UP") {
+                    let response = await getItemVendor(booking.item.item_id);
+                    if (response.status) {
+                        let data = response.data;
+                        setPickupLocation(data.business_address)
+                    } else {
+                        console.log("Can't get vendor location for items")
+                    }
+                }
+            }
+
             setLoading(false);
             fetchUser();
         } catch (error) {
@@ -89,7 +103,7 @@ const BookingDetailsScreen = ({ navigation }) => {
         } else if (item.tour != null) {
             return tourImage;
         } else if (item.item != null) {
-            return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/web/forum/Item.png';
+            return item.item.image;
         } else if (item.telecom.name != null) {
             return 'http://tt02.s3-ap-southeast-1.amazonaws.com/static/mobile/telecom.png';
         } else {
@@ -142,7 +156,6 @@ const BookingDetailsScreen = ({ navigation }) => {
             let day = inputDate.getDate().toString().padStart(2, '0');
             let month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
             let year = inputDate.getFullYear();
-            console.log(booking.item.item_id)
             return `${day}/${month}/${year}`;
         }
     }
@@ -201,7 +214,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                         {getNameForBooking(booking)}
                     </Card.Title>
                     <Card.Image
-                        style={{ padding: 0 }}
+                        style={{ padding: 0 , width:250 , height: 250, marginLeft:40}}
                         source={{
                             uri: getImage(booking)
                         }}
@@ -213,6 +226,8 @@ const BookingDetailsScreen = ({ navigation }) => {
                     {booking.tour && <Text style={styles.description}>Start Date: {formatDateTime(booking.start_datetime)}</Text>}
                     {!booking.tour && <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>}
                     {booking.tour && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
+
+                    {pickupLocation && <Text style={styles.description}> Pick Up Location : {pickupLocation}</Text>}
                     <View style={{ display: 'inline-block' }}>
                         <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{booking.status}</Text>
                     </View>

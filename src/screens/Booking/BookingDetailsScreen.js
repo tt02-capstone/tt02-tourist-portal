@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
 import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import {View, ScrollView, StyleSheet, TouchableOpacity, Switch} from 'react-native';
 import { Text, Card, CheckBox } from '@rneui/themed';
-import { getBookingByBookingId, cancelBookingByBookingId, getTourImage } from '../../redux/reduxBooking';
+import {
+    getBookingByBookingId,
+    cancelBookingByBookingId,
+    getTourImage,
+    updateBookingItemStatus
+} from '../../redux/reduxBooking';
 import { useRoute } from '@react-navigation/native';
 import Toast from "react-native-toast-message";
 import { theme } from '../../core/theme'
@@ -16,6 +21,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [tourImage, setTourImage] = useState('');
     const [pickupLocation, setPickupLocation] = useState('');
+    const [isCollected, setIsCollected] = useState(false);
 
     const route = useRoute();
     const { bookingId } = route.params;
@@ -56,6 +62,7 @@ const BookingDetailsScreen = ({ navigation }) => {
             }
 
             if (booking.item) {
+                setIsCollected(booking.item.isCollected)
                 if (booking.status == "PENDING_VENDOR_PICKUP" || booking.status == "PREPARE_FOR_PICKUP" || booking.status == "READY_FOR_PICKUP" || booking.status == "PICKED_UP") {
                     let response = await getItemVendor(booking.item.item_id);
                     if (response.status) {
@@ -160,24 +167,40 @@ const BookingDetailsScreen = ({ navigation }) => {
         }
     }
 
+    const getStatusDisplayName = (currentstatus) => {
+        const deliverypickup = {
+            PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
+            PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
+            SHIPPED_OUT: 'Shipped Out',
+            DELIVERED: 'Delivered',
+            PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
+            PREPARE_FOR_PICKUP: 'Prepare for Pickup',
+            READY_FOR_PICKUP: 'Ready for Pickup',
+            PICKED_UP: 'Picked Up',
+        }
+        const displayName = deliverypickup[currentstatus] || currentstatus;
+
+        return displayName
+    };
     const getColorForStatus = (label) => {
         const labelColorMap = {
             'UPCOMING': 'lightgreen',
             'ONGOING': 'lightgreen',
             'COMPLETED': 'lightblue',
             'CANCELLED': 'lightpink',
-            'PENDING_VENDOR_DELIVERY' : 'lightyellow',
-            'PENDING_VENDOR_PICKUP' : 'lightyellow', 
-            "PREPARE_FOR_SHIPMENT" : 'lightpurple',
-            "PREPARE_FOR_PICKUP" : 'lightpurple',
-            "SHIPPED_OUT" : "lightorange", 
-            "READY_FOR_PICKUP" : "lightorange", 
+            'PENDING_VENDOR_DELIVERY': 'lightyellow',
+            'PENDING_VENDOR_PICKUP': 'lightyellow',
+            "PREPARE_FOR_SHIPMENT": 'orange',
+            "PREPARE_FOR_PICKUP": 'orange',
+            "SHIPPED_OUT": "yellow",
+            "READY_FOR_PICKUP": "yellow",
             'DELIVERED': 'lightgreen',
             'PICKED_UP': 'lightgreen',
         };
 
         return labelColorMap[label] || 'gray';
     };
+
 
     async function cancelBooking(bookingId) {
         let response = await cancelBookingByBookingId(bookingId);
@@ -206,6 +229,32 @@ const BookingDetailsScreen = ({ navigation }) => {
         return temp;
     }
 
+    const toggleItemStatus = async () => {
+        try {
+            const bookingStatus = booking.status === 'SHIPPED_OUT' ? 'DELIVERED': 'PICKED_UP'
+
+            const response = await updateBookingItemStatus(booking.booking_id, bookingStatus);
+            console.log(response)
+            if (response.status) {
+                fetchBooking();
+
+                Toast.show({
+                    type: 'success',
+                    text1: `Item marked as ${getStatusDisplayName(bookingStatus)}!`,
+                });
+
+                // Fetch updated booking details
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: response.info,
+                });
+            }
+        } catch (error) {
+            console.error('Error marking item:', error);
+        }
+    };
+
     return booking ? (
         <Background>
             <ScrollView>
@@ -229,15 +278,33 @@ const BookingDetailsScreen = ({ navigation }) => {
 
                     {pickupLocation && <Text style={styles.description}> Pick Up Location : {pickupLocation}</Text>}
                     <View style={{ display: 'inline-block' }}>
-                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{booking.status}</Text>
+                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{getStatusDisplayName(booking.status)}</Text>
                     </View>
                 </Card>
+                {booking.item && !isCollected && (booking.status === "SHIPPED_OUT" || booking.status ===  "READY_FOR_PICKUP") && (
+                    <Card>
+                        <Card.Title style={styles.header}>
+                            Update your Item Collection Status
+                        </Card.Title>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={styles.description}>
+                                Mark as {booking.status === "SHIPPED_OUT"? "Delivered": "Picked Up"}
+                            </Text>
+                            <Switch
+                                value={isCollected}
+                                onValueChange={() => toggleItemStatus()}
+                                disabled={isCollected === true}
+                            />
+                        </View>
+                    </Card>
+                )}
                 <Card>
                     <Card.Title style={styles.header}>
                         Cancellation Policy
                     </Card.Title>
                     <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
                     {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
+
                 </Card>
                 {booking.status != 'CANCELLED' && booking.qr_code_list.length > 1 && <Card>
                     <Card.Title style={styles.header}>

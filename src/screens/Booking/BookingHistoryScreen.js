@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 import Background from '../../components/CardBackground'
 import Button from '../../components/Button'
-import { View, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { Text, Card } from '@rneui/themed';
-import { getBookingHistoryList } from '../../redux/reduxBooking';
-import { getUser, getUserType } from '../../helpers/LocalStorage';
-import { useFocusEffect } from '@react-navigation/native';
-import { useIsFocused } from "@react-navigation/native";
+import {View, ScrollView, StyleSheet, TouchableOpacity, Modal} from 'react-native';
+import {Text, Card} from '@rneui/themed';
+import {getBookingHistoryList} from '../../redux/reduxBooking';
+import {getUser, getUserType} from '../../helpers/LocalStorage';
+import {useFocusEffect} from '@react-navigation/native';
+import {useIsFocused} from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
 
-const BookingHistoryScreen = ({ navigation }) => {
+const BookingHistoryScreen = ({navigation}) => {
     const [user, setUser] = useState('');
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -36,6 +36,7 @@ const BookingHistoryScreen = ({ navigation }) => {
                 setLoading(false);
             }
         }
+
         onLoad();
 
         if (isFocused) {
@@ -53,7 +54,7 @@ const BookingHistoryScreen = ({ navigation }) => {
             newSelectedFilters[filterIndex].value = filterValue;
         } else {
             // If the filter type does not exist, add a new filter
-            newSelectedFilters.push({ type: filterType, value: filterValue });
+            newSelectedFilters.push({type: filterType, value: filterValue});
         }
 
         setSelectedFilters(newSelectedFilters);
@@ -105,18 +106,33 @@ const BookingHistoryScreen = ({ navigation }) => {
     };
 
 
+    const getStatusDisplayName = (currentstatus) => {
+        const deliverypickup = {
+            PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
+            PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
+            SHIPPED_OUT: 'Shipped Out',
+            DELIVERED: 'Delivered',
+            PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
+            PREPARE_FOR_PICKUP: 'Prepare for Pickup',
+            READY_FOR_PICKUP: 'Ready for Pickup',
+            PICKED_UP: 'Picked Up',
+        }
+        const displayName = deliverypickup[currentstatus] || currentstatus;
+
+        return displayName
+    };
     const getColorForStatus = (label) => {
         const labelColorMap = {
             'UPCOMING': 'lightgreen',
             'ONGOING': 'lightgreen',
             'COMPLETED': 'lightblue',
             'CANCELLED': 'lightpink',
-            'PENDING_VENDOR_DELIVERY' : 'lightyellow',
-            'PENDING_VENDOR_PICKUP' : 'lightyellow', 
-            "PREPARE_FOR_SHIPMENT" : 'lightpurple',
-            "PREPARE_FOR_PICKUP" : 'lightpurple',
-            "SHIPPED_OUT" : "lightorange", 
-            "READY_FOR_PICKUP" : "lightorange", 
+            'PENDING_VENDOR_DELIVERY': 'lightyellow',
+            'PENDING_VENDOR_PICKUP': 'lightyellow',
+            "PREPARE_FOR_SHIPMENT": 'orange',
+            "PREPARE_FOR_PICKUP": 'orange',
+            "SHIPPED_OUT": "yellow",
+            "READY_FOR_PICKUP": "yellow",
             'DELIVERED': 'lightgreen',
             'PICKED_UP': 'lightgreen',
         };
@@ -133,9 +149,9 @@ const BookingHistoryScreen = ({ navigation }) => {
             return items.booking_item_list[0].activity_selection;
         } else if (items.telecom != null) {
             return items.telecom.name;
-        }  else if (items.item.name != null) {
+        } else if (items.item.name != null) {
             return items.item.name;
-        }  else {
+        } else {
             return items.deal.name;
         }
     }
@@ -153,7 +169,7 @@ const BookingHistoryScreen = ({ navigation }) => {
     }
 
     const viewBooking = (booking_id) => {
-        navigation.navigate('BookingDetailsScreen', { bookingId: booking_id });
+        navigation.navigate('BookingDetailsScreen', {bookingId: booking_id});
     }
 
     const getImage = (item) => {
@@ -217,10 +233,12 @@ const BookingHistoryScreen = ({ navigation }) => {
                                         }}
                                     />
                                 </View>
-                                <View style={{ display: 'inline-block', marginLeft: 20 }}>
-                                    <Text style={[styles.tag, { backgroundColor: getColorForStatus(item.status) }]}>{item.status}</Text>
+                                <View style={{display: 'inline-block', marginLeft: 20}}>
+                                    <Text
+                                        style={[styles.tag, {backgroundColor: getColorForStatus(item.status)}]}>{getStatusDisplayName(item.status)}</Text>
                                 </View>
-                                <Button style={styles.button} text="View Details" mode="contained" onPress={() => viewBooking(item.booking_id)} />
+                                <Button style={styles.button} text="View Details" mode="contained"
+                                        onPress={() => viewBooking(item.booking_id)}/>
                             </Card>
                         </TouchableOpacity>
                     ))
@@ -245,10 +263,11 @@ const BookingHistoryScreen = ({ navigation }) => {
                                                 handleFilterSelect('bookingType', value)
                                             }
                                             items={[
-                                                { label: 'Attraction', value: 'ATTRACTION' },
-                                                { label: 'Tour', value: 'TOUR' },
-                                                { label: 'Accommodation', value: 'ACCOMMODATION' },
-                                                { label: 'Telecom', value: 'TELECOM' },
+                                                {label: 'Attraction', value: 'ATTRACTION'},
+                                                {label: 'Tour', value: 'TOUR'},
+                                                {label: 'Accommodation', value: 'ACCOMMODATION'},
+                                                {label: 'Telecom', value: 'TELECOM'},
+                                                {label: 'Item', value: 'ITEM'},
                                             ]}
                                             value={bookingTypeFilter}
                                             style={pickerSelectStyles}
@@ -260,17 +279,17 @@ const BookingHistoryScreen = ({ navigation }) => {
                                             }}
                                             onValueChange={(value) => handleFilterSelect('bookingStatus', value)}
                                             items={[
-                                                { label: 'Upcoming', value: 'UPCOMING' },
-                                                { label: 'Ongoing', value: 'ONGOING' },
-                                                { label: 'Completed', value: 'COMPLETED' },
-                                                { label: 'Cancelled', value: 'CANCELLED' },
-                                                { label: 'Pending Vendor Delivery', value: 'PENDING_VENDOR_DELIVERY' },
-                                                { label: 'Pending Vendor Pickup', value: 'PENDING_VENDOR_PICKUP' },
-                                                { label: 'Prepare For Shipment', value: 'PREPARE_FOR_SHIPMENT' },
-                                                { label: 'Prepare For Pickup', value: 'PREPARE_FOR_PICKUP' },
-                                                { label: 'Shipped Out', value: 'SHIPPED_OUT' },
-                                                { label: 'Delivered', value: 'DELIVERED' },
-                                                { label: 'Picked Up', value: 'PICKED_UP' },
+                                                {label: 'Upcoming', value: 'UPCOMING'},
+                                                {label: 'Ongoing', value: 'ONGOING'},
+                                                {label: 'Completed', value: 'COMPLETED'},
+                                                {label: 'Cancelled', value: 'CANCELLED'},
+                                                {label: 'Pending Vendor Delivery', value: 'PENDING_VENDOR_DELIVERY'},
+                                                {label: 'Pending Vendor Pickup', value: 'PENDING_VENDOR_PICKUP'},
+                                                {label: 'Prepare For Shipment', value: 'PREPARE_FOR_SHIPMENT'},
+                                                {label: 'Prepare For Pickup', value: 'PREPARE_FOR_PICKUP'},
+                                                {label: 'Shipped Out', value: 'SHIPPED_OUT'},
+                                                {label: 'Delivered', value: 'DELIVERED'},
+                                                {label: 'Picked Up', value: 'PICKED_UP'},
                                             ]}
                                             value={bookingStatusFilter}
                                             style={pickerSelectStyles}
@@ -278,14 +297,15 @@ const BookingHistoryScreen = ({ navigation }) => {
                                     </View>
 
                                     <View style={styles.buttonContainer}>
-                                        <TouchableOpacity onPress={applyFilters} style={[styles.filterButton, { marginRight: 5 }]}>
+                                        <TouchableOpacity onPress={applyFilters}
+                                                          style={[styles.filterButton, {marginRight: 5}]}>
                                             <Text style={styles.filterText}>Apply</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={toggleFilterModal} style={styles.filterButton}>
                                             <Text style={styles.filterText}>Close</Text>
                                         </TouchableOpacity>
                                     </View>
-                                    
+
                                 </ScrollView>
                             </View>
                         </View>
@@ -307,7 +327,7 @@ const BookingHistoryScreen = ({ navigation }) => {
                             <Text style={styles.filterText}>Clear Filters</Text>
                         </TouchableOpacity>
                     </View>
-                    
+
                     <Text style={styles.emptyMessage}>No bookings made</Text>
                 </View>
             </ScrollView>

@@ -251,7 +251,7 @@ const CreateRestaurantDIYEventScreen = ({ navigation }) => {
 
     const handleAddToRemarks = (name) => {
         if (!values.remarks) {
-            setValues({ ...values, remarks: name });
+            setValues({ ...values, remarks: "To try: " + name });
         } else {
             setValues({ ...values, remarks: values.remarks + ', ' + name });
         }

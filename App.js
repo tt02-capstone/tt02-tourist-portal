@@ -72,6 +72,8 @@ import CreateRestaurantDIYEventScreen from './src/screens/Restaurant/CreateResta
 import EventSuggestionsScreen from './src/screens/Itinerary/EventSuggestionsScreen';
 import InviteFriendScreen from './src/screens/Itinerary/InviteFriendScreen';
 import ViewInvitationsScreen from './src/screens/Itinerary/ViewInvitationsScreen';
+import ItemScreen from './src/screens/Items/ItemScreen';
+import ItemDetailsScreen from './src/screens/Items/ItemDetailsScreen';
 
 LogBox.ignoreAllLogs(true)
 
@@ -104,6 +106,7 @@ function MyDrawer() {
         <Drawer.Screen name="Saved Listings" component={SavedListingScreen} />
         <Drawer.Screen name="Forum" component={CategoryScreen} />
         <Drawer.Screen name="Itinerary" component={ItineraryScreen} />
+        <Drawer.Screen name="WithinSG Shop" component={ItemScreen} />
         <Drawer.Screen name="Attractions" component={AttractionScreen} />
         <Drawer.Screen name="Accommodations" component={AccommodationScreen} />
         <Drawer.Screen name="Telecoms" component={TelecomScreen} />
@@ -187,6 +190,8 @@ export const Layout = () => {
                         <Stack.Screen name="EventSuggestionsScreen" component={EventSuggestionsScreen} options={{ title : 'Recommendations By Time' }} />
                         <Stack.Screen name="InviteFriendScreen" component={InviteFriendScreen} options={{ title : 'Invitation' }} />
                         <Stack.Screen name="ViewInvitationsScreen" component={ViewInvitationsScreen} options={{ title : 'Invitations' }} />
+                        <Stack.Screen name="ItemListScreen" component={ItemScreen} options={{ title : 'Shop' }} />
+                        <Stack.Screen name="ItemDetailsScreen" component={ItemDetailsScreen} options={{ title : 'Shop' }} />
                     </>
                 ) : (
                     <>

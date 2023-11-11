@@ -298,13 +298,13 @@ const ItineraryScreen = ({ navigation }) => {
     };
 
     const checkIfSameDay = (dayNum, eventDate) => {
-        let constFirstDay = new Date(itinerary.start_date).getDate();
+        let selectedDay = new Date(itinerary.start_date);
         for (var i = 1; i < dayNum; i++) {
-            constFirstDay++;
+            selectedDay.setDate(selectedDay.getDate() + 1);
         }
         // console.log("event date:", new Date(eventDate).getDate());
-        // console.log("selected date: ", constFirstDay);
-        return new Date(eventDate).getDate() === constFirstDay;
+        // console.log("selected date: ", selectedDay);
+        return new Date(eventDate).getDate() === selectedDay.getDate() && new Date(eventDate).getMonth() == selectedDay.getMonth() && new Date(eventDate).getFullYear() == selectedDay.getFullYear();
     }
 
     const renderEventContent = (event, dayNum) => {

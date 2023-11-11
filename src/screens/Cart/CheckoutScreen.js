@@ -70,22 +70,21 @@ export const CheckoutScreen = ({navigation}) => {
       if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
         console.log('error',response.data)
         setIsCheckout(false);
+      } else {
+        console.log('success', response.data)
+        if (response.data) {
+          setIsCheckout(false);
+          navigation.reset({
+            index: 2,
+            routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'BookingHistoryScreen' }],
+          })
 
-  } else {
-      console.log('success', response.data)
-      if (response.data) {
-        setIsCheckout(false);
-        navigation.reset({
-          index: 2,
-          routes: [{ name: 'Drawer' }, { name: 'HomeScreen' }, { name: 'BookingHistoryScreen' }],
-        })
-
-        setDeletion(!deletion);
-        Toast.show({
-          type: 'success',
-          text1: 'Successfully checked out cart item(s)'
-        });
-    
+          setDeletion(!deletion);
+          Toast.show({
+            type: 'success',
+            text1: 'Successfully checked out cart item(s)'
+          });
+      
         } else {
           Toast.show({
             type: 'error',

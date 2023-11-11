@@ -78,7 +78,10 @@ const SendNotificationScreen = ({ navigation }) => {
             let tempDate = new Date(formDate);
             tempDate.setHours(formTime.hours);
             tempDate.setMinutes(formTime.minutes);
+            tempDate.setSeconds(0);
+            tempDate.setMilliseconds(0);
             tempDate.setHours(tempDate.getHours() + timeZoneOffset);
+            // console.log("notification selected date: ", tempDate);
 
             let response = await sendNotification(user.user_id, tempDate);
             if (response?.status) {
@@ -86,6 +89,10 @@ const SendNotificationScreen = ({ navigation }) => {
                 setFormTime(undefined);
                 console.log('send notification success')
             } else {
+                Toast.show({
+                    type: 'error',
+                    text1: "No booking event within 1hr of selected time!"
+                })
                 console.log('send notification failure');
             }
         } else {

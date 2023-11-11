@@ -312,13 +312,13 @@ const ItineraryScreen = ({ navigation }) => {
             ? { borderWidth: 1.2, borderColor: 'darkgreen' }
             : {};
 
-        if (event.accommodation || event.booking?.room) {
+        if (event.accommodation || event.booking?.room) { // accommodation
 
             return (
                 <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
-                            <View style={{ justifyContent: 'center' }}>
+                            <View style={{ justifyContent: 'center', marginTop: 10 }}>
                                 <IconButton icon="bed" size={20} onPress={null} />
                             </View>
                             <View style={{ justifyContent: 'center' }}>
@@ -330,8 +330,8 @@ const ItineraryScreen = ({ navigation }) => {
                             </View>
                         </View>
 
-                        <View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View style={styles.iconList}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
                                 <IconButton
                                     icon="pencil"
                                     size={20}
@@ -345,27 +345,27 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
-                            </View>
 
-                            <View style={{ alignItems: 'flex-end' }}>
-                                <IconButton
-                                    icon="chevron-right"
-                                    size={35}
-                                    style={[styles.icon, styles.chevronButton]}
-                                    onPress={() => navigateFunction(event)}
-                                />
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <IconButton
+                                        icon="chevron-right"
+                                        size={35}
+                                        style={{paddingLeft: -70, paddingTop: 17, marginTop: -10, marginLeft: -10, marginRight: 5}}
+                                        onPress={() => navigateFunction(event)}
+                                    />
+                                </View>
                             </View>
                         </View>
                     </View>
                 </Card>
             );
-        } else if (event.telecom || event.booking?.telecom) {
+        } else if (event.telecom || event.booking?.telecom) { // telecom
 
             return (
                 <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
-                            <View style={{ justifyContent: 'center' }}>
+                            <View style={{ justifyContent: 'center', marginTop: 10 }}>
                                 <IconButton icon="sim" size={20} onPress={null} />
                             </View>
                             <View style={{ justifyContent: 'center' }}>
@@ -376,8 +376,8 @@ const ItineraryScreen = ({ navigation }) => {
                             </View>
                         </View>
 
-                        <View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View style={styles.iconList}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
                                 <IconButton
                                     icon="pencil"
                                     size={20}
@@ -391,31 +391,77 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
-                            </View>
 
-                            <View style={{ alignItems: 'flex-end' }}>
-                                <IconButton
-                                    icon="chevron-right"
-                                    size={35}
-                                    style={[styles.icon, styles.chevronButton]}
-                                    onPress={() => navigateFunction(event)}
-                                />
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <IconButton
+                                        icon="chevron-right"
+                                        size={35}
+                                        style={{paddingLeft: -70, paddingTop: 17, marginTop: -10, marginLeft: -10, marginRight: 5}}
+                                        onPress={() => navigateFunction(event)}
+                                    />
+                                </View>
                             </View>
                         </View>
                     </View>
                 </Card>
             );
-        } else {
+        } else if (!event.accommodation && !event.telecom && !event.booking && ! event.restaurant && !event.attraction) { // diy event
+            return (
+                <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
+                    <View style={styles.rowContainer} key={event.diy_event_id}>
+                        <View style={styles.cardContainer}>
+                            <View style={{ justifyContent: 'center', marginTop: 10 }}>
+                                <IconButton icon="calendar" size={20} onPress={null} />
+                            </View>
+                            <View style={{ justifyContent: 'center' }}>
+                                <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
+                                {checkIfSameDay(dayNum, event.start_datetime) ? (<Text>Starts from {moment(event.start_datetime).format('LT')}</Text>) : (<Text>Starts from {moment(event.start_datetime).format('Do MMM')}</Text>)}
+                                {checkIfSameDay(dayNum, event.end_datetime) ? (<Text>Ends at {moment(event.end_datetime).format('LT')}</Text>) : (<Text>Ends at {moment(event.end_datetime).format('Do MMM')}</Text>)}
+                                <Text>{event.location}</Text>
+                                {event.remarks && <Text style={{ flexWrap: 'wrap', width: 220, marginTop: 10 }}>{event.remarks}</Text>}
+                            </View>
+                        </View>
+
+                        <View style={styles.iconList}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
+                                <IconButton
+                                    icon="pencil"
+                                    size={20}
+                                    style={[styles.icon]}
+                                    onPress={() => handleEditDiyEventPress(event)}
+                                />
+
+                                {!event.booking && <IconButton
+                                    icon="delete"
+                                    size={20}
+                                    style={[styles.icon]}
+                                    onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
+                                />}
+
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <IconButton
+                                        icon="chevron-right"
+                                        size={35}
+                                        style={{paddingLeft: -70, paddingTop: 17, marginTop: -10, marginLeft: -10, marginRight: 5}}
+                                        onPress={() => navigateFunction(event)}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </Card>
+            );
+
+        } else { // not accom, booking, telecom or diy event
 
             return (
                 <Card style={{ flex: 1 }} wrapperStyle={{ justifyContent: 'center' }} containerStyle={containerStyle}>
                     <View style={styles.rowContainer} key={event.diy_event_id}>
                         <View style={styles.cardContainer}>
-                            <View style={{ justifyContent: 'center' }}>
+                            <View style={{ justifyContent: 'center', marginTop: 10 }}>
                                 {event.restaurant && <IconButton icon="silverware-fork-knife" size={20} onPress={null} />}
                                 {(event.attraction || event.booking?.attraction) && <IconButton icon="ticket-confirmation" size={20} onPress={null} />}
                                 {(event.tourtype || event.booking?.tour) && <IconButton icon="human-greeting-variant" size={20} onPress={null} />}
-                                {(event.attraction == null && event.accommodation == null && event.telecom == null && event.restaurant == null && event.booking == null) && <IconButton icon="calendar" size={20} onPress={null} />}
                             </View>
                             <View style={{ justifyContent: 'center' }}>
                                 <Text style={{ fontWeight: 'bold' }}>{event.name}</Text>
@@ -425,8 +471,8 @@ const ItineraryScreen = ({ navigation }) => {
                             </View>
                         </View>
 
-                        <View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View style={styles.iconList}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
                                 <IconButton
                                     icon="pencil"
                                     size={20}
@@ -440,18 +486,17 @@ const ItineraryScreen = ({ navigation }) => {
                                     style={[styles.icon]}
                                     onPress={() => handleDeleteDiyEventPress(event.diy_event_id)}
                                 />}
-                            </View>
 
-                            <View style={{ alignItems: 'flex-end' }}>
-                                <IconButton
-                                    icon="chevron-right"
-                                    size={35}
-                                    style={[styles.icon, styles.chevronButton]}
-                                    onPress={() => navigateFunction(event)}
-                                />
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <IconButton
+                                        icon="chevron-right"
+                                        size={35}
+                                        style={{paddingLeft: -70, paddingTop: 17, marginTop: -10, marginLeft: -10, marginRight: 5}}
+                                        onPress={() => navigateFunction(event)}
+                                    />
+                                </View>
                             </View>
                         </View>
-
                     </View>
                 </Card>
             );
@@ -711,7 +756,7 @@ const styles = StyleSheet.create({
     },
     icon: {
         marginLeft: -5,
-        marginTop: -5,
+        marginTop: -15,
         marginRight: 3,
     },
     itineraryEditIcon: {
@@ -810,6 +855,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginRight: 100
     },
     minorOverlapText: {
         flex: 1,
@@ -850,9 +896,11 @@ const styles = StyleSheet.create({
     cardContainer: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'left',
+        alignItems: 'left',
         marginLeft: -10,
+        width: 240,
+        // backgroundColor: 'green'
     },
     profileImageList: {
         marginTop: 0,
@@ -868,6 +916,11 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
     },
+    iconList: {
+        width: 95,
+        marginLeft: 15,
+        // backgroundColor: 'blue',
+    }
 });
 
 export default ItineraryScreen

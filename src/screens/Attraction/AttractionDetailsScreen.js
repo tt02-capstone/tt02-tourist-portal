@@ -101,11 +101,43 @@ const AttractionDetailsScreen = ({ navigation }) => {
             })
         } else {
             // format date
+            // // get attraction opening hours
+            // let startHours = '';
+            // for (var i = 0; i < attraction?.opening_hours.length && i < 2; i++) {
+            //     let x = attraction?.opening_hours[i];
+            //     if (x === '1' || x === '2' || x === '3' || x === '4' || x === '5' || x === '6' || x === '7' || x === '8' || x === '9' || x === '10' || x === '11' || x === '12') { // if x is from 1am - 12pm
+            //         startHours = startHours + x;
+            //     } else {
+            //         break;
+            //     }
+            // }
+            // startHours = startHours !== '' ? Number(startHours) : 0;
+
+            // // get attraction suggested duration, else set default to 2
+            // const suggestedDuration = attraction?.suggested_duration ? attraction.suggested_duration : 2;
+
             selectedDate.setHours(selectedDate.getHours() + timeZoneOffset);
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
             const day = String(selectedDate.getDate()).padStart(2, '0'); // format to current timezone 
             const formattedDate = `${year}-${month}-${day}`;
+
+            // const formattedStartDate = new Date();
+            // formattedStartDate.setFullYear(year);
+            // formattedStartDate.setMonth(month-1);
+            // formattedStartDate.setDate(day);
+            // formattedStartDate.setHours(startHours);
+            // formattedStartDate.setMinutes(0);
+            // formattedStartDate.setSeconds(0);
+            // formattedStartDate.setMilliseconds(0);
+            // formattedStartDate.setHours(formattedStartDate.getHours() + timeZoneOffset);
+
+            // const formattedEndDate = new Date(formattedStartDate);
+            // formattedEndDate.setHours(formattedEndDate.getHours() + suggestedDuration);
+            // // console.log("start: ", year, month, day, startHours, suggestedDuration);
+            // // console.log("start: ", formattedStartDate);
+            // // console.log("end: ", formattedEndDate);
+
             let noOfPax = 0;
 
             for (const ticketType in quantityByTicketType) {
@@ -239,6 +271,7 @@ const AttractionDetailsScreen = ({ navigation }) => {
                         text1: checkInventory.error
                     })
                 } else {
+                    console.log(cartItems);
                     const response = await cartApi.post(`/addCartItems/${user_type}/${tourist_email}/${activity_name}`, cartItems);
                     console.log('attractions', response.data.httpStatusCode);
                     // const tourResponse = await cartApi.post(`/addTourToCart/${user.user_id}/${tourId}`, tourCartPayload);

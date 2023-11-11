@@ -135,7 +135,7 @@ export const ItemDetailsScreen = ({ navigation }) => {
         if (itemQuantity < 1) {
             Toast.show({
                 type: 'error',
-                text1: "Please  at least add quantity of 1!"
+                text1: "Please at least add quantity of 1!"
             })
         } else if (selectedItem.quantity < itemQuantity) {
             Toast.show({
@@ -186,9 +186,9 @@ export const ItemDetailsScreen = ({ navigation }) => {
                     <View style={styles.container}>
                         <Card>
                             { selectedItem.is_limited_edition && (
-                                <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginTop:5}}> LIMITED EDTION </Text>
+                                <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginTop:5, marginBottom: 15, marginLeft:8}}> LIMITED EDITION </Text>
                             )}
-                            <Image source={{ uri: selectedItem.image }} style={{ width: 300, height: 300, marginLeft:8 }} />
+                            <Image source={{ uri: selectedItem.image }} style={{ width: 300, height: 300, marginLeft:8, marginBottom: 12 }} />
                         
                             <View style={{marginLeft: 10, marginTop:0}}>
                                 { vendors != undefined && (
@@ -203,15 +203,14 @@ export const ItemDetailsScreen = ({ navigation }) => {
 
                                 <View style={{flexDirection:"row"}}>
                                     <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {selectedItem.name}  </Text>
-                                    
-                                    <Button mode="text" style={{ marginTop:-10, marginLeft: 170 , width:'10%'}} onPress={save} >
-                                        {isSaved && <Icon name="heart" size={15} color='red' />}
-                                        {!isSaved && <Icon name="heart" size={15} color='grey' />}
-                                    </Button>
+                                        <Button mode="text" style={{ marginTop:-10, marginLeft:-20 , width:'10%'}} onPress={save} >
+                                            {isSaved && <Icon name="heart" size={15} color='red' />}
+                                            {!isSaved && <Icon name="heart" size={15} color='grey' />}
+                                        </Button>
                                 </View>
 
-                                <Text style={{ fontSize: 13 ,  marginTop:0, color:'grey'}}> {selectedItem.description} </Text>
-                                <Text style={{ fontSize: 12 , fontWeight:'bold', marginTop:3, color:'grey'}}> $ {selectedItem.price}.00 </Text>
+                                <Text style={{ fontSize: 13 ,  marginTop:0, color:'grey', width:300}}> {selectedItem.description} </Text>
+                                <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:13, color:'black'}}> $ {selectedItem.price}.00 </Text>
                             
                             </View>
 
@@ -242,7 +241,7 @@ export const ItemDetailsScreen = ({ navigation }) => {
                                 </Card.Title>
 
                                 <ScrollView horizontal>
-                                    <View style={{ flexDirection: 'row', height: 350 }}>
+                                    <View style={{ flexDirection: 'row', height: 350, }}>
                                         {
                                             recommendation.map((item, index) => (
                                                 <TouchableOpacity key={index} onPress={() => viewOtherItem(item.item_id)}>
@@ -251,12 +250,12 @@ export const ItemDetailsScreen = ({ navigation }) => {
                                                         <View>
                                                             <View style={{marginLeft: 10, marginTop:3}}>
                                                             
-                                                                { item.quantity <=5 && (
+                                                                {/* { item.quantity <=5 && (
                                                                     <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginBottom:3, marginLeft:2}}> SELLING OUT SOON </Text>
-                                                                )}
+                                                                )} */}
 
-                                                                <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {item.name} </Text>
-                                                                <Text style={{ fontSize: 11 , fontWeight:'bold', marginTop:3, color:'grey'}}> $ {item.price}.00 </Text>
+                                                                <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:5, marginLeft:-10, color:'#044537'}}> {item.name} </Text>
+                                                                <Text style={{ fontSize: 11 , fontWeight:'bold', marginTop:3, color:'black', marginLeft:-10,}}> $ {item.price}.00 </Text>
                                                             
                                                             </View>
                                                         </View>

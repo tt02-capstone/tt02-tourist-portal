@@ -742,26 +742,27 @@ export const CartScreen = ({ route, navigation }) => {
           ))
           }
         </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#DCF2DD', padding: 10, height: 70 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <CheckBox
+              left
+              iconType="material-community"
+              checkedIcon="checkbox-outline"
+              uncheckedIcon={'checkbox-blank-outline'}
+              title="All"
+              style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight: 'bold', color: 'black' }}
+              containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color: 'black' }}
+              checked={isAllChecked()} // Check if all items are checked
+              onPress={handleCheckAllToggle} />
+            <Text style={{ fontWeight: 'bold', color: 'black' }}>Total Price: ${totalPrice.toFixed(2)}</Text>
+          </View>
+
+          {/* <Button title="Checkout" onPress={() => {checkout()}} /> */}
+          <CheckoutButton mode="contained"  style={{ backgroundColor: '#044537', color: "white", marginLeft: 10, width:'33%', fontWeight:'bold' }} onPress={() => {checkout()}} > Checkout </CheckoutButton>
+        </View>
       </ScrollView>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#DCF2DD', padding: 10, height: 70 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <CheckBox
-            left
-            iconType="material-community"
-            checkedIcon="checkbox-outline"
-            uncheckedIcon={'checkbox-blank-outline'}
-            title="All"
-            style={{ borderWidth: 0, margin: 0, padding: 0, fontWeight: 'bold', color: 'black' }}
-            containerStyle={{ borderWidth: 0, margin: 0, padding: 0, backgroundColor: 'transparent', color: 'black' }}
-            checked={isAllChecked()} // Check if all items are checked
-            onPress={handleCheckAllToggle} />
-          <Text style={{ fontWeight: 'bold', color: 'black' }}>Total Price: ${totalPrice.toFixed(2)}</Text>
-        </View>
-
-        {/* <Button title="Checkout" onPress={() => {checkout()}} /> */}
-        <CheckoutButton mode="contained"  style={{ backgroundColor: '#044537', color: "white", marginLeft: 10, width:'38%' }} onPress={() => {checkout()}} > CHECKOUT </CheckoutButton>
-      </View>
     </View>
   );
 };

@@ -301,7 +301,7 @@ export const CheckoutScreen = ({navigation}) => {
         <View style={{marginRight: -80}}>
           <ActivityIndicator size='small' animating={isCheckout} color='green'/>
         </View>
-        <Button text="Book Now" style={{width:100}} onPress={() => {checkout()}} />
+        <Button text="Buy Now" style={{width:100}} onPress={() => {checkout()}} />
       </View>
     </View>
   );

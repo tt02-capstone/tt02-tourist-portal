@@ -112,7 +112,7 @@ function MyDrawer() {
         <Drawer.Screen name="Telecoms" component={TelecomScreen} />
         <Drawer.Screen name="Restaurants" component={RestaurantScreen} />
         <Drawer.Screen name="Deals" component={DealScreen} />
-        <Drawer.Screen name="Bookings" component={BookingHistoryScreen} />
+        <Drawer.Screen name="Purchases" component={BookingHistoryScreen} />
         <Drawer.Screen name="Payments" component={PaymentHistoryScreen} />
         <Drawer.Screen name="Support Tickets" component={SupportTicketScreen} />
         <Drawer.Screen name="Send Notification" component={SendNotificationScreen} />
@@ -150,8 +150,8 @@ export const Layout = () => {
                         <Stack.Screen name="ApplyDealScreen" component={ApplyDealScreen} options={{ title : 'Apply Deal Screen' }} />
                         <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
-                        <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Booking History' }} />
-                        <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Booking Details' }} />
+                        <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Purchase History' }} />
+                        <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Purchase Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
                         <Stack.Screen name="SavedListingScreen" component={ SavedListingScreen } options={{ title : 'Saved Listing' }} />
                         <Stack.Screen name="CreditCardsScreen" component={CreditCardsScreen} options={{title: 'My Credit Cards'}}/>

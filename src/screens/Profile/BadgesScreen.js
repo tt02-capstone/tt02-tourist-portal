@@ -40,10 +40,11 @@ export const BadgesScreen = ({ route, navigation }) => {
 
                 let badgeTypesResponse = await getAllBadgeTypes(userData.user_id);
                 if (badgeTypesResponse.status) {
-                    const filteredBadgeTypes = badgeTypesResponse.data.filter(
+                    const filteredBadgeTypes1 = badgeTypesResponse.data.filter(
                         (type) => !badges || badges.length === 0 || !badges.some((badge) => badge.badge_type === type)
                     );
-                    setBadgeTypes(filteredBadgeTypes);
+                    const filteredBadgeTypes2 = filteredBadgeTypes1.filter((type) => type != 'ACCOMMODATION_EXPERT')
+                    setBadgeTypes(filteredBadgeTypes2);
 
                     let badgeProgressResponse = await getBadgeProgress(userData.user_id);
                     if (badgeProgressResponse.status) {
@@ -52,13 +53,15 @@ export const BadgesScreen = ({ route, navigation }) => {
                             ...prevValues,
                             FOODIE: badgeProgressResponse.data.foodie,
                             ATTRACTION_EXPERT: badgeProgressResponse.data.attraction_EXPERT,
-                            ACCOMMODATION_EXPERT: badgeProgressResponse.data.accommodation_EXPERT,
+                            // ACCOMMODATION_EXPERT: badgeProgressResponse.data.accommodation_EXPERT,
                             TELECOM_EXPERT: badgeProgressResponse.data.telecom_EXPERT,
                             TOUR_EXPERT: badgeProgressResponse.data.tour_EXPERT,
                             TOP_CONTRIBUTOR: badgeProgressResponse.data.top_CONTRIBUTOR
                         }));
 
-                        const sortedBadgeTypes = badgeTypes.sort((a, b) => {
+                        const sortedBadgeTypes = badgeTypes
+                            .filter((type) => type.toUpperCase() !== 'ACCOMMODATION_EXPERT')
+                            .sort((a, b) => {
                             const progressDiff = progressValues[b.toUpperCase()] - progressValues[a.toUpperCase()];
                             if (progressDiff === 0) {
                                 if (a.toUpperCase() < b.toUpperCase()) {
@@ -95,21 +98,23 @@ export const BadgesScreen = ({ route, navigation }) => {
         const formattedName = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
         if (formattedName == "Foodie") {
             return "Foodie Expert"
+        } else if (formattedName == "Tour Expert") {
+            return "Touring Expert"
+        } else if (formattedName == "Attraction Expert") {
+            return "Attraction Pro"
         }
         return formattedName;
     }
 
     function badgeDetails(name) {
         if (name == "FOODIE") {
-            return "Unlocked After Creating 2 Restaurant Related Posts"
+            return "  Unlocked After Creating 2 Restaurant Related Posts"
         } else if (name == "ATTRACTION_EXPERT") {
-            return "Unlocked After Creating 2 Attraction Related Posts"
-        } else if (name == "ACCOMMODATION_EXPERT") {
-            return "Unlocked After Creating 2 Accommodation Related Posts"
+            return "  Unlocked After Creating 2 Attraction Related Posts"
         } else if (name == "TELECOM_EXPERT") {
-            return "Unlocked After Creating 2 Telecom Related Posts"
+            return " Unlocked After Creating 2 Telecom Related Posts"
         } else if (name == "TOUR_EXPERT") {
-            return "Unlocked After Creating 2 Tour Related Posts"
+            return "  Unlocked After Creating 2 Tour Related Posts"
         } else {
             return "Unlocked After Creating 4 Posts on Forum"
         }
@@ -141,18 +146,18 @@ export const BadgesScreen = ({ route, navigation }) => {
                         {badges.map((badge, index) => (
                             <Card key={index}>
                                 {!badge.is_primary ? (
-                                    <Button mode="text" onPress={() => setPrimary(badge.badge_id, user.user_id)} style={{ width: "50%", marginTop: -10, marginLeft: -25 }}>
+                                    <Button mode="text" onPress={() => setPrimary(badge.badge_id, user.user_id)} style={{ width: "50%", marginTop: -10, marginLeft: -25, marginBottom:10 }}>
                                         <Icon name="bookmark" size={12} color='#044537' />
                                         <Text style={{ color: '#044537', fontSize: 10, fontWeight: 'bold' }}> Mark as Primary </Text>
                                     </Button>
                                 ) : (
-                                    <Text style={{ color: 'red', fontSize: 10, fontWeight: 'bold' }}> PRIMARY </Text>
+                                    <Text style={{ color: 'red', fontSize: 10, fontWeight: 'bold', marginBottom : 20 }}> PRIMARY </Text>
                                 )
                                 }
-                                <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 200, height: 200, marginLeft: 55, marginBottom: -50, marginTop: -10 }} />
-                                <Text style={{ fontSize: 20, textAlign: 'center', fontWeight: 'bold', marginTop: 23, marginLeft: -3 }}>{formatBadgeName(badge.badge_type)}</Text>
-                                <Text style={{ fontSize: 8, textAlign: 'center', fontWeight: 'bold', marginTop: 6, color: 'grey' }}> {badgeDetails(badge.badge_type)} </Text>
-                                <View style={{ alignSelf: 'center', marginTop: 20, marginBottom: 10 }}>
+                                <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 65, height: 65, marginLeft: 18, marginBottom: -50, marginTop: -10 }} />
+                                <Text style={{ fontSize: 20, textAlign: 'center', fontWeight: 'bold', marginTop: -10, marginLeft: 6 }}>{formatBadgeName(badge.badge_type)}</Text>
+                                <Text style={{ fontSize: 8, textAlign: 'left', fontWeight: 'bold', marginTop: 6, color: 'grey',  marginLeft: 97 }}> {badgeDetails(badge.badge_type)} </Text>
+                                <View style={{ alignSelf: 'center', marginTop: 30, marginBottom: 20, marginLeft:8 }}>
                                     <Progress.Bar
                                         progress={progressValues[badge.badge_type]}
                                         width={280}
@@ -160,7 +165,7 @@ export const BadgesScreen = ({ route, navigation }) => {
                                         color={'#44C662'}
                                     />
                                     <Text style={styles.progressBarText}>
-                                        {`Achieved!`}
+                                        {`ACHIEVED!!`}
                                     </Text>
                                 </View>
                             </Card>
@@ -178,15 +183,15 @@ export const BadgesScreen = ({ route, navigation }) => {
                                         source={{
                                             uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + formattedBadgeType + ".png",
                                         }}
-                                        style={{ width: 200, height: 200, marginLeft: 55, marginBottom: -50, marginTop: -10 }}
+                                        style={{ width: 60, height: 60,  marginLeft: 18, marginBottom: -50, marginTop: 7 }}
                                     />
-                                    <Text style={{ fontSize: 20, textAlign: 'center', fontWeight: 'bold', marginTop: 23, marginLeft: -3 }}>
+                                    <Text style={{ fontSize: 18, textAlign: 'center', fontWeight: 'bold', marginTop: -10, marginLeft: 0, wdith:100 }}>
                                         {formatBadgeName(formattedBadgeType)}
                                     </Text>
-                                    <Text style={{ fontSize: 8, textAlign: 'center', fontWeight: 'bold', marginTop: 6, color: 'grey' }}>
+                                    <Text style={{ fontSize: 8, textAlign: 'left', fontWeight: 'bold', marginTop: 6, color: 'grey',  marginLeft: 100 }}>
                                         {badgeDetails(formattedBadgeType)}
                                     </Text>
-                                    <View style={{ alignSelf: 'center', marginTop: 20, marginBottom: 10 }}>
+                                    <View style={{ alignSelf: 'center', marginTop: 30, marginBottom: 20, marginLeft:8  }}>
                                         <Progress.Bar
                                             progress={progressValues[formattedBadgeType]}
                                             width={280}
@@ -226,5 +231,6 @@ const styles = StyleSheet.create({
         marginTop: 15,
         fontSize: 12,
         color: '#000000',
+        fontWeight:'bold'
     },
 });

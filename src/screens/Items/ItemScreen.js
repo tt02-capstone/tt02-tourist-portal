@@ -83,10 +83,10 @@ export const ItemScreen = ({ navigation }) => {
                         <TouchableOpacity key={index} onPress={() => viewItem(item.item_id)}>
                             <Card key={index}>
                                 { item.quantity <=5 && (
-                                    <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginBottom:3, marginLeft:8}}> SELLING OUT SOON </Text>
+                                    <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginBottom:10, marginLeft:8}}> SELLING OUT SOON </Text>
                                 )}
                                 <View>
-                                    <Image source={{ uri: item.image }} style={{ width: 150, height: 150, marginLeft:80 }} />
+                                    <Image source={{ uri: item.image }} style={{ width: 150, height: 150, marginLeft:80, marginBottom: 10 }} />
                                     <View style={{marginLeft: 10, marginTop:3}}>
                                         <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {item.name} </Text>
                                         <Text style={{ fontSize: 11 , fontWeight:'bold', marginTop:3, color:'grey'}}> $ {item.price}.00 </Text>

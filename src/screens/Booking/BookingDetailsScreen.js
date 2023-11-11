@@ -184,18 +184,18 @@ const BookingDetailsScreen = ({ navigation }) => {
     };
     const getColorForStatus = (label) => {
         const labelColorMap = {
-            'UPCOMING': 'lightgreen',
-            'ONGOING': 'lightgreen',
+            'UPCOMING': 'green',
+            'ONGOING': 'green',
             'COMPLETED': 'lightblue',
             'CANCELLED': 'lightpink',
-            'PENDING_VENDOR_DELIVERY': 'lightyellow',
-            'PENDING_VENDOR_PICKUP': 'lightyellow',
+            'PENDING_VENDOR_DELIVERY': 'purple',
+            'PENDING_VENDOR_PICKUP': 'purple',
             "PREPARE_FOR_SHIPMENT": 'orange',
             "PREPARE_FOR_PICKUP": 'orange',
             "SHIPPED_OUT": "yellow",
             "READY_FOR_PICKUP": "yellow",
-            'DELIVERED': 'lightgreen',
-            'PICKED_UP': 'lightgreen',
+            'DELIVERED': 'green',
+            'PICKED_UP': 'green',
         };
 
         return labelColorMap[label] || 'gray';
@@ -259,9 +259,13 @@ const BookingDetailsScreen = ({ navigation }) => {
         <Background>
             <ScrollView>
                 <Card>
-                    <Card.Title style={styles.header}>
-                        {getNameForBooking(booking)}
-                    </Card.Title>
+                    <View style={{flexDirection:'row', marginBottom: 5}}>
+                        <Card.Title style={{ color:'#044537', fontSize:15, marginLeft:0}}>
+                            {getNameForBooking(booking)}
+                        </Card.Title>
+                        <Text style={[styles.tag, {color: getColorForStatus(booking.status)}]}> [{getStatusDisplayName(booking.status)}]</Text>
+                    </View>
+
                     <Card.Image
                         style={{ padding: 0 , width:250 , height: 250, marginLeft:40}}
                         source={{
@@ -277,10 +281,12 @@ const BookingDetailsScreen = ({ navigation }) => {
                     {booking.tour && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
 
                     {pickupLocation && <Text style={styles.description}> Pick Up Location : {pickupLocation}</Text>}
-                    <View style={{ display: 'inline-block' }}>
-                        <Text style={[styles.tag, { backgroundColor: getColorForStatus(booking.status) }]}>{getStatusDisplayName(booking.status)}</Text>
-                    </View>
+                    {/* <View style={{ display: 'inline-block' }}>
+                        <Text style={[styles.tag, {color: getColorForStatus(booking.status)}]}> [{getStatusDisplayName(booking.status)}]</Text>
+                    </View> */}
                 </Card>
+
+
                 {booking.item && !isCollected && (booking.status === "SHIPPED_OUT" || booking.status ===  "READY_FOR_PICKUP") && (
                     <Card>
                         <Card.Title style={styles.header}>
@@ -380,14 +386,12 @@ const styles = StyleSheet.create({
         marginBottom: 10, fontSize: 13, marginTop: 10
     },
     tag: {
-        color: 'black',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        margin: 5,
         width: 210,
         fontSize: 12,
-        fontWeight: 'bold'
+        marginLeft: 5,
+        marginTop:2,
+        fontWeight: 'bold',
+        marginBottom:10
     },
     dropBorder: {
         borderWidth: 0,

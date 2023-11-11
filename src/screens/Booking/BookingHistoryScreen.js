@@ -123,18 +123,18 @@ const BookingHistoryScreen = ({navigation}) => {
     };
     const getColorForStatus = (label) => {
         const labelColorMap = {
-            'UPCOMING': 'lightgreen',
-            'ONGOING': 'lightgreen',
+            'UPCOMING': 'green',
+            'ONGOING': 'green',
             'COMPLETED': 'lightblue',
             'CANCELLED': 'lightpink',
-            'PENDING_VENDOR_DELIVERY': 'lightyellow',
-            'PENDING_VENDOR_PICKUP': 'lightyellow',
+            'PENDING_VENDOR_DELIVERY': 'purple',
+            'PENDING_VENDOR_PICKUP': 'purple',
             "PREPARE_FOR_SHIPMENT": 'orange',
             "PREPARE_FOR_PICKUP": 'orange',
             "SHIPPED_OUT": "yellow",
             "READY_FOR_PICKUP": "yellow",
-            'DELIVERED': 'lightgreen',
-            'PICKED_UP': 'lightgreen',
+            'DELIVERED': 'green',
+            'PICKED_UP': 'green',
         };
 
         return labelColorMap[label] || 'gray';
@@ -207,9 +207,13 @@ const BookingHistoryScreen = ({navigation}) => {
                     {data.map((item, index) => (
                         <TouchableOpacity key={index} onPress={() => viewBooking(item.booking_id)}>
                             <Card>
-                                <Card.Title style={styles.header}>
-                                    {getNameForBooking(item)}
-                                </Card.Title>
+                                <View style={{flexDirection:'row', marginBottom:-13}}>
+                                    <Card.Title style={{ color:'#044537', fontSize:15, marginLeft:15}}>
+                                        {getNameForBooking(item)}
+                                    </Card.Title>
+                                    <Text style={[styles.tag, {color: getColorForStatus(item.status)}]}> [{getStatusDisplayName(item.status)}]</Text>
+                                </View>
+                                
                                 <View style={{
                                     flexDirection: 'row',
                                     alignItems: 'start',
@@ -227,16 +231,16 @@ const BookingHistoryScreen = ({navigation}) => {
                                             width: 120,
                                             height: 120,
                                             marginLeft: 40,
+                                            marginBottom:-10
                                         }}
                                         source={{
                                             uri: getImage(item)
                                         }}
                                     />
                                 </View>
-                                <View style={{display: 'inline-block', marginLeft: 20}}>
-                                    <Text
-                                        style={[styles.tag, {backgroundColor: getColorForStatus(item.status)}]}>{getStatusDisplayName(item.status)}</Text>
-                                </View>
+                                {/* <View style={{display: 'inline-block', marginLeft: 20}}>
+                                    <Text style={[styles.tag, {color: getColorForStatus(item.status)}]}>{getStatusDisplayName(item.status)}</Text>
+                                </View> */}
                                 <Button style={styles.button} text="View Details" mode="contained"
                                         onPress={() => viewBooking(item.booking_id)}/>
                             </Card>
@@ -328,7 +332,7 @@ const BookingHistoryScreen = ({navigation}) => {
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.emptyMessage}>No bookings made</Text>
+                    <Text style={styles.emptyMessage}>No Purchase Made</Text>
                 </View>
             </ScrollView>
         </Background>
@@ -379,18 +383,12 @@ const styles = StyleSheet.create({
         marginBottom: 20, fontSize: 13, marginTop: 10
     },
     tag: {
-        color: 'black',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        margin: 5,
         width: 210,
         fontSize: 12,
-        fontWeight: 'bold'
-    },
-    header: {
-        color: '#044537',
-        fontSize: 15
+        marginLeft: 5,
+        marginTop:2,
+        fontWeight: 'bold',
+        marginBottom:10
     },
     emptyContainer: {
         backgroundColor: 'white',
@@ -404,7 +402,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     button: {
-        width: '100%'
+        width: '98%'
     },
     filterContainer: {
         flexDirection: 'row',

@@ -125,6 +125,7 @@ export const CartScreen = ({ route, navigation }) => {
     const priceList = [];
     const selectedCartItems = [];
     let isShoppingItem = false;
+    let pickupAddress = "";
 
     itemChecked.forEach((value, key) => {
       const items_for_vendor = value.filter(value => value === true).length;
@@ -143,6 +144,7 @@ export const CartScreen = ({ route, navigation }) => {
 
           if (vendorCartMap.get(key)[index].type == "ITEM") {
             isShoppingItem = true;
+            pickupAddress = vendorCartMap.get(key)[index].address; // to pass the pickup location to checkout screen
           }
         }
       });
@@ -151,7 +153,7 @@ export const CartScreen = ({ route, navigation }) => {
     console.log(booking_ids, priceList, selectedCartItems)
 
     if (selectedCartItems.length > 0) {
-      navigation.navigate('CheckoutScreen', { booking_ids, priceList, selectedCartItems, totalPrice, isShoppingItem});
+      navigation.navigate('CheckoutScreen', { booking_ids, priceList, selectedCartItems, totalPrice, isShoppingItem, pickupAddress});
     } else {
       Toast.show({
         type: 'error',
@@ -462,6 +464,7 @@ export const CartScreen = ({ route, navigation }) => {
                 items: detail.cart_item_list,
                 price: subtotal.toFixed(2),
                 quantity: quantities,
+                address: detail.vendor.business_address
               };
               setVendorCartMapping(detail.vendor.vendor_id, attr)
               return attr

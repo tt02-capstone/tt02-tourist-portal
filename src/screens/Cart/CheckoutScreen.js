@@ -8,6 +8,7 @@ import Toast from "react-native-toast-message";
 import { cartApi, paymentsApi } from '../../helpers/api';
 import { useRoute } from '@react-navigation/native';
 import { useIsFocused } from '@react-navigation/native';
+import TextInput from '../../components/TextInput';
 
 export const CheckoutScreen = ({navigation}) => {
     
@@ -19,9 +20,10 @@ export const CheckoutScreen = ({navigation}) => {
   const [cards, setCards] = useState([]); 
   const [itemChecked, setItemChecked] = useState([false]); 
   const [isCheckout, setIsCheckout] = useState(false);
-  const { booking_ids, priceList, selectedCartItems, totalPrice, isShoppingItem} = route.params;
+  const { booking_ids, priceList, selectedCartItems, totalPrice, isShoppingItem, pickupAddress} = route.params;
   const isFocused = useIsFocused();
   const [selectedDeliveryType, setSelectedDeliveryType] = useState(null);
+  const [formData, setFormData] = useState({ addrValue: '' })
 
   function formatDateAndTime(date) {
     const options = {
@@ -58,12 +60,22 @@ export const CheckoutScreen = ({navigation}) => {
     const payment_method_id = cards[getSelectedCard].id;
     // console.log(booking_ids)
 
+    let deliveryAddress = ""
+
     try {
+      let deliveryAddress = ""
+
+      if (formData.addrValue !== "") {
+        deliveryAddress = formData.addrValue;
+      }
+
       let tempObj = {
         booking_ids: booking_ids,
         priceList: priceList,
-        selectedDeliveryType: selectedDeliveryType
+        selectedDeliveryType: selectedDeliveryType,
+        deliveryAddress : deliveryAddress
       }
+
       setIsCheckout(true);
       
       const response = await cartApi.post(`/checkout/${user_type}/${tourist_email}/${payment_method_id}/${totalPrice}`, tempObj);
@@ -150,8 +162,13 @@ export const CheckoutScreen = ({navigation}) => {
     onLoad();
   }, [isFocused]);
 
+  // to cater for delivery use cases 
   useEffect(() => {
     console.log(selectedDeliveryType)
+    if (selectedDeliveryType == "DELIVERY") {
+      console.log("help")
+      console.log(formData)
+    }
   }, [selectedDeliveryType])
 
   return (
@@ -206,7 +223,6 @@ export const CheckoutScreen = ({navigation}) => {
         ))}
         <ListItem containerStyle={padding= 20}>
           
-      
       <View>
         { isShoppingItem && (
           <View>
@@ -218,16 +234,27 @@ export const CheckoutScreen = ({navigation}) => {
                 uncheckedIcon="radiobox-blank"
                 containerStyle={{ marginLeft: 0, marginBottom: -8 }}
                 checked={selectedDeliveryType === 'DELIVERY'}
-                onPress={() => setSelectedDeliveryType('DELIVERY')}
+                onPress={() => { setSelectedDeliveryType('DELIVERY'); setFormData({ addrValue: '' });}}
               />
+
+              {selectedDeliveryType === 'DELIVERY' && (
+                  <TextInput
+                    style={{width: 320, marginLeft: 15}}
+                    label="Enter Delivery Address"
+                    returnKeyType="next"
+                    value={formData.addrValue}
+                    onChangeText={(addrValue) => setFormData({...formData, addrValue})}
+                  />
+              )}
+              
               <CheckBox
-                title='Pickup'
+                title={'Pickup @ ' + pickupAddress}
                 iconType="material-community"
                 checkedIcon="radiobox-marked"
                 uncheckedIcon="radiobox-blank"
                 containerStyle={{ marginLeft: 0, marginRight: -8}}
                 checked={selectedDeliveryType === 'PICKUP'}
-                onPress={() => setSelectedDeliveryType('PICKUP')}
+                onPress={() => { setSelectedDeliveryType('PICKUP'); setFormData({ addrValue: '' });}}
               />
           </View>
 

@@ -22,6 +22,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const [tourImage, setTourImage] = useState('');
     const [pickupLocation, setPickupLocation] = useState('');
     const [isCollected, setIsCollected] = useState(false);
+    const [deliveryLocation, setDeliveryLocation] = useState('');
 
     const route = useRoute();
     const { bookingId } = route.params;
@@ -71,6 +72,13 @@ const BookingDetailsScreen = ({ navigation }) => {
                     } else {
                         console.log("Can't get vendor location for items")
                     }
+                }
+
+                if (booking.status == "PENDING_VENDOR_DELIVERY" || booking.status == "PREPARE_FOR_SHIPMENT" || booking.status == "SHIPPED_OUT" || booking.status == "DELIVERED") {
+                    const booking_item = booking.booking_item_list[0];
+                    const as = booking_item.activity_selection;
+                    const parts = as.split('_');
+                    setDeliveryLocation(parts[1]);
                 }
             }
 
@@ -177,6 +185,7 @@ const BookingDetailsScreen = ({ navigation }) => {
             PREPARE_FOR_PICKUP: 'Prepare for Pickup',
             READY_FOR_PICKUP: 'Ready for Pickup',
             PICKED_UP: 'Picked Up',
+            CANCELLED:'Cancelled'
         }
         const displayName = deliverypickup[currentstatus] || currentstatus;
 
@@ -187,13 +196,13 @@ const BookingDetailsScreen = ({ navigation }) => {
             'UPCOMING': 'green',
             'ONGOING': 'green',
             'COMPLETED': 'lightblue',
-            'CANCELLED': 'lightpink',
+            'CANCELLED': 'red',
             'PENDING_VENDOR_DELIVERY': 'purple',
             'PENDING_VENDOR_PICKUP': 'purple',
             "PREPARE_FOR_SHIPMENT": 'orange',
             "PREPARE_FOR_PICKUP": 'orange',
-            "SHIPPED_OUT": "yellow",
-            "READY_FOR_PICKUP": "yellow",
+            "SHIPPED_OUT": "hotpink",
+            "READY_FOR_PICKUP": "hotpink",
             'DELIVERED': 'green',
             'PICKED_UP': 'green',
         };
@@ -281,6 +290,8 @@ const BookingDetailsScreen = ({ navigation }) => {
                     {booking.tour && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
 
                     {pickupLocation && <Text style={styles.description}> Pick Up Location : {pickupLocation}</Text>}
+                    {deliveryLocation && <Text style={styles.description}> Delivery Location : {deliveryLocation}</Text>}
+
                     {/* <View style={{ display: 'inline-block' }}>
                         <Text style={[styles.tag, {color: getColorForStatus(booking.status)}]}> [{getStatusDisplayName(booking.status)}]</Text>
                     </View> */}
@@ -304,14 +315,19 @@ const BookingDetailsScreen = ({ navigation }) => {
                         </View>
                     </Card>
                 )}
-                <Card>
-                    <Card.Title style={styles.header}>
-                        Cancellation Policy
-                    </Card.Title>
-                    <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
-                    {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
 
-                </Card>
+                { booking.status == 'UPCOMING' && booking.status == 'ONGOING' && booking.status == 'PENDING_VENDOR_DELIVERY' && booking.status == 'PENDING_VENDOR_PICKUP' &&
+                    <Card>
+                        <Card.Title style={styles.header}>
+                            Cancellation Policy
+                        </Card.Title>
+                        <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
+                        {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
+                    </Card>
+                }
+                
+
+
                 {booking.status != 'CANCELLED' && booking.qr_code_list.length > 1 && <Card>
                     <Card.Title style={styles.header}>
                         Ticket Vouchers

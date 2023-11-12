@@ -116,6 +116,7 @@ const BookingHistoryScreen = ({navigation}) => {
             PREPARE_FOR_PICKUP: 'Prepare for Pickup',
             READY_FOR_PICKUP: 'Ready for Pickup',
             PICKED_UP: 'Picked Up',
+            CANCELLED:'Cancelled'
         }
         const displayName = deliverypickup[currentstatus] || currentstatus;
 
@@ -126,13 +127,13 @@ const BookingHistoryScreen = ({navigation}) => {
             'UPCOMING': 'green',
             'ONGOING': 'green',
             'COMPLETED': 'lightblue',
-            'CANCELLED': 'lightpink',
+            'CANCELLED': 'red',
             'PENDING_VENDOR_DELIVERY': 'purple',
             'PENDING_VENDOR_PICKUP': 'purple',
             "PREPARE_FOR_SHIPMENT": 'orange',
             "PREPARE_FOR_PICKUP": 'orange',
-            "SHIPPED_OUT": "yellow",
-            "READY_FOR_PICKUP": "yellow",
+            "SHIPPED_OUT": "hotpink",
+            "READY_FOR_PICKUP": "hotpink",
             'DELIVERED': 'green',
             'PICKED_UP': 'green',
         };

@@ -50,7 +50,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const fetchBooking = async () => {
         try {
             let booking = await getBookingByBookingId(bookingId);
-            // console.log(booking);
+            console.log(booking.status);
             setBooking(booking);
 
             if (booking.tour) {
@@ -316,7 +316,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                     </Card>
                 )}
 
-                { booking.status == 'UPCOMING' && booking.status == 'ONGOING' && booking.status == 'PENDING_VENDOR_DELIVERY' && booking.status == 'PENDING_VENDOR_PICKUP' &&
+                { booking.status === "UPCOMING" || booking.status === "ONGOING" || booking.status === "PENDING_VENDOR_DELIVERY" || booking.status === "PENDING_VENDOR_PICKUP" && (
                     <Card>
                         <Card.Title style={styles.header}>
                             Cancellation Policy
@@ -324,7 +324,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                         <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
                         {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
                     </Card>
-                }
+                )}
                 
 
 

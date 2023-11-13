@@ -150,7 +150,7 @@ export const Layout = () => {
                         <Stack.Screen name="ApplyDealScreen" component={ApplyDealScreen} options={{ title : 'Apply Deal Screen' }} />
                         <Stack.Screen name="RestaurantScreen" component={RestaurantScreen} options={{ title : 'Restaurant' }} />
                         <Stack.Screen name="RestaurantDetailsScreen" component={RestaurantDetailsScreen} options={{ title : 'Restaurant' }} />
-                        <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Purchase History' }} />
+                        <Stack.Screen name="BookingHistoryScreen" component={ BookingHistoryScreen} options={{ title : 'Purchases' }} />
                         <Stack.Screen name="BookingDetailsScreen" component={ BookingDetailsScreen} options={{ title : 'Purchase Details' }} />
                         <Stack.Screen name="PaymentHistoryScreen" component={ PaymentHistoryScreen} options={{ title : 'Payment History' }} />
                         <Stack.Screen name="SavedListingScreen" component={ SavedListingScreen } options={{ title : 'Saved Listing' }} />

@@ -132,7 +132,7 @@ export const ForumProfileScreen = ({navigation}) => {
                     <View>
                         <Text style={{marginTop: 10, marginLeft: 15, fontWeight: 'bold', fontSize: 15}} >Primary Badge</Text>
                         <Card>
-                            <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 250, height: 200 }} />
+                            <Image source={{ uri: "https://tt02.s3.ap-southeast-1.amazonaws.com/static/badges/" + badge.badge_type + ".png" }} style={{ width: 250, height: 200, marginLeft:15 }} />
                             <Text style={{ fontSize: 20 ,textAlign: 'center', fontWeight:'bold', marginTop:10}}>{formatBadgeName(badge.badge_type)}</Text>
                             <Text style={{ fontSize: 8 ,textAlign: 'center', fontWeight:'bold', marginTop:6, color:'grey'}}> {badgeDetails(badge.badge_type)} </Text>
                         </Card>

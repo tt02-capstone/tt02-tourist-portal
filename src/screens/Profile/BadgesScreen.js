@@ -53,15 +53,12 @@ export const BadgesScreen = ({ route, navigation }) => {
                             ...prevValues,
                             FOODIE: badgeProgressResponse.data.foodie,
                             ATTRACTION_EXPERT: badgeProgressResponse.data.attraction_EXPERT,
-                            // ACCOMMODATION_EXPERT: badgeProgressResponse.data.accommodation_EXPERT,
                             TELECOM_EXPERT: badgeProgressResponse.data.telecom_EXPERT,
                             TOUR_EXPERT: badgeProgressResponse.data.tour_EXPERT,
                             TOP_CONTRIBUTOR: badgeProgressResponse.data.top_CONTRIBUTOR
                         }));
 
-                        const sortedBadgeTypes = badgeTypes
-                            .filter((type) => type.toUpperCase() !== 'ACCOMMODATION_EXPERT')
-                            .sort((a, b) => {
+                        const sortedBadgeTypes = filteredBadgeTypes2.sort((a, b) => {
                             const progressDiff = progressValues[b.toUpperCase()] - progressValues[a.toUpperCase()];
                             if (progressDiff === 0) {
                                 if (a.toUpperCase() < b.toUpperCase()) {
@@ -175,7 +172,7 @@ export const BadgesScreen = ({ route, navigation }) => {
 
                 {badgeTypes && badgeTypes.length > 0 && user && (
                     <View style={styles.container}>
-                        {badgeTypes.map((badgeType, index) => {
+                        { badgeTypes.map((badgeType, index) => {
                             const formattedBadgeType = badgeType.toUpperCase();
                             return (
                                 <Card key={index}>

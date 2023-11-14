@@ -116,8 +116,8 @@ const EventSuggestionsScreen = ({ navigation }) => {
             <Text>{'\n'}</Text>
             <ScrollView style={styles.scrollContainer}>
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.label}>From</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{marginTop: 15}}>From </Text>
                         <DateButton onPress={() => setOpenStartTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115 }}>
                             {startTime ? `${formatTimePicker(startTime)}` : 'Start'}
                         </DateButton>
@@ -129,7 +129,7 @@ const EventSuggestionsScreen = ({ navigation }) => {
                             minutes={0}
                         />
 
-                        <Text style={styles.label}>To</Text>
+                        <Text style={{marginTop: 15}}>  To </Text>
                         <DateButton onPress={() => setOpenEndTime(true)} uppercase={false} mode="outlined" style={{ marginTop: 10, marginBottom: -5, marginLeft: 5, width: 115 }}>
                             {endTime ? `${formatTimePicker(endTime)}` : 'End'}
                         </DateButton>

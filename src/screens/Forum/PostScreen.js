@@ -574,7 +574,7 @@ const PostScreen = ({ navigation }) => {
                             data={comments}
                             textField="content"
                             childField="child_comment_list"
-                            textStyle={{ color: 'black' }}
+                            textStyle={{ color: 'black'}}
                             iconColor="black"
                             iconSize={26}
                             openIcon={<AntDesign name="arrowdown" size={26} />}
@@ -587,7 +587,7 @@ const PostScreen = ({ navigation }) => {
                                         {item.local_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.local_user.user_id)}>{item.local_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
                                         {item.vendor_staff_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.vendor_staff_user.user_id)}>{item.vendor_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
                                         {item.internal_staff_user && <Text style={{fontSize: 14, fontWeight: 'bold'}} onPress={() => viewUserProfile(item.internal_staff_user.user_id)}>{item.internal_staff_user.name}  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 2, fontSize:10 }}>{moment(item.updated_time).format('LT')}</Text> </Text>}
-                                        <Text style={{fontSize: 14, marginBottom: 10, marginTop: 5}}>{item.content}</Text>
+                                        <Text style={{fontSize: 13, marginBottom: 10, marginTop: 5, width:'86%'}}>{item.content}</Text>
 
                                         <View style={{flexDirection: 'row',}}>
                                             { item.is_published && (

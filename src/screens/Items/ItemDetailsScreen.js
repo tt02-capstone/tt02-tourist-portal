@@ -188,6 +188,15 @@ export const ItemDetailsScreen = ({ navigation }) => {
                             { selectedItem.is_limited_edition && (
                                 <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginTop:5, marginBottom: 15, marginLeft:8}}> LIMITED EDITION </Text>
                             )}
+
+                            <View style={{flexDirection:"row", marginLeft:5}}>
+                                <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {selectedItem.name}  </Text>
+                                    <Button mode="text" style={{ marginTop:-10, marginLeft:-20 , width:'10%'}} onPress={save} >
+                                        {isSaved && <Icon name="heart" size={15} color='red' />}
+                                        {!isSaved && <Icon name="heart" size={15} color='grey' />}
+                                    </Button>
+                            </View>
+
                             <Image source={{ uri: selectedItem.image }} style={{ width: 300, height: 300, marginLeft:8, marginBottom: 12 }} />
                         
                             <View style={{marginLeft: 10, marginTop:0}}>
@@ -201,13 +210,7 @@ export const ItemDetailsScreen = ({ navigation }) => {
                                     </View>
                                 )}
 
-                                <View style={{flexDirection:"row"}}>
-                                    <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {selectedItem.name}  </Text>
-                                        <Button mode="text" style={{ marginTop:-10, marginLeft:-20 , width:'10%'}} onPress={save} >
-                                            {isSaved && <Icon name="heart" size={15} color='red' />}
-                                            {!isSaved && <Icon name="heart" size={15} color='grey' />}
-                                        </Button>
-                                </View>
+                                
 
                                 <Text style={{ fontSize: 13 ,  marginTop:0, color:'grey', width:300}}> {selectedItem.description} </Text>
                                 <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:13, color:'black'}}> $ {selectedItem.price}.00 </Text>

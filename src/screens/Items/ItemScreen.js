@@ -86,8 +86,9 @@ export const ItemScreen = ({ navigation }) => {
                                     <Text style={{color:'red', fontSize:10, fontWeight:'bold', marginBottom:10, marginLeft:8}}> SELLING OUT SOON </Text>
                                 )}
                                 <View>
-                                    <Image source={{ uri: item.image }} style={{ width: 150, height: 150, marginLeft:80, marginBottom: 10 }} />
-                                    <View style={{marginLeft: 10, marginTop:3}}>
+                                    <Image source={{ uri: item.image }} style={{ width: 330, height: 180, marginLeft:0, marginBottom: 10 }} />
+                                    {/* <View style={{alignContent:'center', alignSelf:'center', alignItems:'center'}}></View> */}
+                                    <View style={{marginLeft: 5, marginTop:3}}>
                                         <Text style={{ fontSize: 15 , fontWeight:'bold', marginTop:0, color:'#044537'}}> {item.name} </Text>
                                         <Text style={{ fontSize: 11 , fontWeight:'bold', marginTop:3, color:'grey'}}> $ {item.price}.00 </Text>
                                     </View>

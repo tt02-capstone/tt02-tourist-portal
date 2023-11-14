@@ -552,7 +552,7 @@ const PostScreen = ({ navigation }) => {
                             <TextInput
                                 label="Add New Comment"
                                 returnKeyType="next"
-                                style={{width: 275, height: 30, marginLeft: 15, fontSize:'10'}}
+                                style={{width: 275, height: 35, marginLeft: 15, fontSize:'17'}}
                                 value={formData.parentComment}
                                 onChangeText={(parentComment) => setFormData({...formData, parentComment })}
                                 autoCapitalize="none"
@@ -599,17 +599,17 @@ const PostScreen = ({ navigation }) => {
                                             )}
                                             
                                             <Text style={{marginLeft: 5, marginRight: 10, marginTop: 5, fontSize:10}}>{item.child_comment_list ? item.child_comment_list.length : 0} Replies</Text>
-                                            {item.is_published &&  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => addChildComment(item)}>Reply</Text>}
+                                            {item.is_published &&  <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => addChildComment(item)}>Reply</Text>}
 
-                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold',fontSize:10}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold',fontSize:13}} onPress={() => onUpdateCommentPressed(item)}>Edit</Text>}
 
-                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.local_user && item.local_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id === user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => onDeleteCommentPressed(item)}>Delete</Text>}
 
-                                            {item.local_user && item.local_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
-                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 5, color: '#044537', fontWeight: 'bold', fontSize:10}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.local_user && item.local_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.tourist_user && item.tourist_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
+                                            {item.vendor_staff_user && item.vendor_staff_user?.user_id !== user.user_id && item.is_published && <Text style={{marginLeft: 5, marginRight: 5, marginTop: 3, color: '#044537', fontWeight: 'bold', fontSize:13}} onPress={() => onReportCommentPressed(item.comment_id)}>Report</Text>}
 
                                         </View>
                                     </View>

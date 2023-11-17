@@ -50,7 +50,7 @@ const BookingDetailsScreen = ({ navigation }) => {
     const fetchBooking = async () => {
         try {
             let booking = await getBookingByBookingId(bookingId);
-            console.log(booking.status);
+            // console.log(booking);
             setBooking(booking);
 
             if (booking.tour) {
@@ -216,7 +216,7 @@ const BookingDetailsScreen = ({ navigation }) => {
         if (!response.status) {
             Toast.show({
                 type: 'success',
-                text1: 'Booking has been cancelled!'
+                text1: 'Purchase has been cancelled!'
             });
             const timer = setTimeout(() => {
                 fetchBooking();
@@ -284,10 +284,13 @@ const BookingDetailsScreen = ({ navigation }) => {
                     <Text style={styles.description}>Booking Reference Number: #{getReferenceNumber()}</Text>
                     <Text style={styles.description}>Total Paid: S${booking.payment.payment_amount.toFixed(2)}</Text>
                     <Text style={styles.description}>Type: {formatType(booking.type)}</Text>
-                    {!booking.tour && <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>}
-                    {booking.tour && <Text style={styles.description}>Start Date: {formatDateTime(booking.start_datetime)}</Text>}
-                    {!booking.tour && <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>}
-                    {booking.tour && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
+                    {!booking.tour && !booking.item && <Text style={styles.description}>Start Date: {formatDate(booking.start_datetime)}</Text>}
+                    {booking.tour && !booking.item && <Text style={styles.description}>Start Date: {formatDateTime(booking.start_datetime)}</Text>}
+
+                    {!booking.tour && !booking.item && <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>}
+                    {booking.tour && !booking.item && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
+
+                    {booking.item && <Text style={styles.description}>Purchase Date: {formatDate(booking.end_datetime)}</Text>}
 
                     {pickupLocation && <Text style={styles.description}>Pick Up Location : {pickupLocation}</Text>}
                     {deliveryLocation && <Text style={styles.description}> Delivery Location : {deliveryLocation}</Text>}
@@ -323,7 +326,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                             Cancellation Policy
                         </Card.Title>
                         <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
-                        {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
+                        {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Purchase" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
                     </Card>
                 )}
                 

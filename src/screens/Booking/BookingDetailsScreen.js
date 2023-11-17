@@ -216,7 +216,7 @@ const BookingDetailsScreen = ({ navigation }) => {
         if (!response.status) {
             Toast.show({
                 type: 'success',
-                text1: 'Booking has been cancelled!'
+                text1: 'Purchase has been cancelled!'
             });
             const timer = setTimeout(() => {
                 fetchBooking();
@@ -322,7 +322,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                             Cancellation Policy
                         </Card.Title>
                         <Text style={[styles.description]}>Full refund if cancelled by {getCancellationDate(booking)}.</Text>
-                        {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Booking" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
+                        {booking.status != 'CANCELLED' && <Button style={{ width: '100%' }} text="Cancel Purchase" mode="contained" onPress={() => cancelBooking(booking.booking_id)} />}
                     </Card>
                 )}
                 

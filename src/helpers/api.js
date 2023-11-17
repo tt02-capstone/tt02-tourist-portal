@@ -95,7 +95,9 @@ export const badgeApi = axios.create({
 })
 
 export const itineraryApi = axios.create({
-    baseURL: HOST_WITH_PORT + '/itinerary'
+    baseURL: HOST_WITH_PORT + '/itinerary',
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
 })
 
 export const diyEventApi = axios.create({

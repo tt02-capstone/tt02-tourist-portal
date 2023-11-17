@@ -289,7 +289,7 @@ const BookingDetailsScreen = ({ navigation }) => {
                     {!booking.tour && <Text style={styles.description}>End Date: {formatDate(booking.end_datetime)}</Text>}
                     {booking.tour && <Text style={styles.description}>End Date: {formatDateTime(booking.end_datetime)}</Text>}
 
-                    {pickupLocation && <Text style={styles.description}> Pick Up Location : {pickupLocation}</Text>}
+                    {pickupLocation && <Text style={styles.description}>Pick Up Location : {pickupLocation}</Text>}
                     {deliveryLocation && <Text style={styles.description}> Delivery Location : {deliveryLocation}</Text>}
 
                     {/* <View style={{ display: 'inline-block' }}>
@@ -301,8 +301,9 @@ const BookingDetailsScreen = ({ navigation }) => {
                 {booking.item && !isCollected && (booking.status === "SHIPPED_OUT" || booking.status ===  "READY_FOR_PICKUP") && (
                     <Card>
                         <Card.Title style={styles.header}>
-                            Update your Item Collection Status
+                            Update Your Item Collection Status
                         </Card.Title>
+                        {booking && (booking.status === 'READY_FOR_PICKUP' || booking.status === 'SHIPPED_OUT') && <Text style={{fontWeight: 'bold', color: 'red', textAlign: 'center'}}>Your item is ready for pickup!</Text>}
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={styles.description}>
                                 Mark as {booking.status === "SHIPPED_OUT"? "Delivered": "Picked Up"}
